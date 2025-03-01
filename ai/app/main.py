@@ -6,6 +6,8 @@ from uuid_extensions import uuid7
 from fastapi import FastAPI
 from time import sleep 
 from uuid import UUID
+from . import database 
+
 app = FastAPI()
 
 
@@ -15,10 +17,6 @@ def read_root():
     return {"Hello": "World"}
 
 
-def create_article_indexing_job(article: Article) -> ArticleIndexingJob:
-    job = ArticleIndexingJob(id=uuid7(), article=article, status="queued", impacted_stocks=[])
-    return job
-
 def process_article_indexing_job(id: UUID) -> None:
     print("indexing article!")
     sleep(3)
@@ -26,8 +24,9 @@ def process_article_indexing_job(id: UUID) -> None:
     sleep(3)
     print(f"fully indexed {id}") 
 
+
 def index_article(article: Article, background_tasks: BackgroundTasks) -> ArticleIndexingJob:
-    indexing_job = create_article_indexing_job(article)
+    indexing_job = database.create_article_indexing_job(article)
     background_tasks.add_task(process_article_indexing_job, indexing_job.id)
     return indexing_job
 
@@ -37,3 +36,13 @@ def process_article(article: Article, background_tasks: BackgroundTasks) -> Arti
     job = index_article(article, background_tasks)
     return job 
 
+@app.get("/articles/processing-jobs")
+def get_article_processing_jobs() -> list[ArticleIndexingJob]:
+    return database.get_article_indexing_jobs()
+
+@app.get("/articles/processing-jobs/{id}")
+def get_article_processing_job(id: UUID) -> Union[ArticleIndexingJob, dict[str, str]]:
+    job = database.get_article_indexing_job(id)
+    if job is None:
+        return {"error": "Job not found"}
+    return job
