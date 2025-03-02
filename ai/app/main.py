@@ -1,3 +1,4 @@
+import logging
 from os import environ
 from typing import Union
 from uuid import UUID
@@ -7,18 +8,20 @@ from fastapi import BackgroundTasks, FastAPI
 from . import database, worker
 from .schemas import Article, ArticleIndexingJob
 
+# set DEBUG level of logs
+logging.basicConfig(level=logging.DEBUG)
+
 app = FastAPI()
 
 
 @app.get("/")
 def read_root():
-    return {"OPENAI_API_KEY": environ.get("OPENAI_API_KEY")}
     return {"Hello": "World"}
 
 
 def index_article(article: Article, background_tasks: BackgroundTasks) -> ArticleIndexingJob:
     indexing_job = database.create_article_indexing_job(article)
-    background_tasks.add_task(worker.process_article_indexing_job, indexing_job.id)
+    background_tasks.add_task(worker.handle_article_indexing_job, indexing_job.id)
     return indexing_job
 
 
