@@ -1,10 +1,12 @@
 import logging
 from time import sleep
 from uuid import UUID
+
 from .database import get_article_indexing_job, update_article_indexing_job
 from .schemas import ArticleIndexingJobStatus
 
 logger = logging.getLogger(__name__)
+
 
 def process_article_indexing_job(id: UUID) -> None:
     logging.info(f"Attempting to process job {id}.")
@@ -14,8 +16,10 @@ def process_article_indexing_job(id: UUID) -> None:
         return
 
     if article_indexing_job.status != ArticleIndexingJobStatus.queued:
-        logging.error(f"Received an article indexing job in an invalid state {article_indexing_job.status}! Abandoning the job.")
-        return 
+        logging.error(
+            f"Received an article indexing job in an invalid state {article_indexing_job.status}! Abandoning the job."
+        )
+        return
 
     article_indexing_job.status = ArticleIndexingJobStatus.processing
     update_article_indexing_job(article_indexing_job)
@@ -24,7 +28,7 @@ def process_article_indexing_job(id: UUID) -> None:
     sleep(10)
     print("still indexing")
     sleep(10)
-    print(f"fully indexed {id}") 
+    print(f"fully indexed {id}")
 
     article_indexing_job.status = ArticleIndexingJobStatus.completed
     update_article_indexing_job(article_indexing_job)
