@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StockServiceImpl implements StockService {
@@ -13,7 +14,7 @@ public class StockServiceImpl implements StockService {
     public List<StockDto> getAllStocks() {
         List<StockDto> list = new ArrayList<>();
         list.add(new StockDto(
-                1L,
+                UUID.randomUUID().toString(),
                 "CD PROJEKT",
                 "CD PROJEKT RED SA",
                 "CD PROJEKT to wiodący producent gier komputerowych, odpowiedzialny za takie tytuły jak Wiedźmin oraz Cyberpunk 2077.",
@@ -22,7 +23,7 @@ public class StockServiceImpl implements StockService {
                 "PL"
         ));
         list.add(new StockDto(
-                2L,
+                UUID.randomUUID().toString(),
                 "KGHM",
                 "KGHM Polska Miedź SA",
                 "KGHM to jeden z największych producentów miedzi na świecie, który prowadzi również działalność w zakresie wydobycia srebra.",
@@ -31,7 +32,7 @@ public class StockServiceImpl implements StockService {
                 "PL"
         ));
         list.add(new StockDto(
-                3L,
+                UUID.randomUUID().toString(),
                 "PKN ORLEN",
                 "PKN ORLEN SA",
                 "PKN ORLEN to jedna z największych firm petrochemicznych w Europie Środkowo-Wschodniej, działająca w sektorze paliwowym, chemicznym i energetycznym.",
@@ -40,7 +41,7 @@ public class StockServiceImpl implements StockService {
                 "PL"
         ));
         list.add(new StockDto(
-                4L,
+                UUID.randomUUID().toString(),
                 "Google",
                 "Alphabet Inc.",
                 "Google to amerykańska firma technologiczna, właściciel jednej z największych wyszukiwarek internetowych, oferująca także usługi chmurowe, reklamy, hardware i software.",
@@ -49,7 +50,7 @@ public class StockServiceImpl implements StockService {
                 "US"
         ));
         list.add(new StockDto(
-                5L,
+                UUID.randomUUID().toString(),
                 "Apple",
                 "Apple Inc.",
                 "Apple to amerykańska firma technologiczna, znana z produkcji elektroniki użytkowej, oprogramowania oraz usług cyfrowych.",
@@ -58,7 +59,7 @@ public class StockServiceImpl implements StockService {
                 "US"
         ));
         list.add(new StockDto(
-                6L,
+                UUID.randomUUID().toString(),
                 "Facebook",
                 "Meta Platforms, Inc.",
                 "Facebook, obecnie Meta, to amerykańska firma technologiczna, specjalizująca się w usługach społecznościowych, reklamie internetowej oraz rozwijaniu technologii wirtualnej rzeczywistości.",
@@ -67,7 +68,7 @@ public class StockServiceImpl implements StockService {
                 "US"
         ));
         list.add(new StockDto(
-                7L,
+                UUID.randomUUID().toString(),
                 "Cameco",
                 "Cameco Corporation",
                 "Cameco to kanadyjska firma zajmująca się wydobyciem i produkcją uranu, dostarczająca surowiec do elektrowni jądrowych na całym świecie.",
@@ -76,7 +77,7 @@ public class StockServiceImpl implements StockService {
                 "CA"
         ));
         list.add(new StockDto(
-                8L,
+                UUID.randomUUID().toString(),
                 "Rio Tinto",
                 "Rio Tinto Group",
                 "Rio Tinto to międzynarodowa firma zajmująca się wydobyciem i obróbką minerałów, specjalizująca się w produkcji metali i minerałów przemysłowych.",
@@ -85,7 +86,7 @@ public class StockServiceImpl implements StockService {
                 "GB"
         ));
         list.add(new StockDto(
-                9L,
+                UUID.randomUUID().toString(),
                 "Veeva",
                 "Veeva Systems Inc.",
                 "Veeva Systems to amerykańska firma oferująca oprogramowanie chmurowe i rozwiązania IT dla branży farmaceutycznej i biotechnologicznej.",
@@ -94,7 +95,7 @@ public class StockServiceImpl implements StockService {
                 "US"
         ));
         list.add(new StockDto(
-                10L,
+                UUID.randomUUID().toString(),
                 "JSW",
                 "Jastrzębska Spółka Węglowa SA",
                 "Grupa JSW jest największym producentem wysokiej jakości węgla koksowego typu hard w Unii Europejskiej [...]",
