@@ -29,6 +29,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+
   backend:
     build:
       context: backend
@@ -41,6 +42,17 @@ services:
       - "8080:8080"
     depends_on:
       - postgres-db
+    networks:
+      - tarantula
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - tarantula
 
