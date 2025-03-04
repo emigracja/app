@@ -4,6 +4,7 @@ import com.example.backend.domain.dto.StockDto;
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 import com.example.backend.domain.service.ArticleStockImpactService;
 import com.example.backend.domain.service.StockService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class StockApi {
     private final ArticleStockImpactService stockImpactService;
 
     @GetMapping("/stock")
+    @Operation(summary = "Providing a list of all stocks present in the database")
     public ResponseEntity<List<StockDto>> getStockService() {
         try{
             List<StockDto> list = stockService.getAllStocks();
@@ -31,6 +33,7 @@ public class StockApi {
     }
 
     @PostMapping("/article/impact")
+    @Operation(summary = "Endpoint receives article sentiment data sent from the AI module")
     public ResponseEntity<String> processArticleStockImpact(@Valid @RequestBody ArticleStockImpactDto request,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
