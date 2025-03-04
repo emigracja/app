@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockDto {
-    private Long id;
+    private String id;
     private String symbol;
     private String name;
     private String description;
