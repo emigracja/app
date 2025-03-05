@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type {Metadata, Viewport} from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import NavBar from "@/components/navbar/NavBar";
+import {ViewportMetaKeys} from "next/dist/lib/metadata/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,17 +26,28 @@ export const metadata: Metadata = {
     ],
 };
 
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    userScalable: false,
+    minimumScale: 1,
+    maximumScale: 1,
+    viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+
+    return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <NavBar />
       </body>
     </html>
   );
