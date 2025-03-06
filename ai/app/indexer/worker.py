@@ -43,7 +43,7 @@ def index_article(id: UUID) -> None:
     logging.info(f"Indexing article {id} has been completed. Success: {success}")
 
 
-def _process_article(article: Article) -> (int, int):
+def _process_article(article: Article) -> tuple[int, int]:
     stocks = backend_api.get_stocks()
     sent_notifications, omitted_notifications = 0, 0
     for impact in llm.does_article_impact_stocks(article.content, stocks):

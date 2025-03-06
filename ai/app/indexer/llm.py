@@ -18,6 +18,7 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
         stock_symbols.add(stock.symbol)
 
     # Chunk stocks for processing - up to 10 at once to prevent hitting the context limit
+    # TODO: tune this value
     stock_groups = [stocks[i:i + 10] for i in range(0, len(stocks), 10)]
     for stock_group in stock_groups:
         response = prompt_openai_llm(

@@ -1,5 +1,7 @@
 import logging
 import uuid
+import requests
+
 
 from .schemas import ArticleStockImpact, Stock
 
@@ -39,8 +41,25 @@ def get_stocks() -> list[Stock]:
 
 
 def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: ArticleStockImpact) -> bool:
-    # TODO: Send the article stock impact to the backend API
+    # TODO: Adapt it to the final schema once #6 is completed
+    # TODO: Move the backend URL to env 
     logger.info(
         f"Notifying the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
     )
+
+    request_body = {
+        "stock_id": str(article_stock_impact.stock_id),
+        "impact": article_stock_impact.impact.name,
+        "reason": article_stock_impact.reason,
+    }
+
+    url = "http://backend:8080/article/impact"
+    response = requests.post(url, json=request_body)
+    if response.status_code > 399:
+        logger.warning(
+            f"Failed to notify the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
+        )
+        logger.warning(response.text)
+        return False
+
     return True
