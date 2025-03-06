@@ -32,7 +32,6 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
 
             yield ArticleStockImpact(
                 stock_id=stock.id,
-                stock_symbol=stock.symbol,
                 impact=stock_response.impact,
                 reason=stock_response.would_the_article_impact_this_stock + "\n" + stock_response.how_severe_would_the_impact_be
             )

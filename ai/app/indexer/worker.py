@@ -26,16 +26,31 @@ def index_article(id: UUID) -> None:
 
     article.status = ArticleStatus.processing
     update_article(article)
-    success = _process_article(article)
+    error_message = None
+    try:
+        sent_notifications, omitted_notifications = _process_article(article)
+        success = omitted_notifications == 0
+        if not success:
+            error_message = f"Failed to send {omitted_notifications} notifications out of {sent_notifications + omitted_notifications} article stock impacts."
+    except Exception as e:
+        logging.exception(e)
+        success = False
+        error_message = str(e)
+
     article.status = ArticleStatus.completed if success else ArticleStatus.failed
+    article.error_message = error_message
     update_article(article)
     logging.info(f"Indexing article {id} has been completed. Success: {success}")
 
 
-def _process_article(article: Article) -> None:
+def _process_article(article: Article) -> (int, int):
     stocks = backend_api.get_stocks()
+    sent_notifications, omitted_notifications = 0, 0
     for impact in llm.does_article_impact_stocks(article.content, stocks):
-        if not backend_api.send_article_stock_impact(impact):
-            return False
+        article.impacted_stocks.append(impact)
+        if backend_api.send_article_stock_impact(article.id, impact):
+           sent_notifications += 1 
+        else:
+            omitted_notifications += 1
 
-    return True
+    return sent_notifications, omitted_notifications

@@ -44,9 +44,7 @@ class ArticleStockImpactSeverity(int, Enum):
 
 
 class ArticleStockImpact(BaseModel):
-    # todo: add article_id
     stock_id: uuid.UUID
-    stock_symbol: Optional[str] = None  # for easier API debugging
     impact: ArticleStockImpactSeverity
     reason: Optional[str] = None
 
@@ -63,6 +61,7 @@ class Article(BaseModel):
     content: ArticleContent
     status: ArticleStatus
     impacted_stocks: list[ArticleStockImpact] = []
+    error_message: Optional[str] = None
 
 class ArticleList(BaseModel):
     articles: list[Article]

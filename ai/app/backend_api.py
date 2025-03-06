@@ -38,9 +38,9 @@ def get_stocks() -> list[Stock]:
     ]
 
 
-def send_article_stock_impact(article_stock_impact: ArticleStockImpact) -> bool:
+def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: ArticleStockImpact) -> bool:
     # TODO: Send the article stock impact to the backend API
     logger.info(
-        f"Notifying the backend API about stock {article_stock_impact.stock_symbol} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
+        f"Notifying the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
     )
     return True
