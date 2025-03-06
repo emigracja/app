@@ -29,7 +29,7 @@ class Stock(BaseModel):
     country: Optional[str] = None
 
 
-class Article(BaseModel):
+class ArticleContent(BaseModel):
     title: str
     description: str
     published_at: Optional[datetime] = None
@@ -50,18 +50,18 @@ class ArticleStockImpact(BaseModel):
     reason: Optional[str] = None
 
 
-class ArticleIndexingJobStatus(str, Enum):
+class ArticleStatus(str, Enum):
     queued = "queued"
     processing = "processing"
     completed = "completed"
     failed = "failed"
 
 
-class ArticleIndexingJob(BaseModel):
+class Article(BaseModel):
     id: uuid.UUID
-    article: Article
-    status: ArticleIndexingJobStatus
+    content: ArticleContent
+    status: ArticleStatus
     impacted_stocks: list[ArticleStockImpact] = []
 
-class ArticleIndexingJobs(BaseModel):
-    jobs: list[ArticleIndexingJob]
+class ArticleList(BaseModel):
+    articles: list[Article]

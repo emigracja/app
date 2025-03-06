@@ -2,40 +2,40 @@ from uuid import UUID
 
 from uuid_extensions import uuid7
 
-from .schemas import Article, ArticleIndexingJob
+from .schemas import ArticleContent, Article
 
 # Using an in-memory store, as there's no need for persistance atm
-article_indexing_jobs = {
-    # ID -> job
+articles = {
+    # ID -> article
 }
 # TODO: clean this up periodically
 
 
-def create_article_indexing_job(article: Article) -> ArticleIndexingJob:
-    job = ArticleIndexingJob(id=uuid7(), article=article, status="queued", impacted_stocks=[])
-    article_indexing_jobs[job.id] = job
-    return job
+def create_article(content: ArticleContent) -> Article:
+    article = Article(id=uuid7(), content=content, status="queued", impacted_stocks=[])
+    articles[article.id] = article
+    return article
 
 
-def delete_article_indexing_job(id: UUID) -> bool:
-    if id not in article_indexing_jobs:
+def delete_article(id: UUID) -> bool:
+    if id not in articles:
         return False
 
-    del article_indexing_jobs[id]
+    del articles[id]
     return True
 
 
-def update_article_indexing_job(article_indexing_job: ArticleIndexingJob) -> bool:
-    if article_indexing_job.id not in article_indexing_jobs:
+def update_article(article: Article) -> bool:
+    if article.id not in articles:
         return False  # Not persisted in database
 
-    article_indexing_jobs[article_indexing_job.id] = article_indexing_job
+    articles[article.id] = article
     return True
 
 
-def get_article_indexing_jobs() -> list[ArticleIndexingJob]:
-    return article_indexing_jobs.values()
+def get_articles() -> list[Article]:
+    return articles.values()
 
 
-def get_article_indexing_job(id: UUID) -> ArticleIndexingJob | None:
-    return article_indexing_jobs.get(id, None)
+def get_article(id: UUID) -> Article | None:
+    return articles.get(id, None)

@@ -1,9 +1,9 @@
 from typing import Iterator
 
-from .schemas import Article, ArticleStockImpact, ArticleStockImpactSeverity, Stock
+from .schemas import ArticleContent, ArticleStockImpact, ArticleStockImpactSeverity, Stock
 
 
-def does_article_impact_stocks(article: Article, stocks: list[Stock]) -> Iterator[ArticleStockImpact]:
+def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> Iterator[ArticleStockImpact]:
     # This is a dummy implementation that just returns an impact on all stocks
     for stock in stocks:
         yield ArticleStockImpact(
