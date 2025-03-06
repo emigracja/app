@@ -3,10 +3,10 @@ import Tag from "@/components/news/Tag";
 import Image from "next/image";
 
 interface Props {
-    id: string;
+    id: string | null;
     title: string;
     publishedAt: string;
-    affectedStocks: number;
+    affectedStocks: number | null;
     tags: string[];
     author: string;
     imageUri: string;
@@ -14,7 +14,7 @@ interface Props {
 
 const getTimeDifference = (publishedAt: string): string => {
     const now = Date.now();
-    const published = parseInt(publishedAt) * 1000;
+    const published = parseInt(publishedAt);
     const diff = now - published;
 
     const timeUnits = [
@@ -46,8 +46,8 @@ const Card = ({
     const publishedAtString = getTimeDifference(publishedAt);
 
     return (
-        <a className="relative block text-xl text-white rounded-xl p-3 box-content" href={`/news/${id}`}>
-            <section className="flex flex-col gap-5 justify-end">
+        <section className="relative block text-xl text-white rounded-xl p-3 box-content" >
+            <a href={ id != null ? `/news/${id}` : ''} className="flex flex-col gap-5 justify-end">
                 <p className={"text-white font-bold"}>
                     {title}
                 </p>
@@ -55,13 +55,15 @@ const Card = ({
                     <div className={"flex gap-2"}>
                         {tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
                     </div>
+                    {affectedStocks &&
                     <p className={"text-white font-bold text-sm h-0 mt-3"}>
                         Affected Stocks ({affectedStocks})
                     </p>
+                    }
                 </div>
-            </section>
+            </a>
             <Image
-                className="absolute inset-0 object-cover box-content opacity-60 rounded-xl"
+                className="absolute inset-0 object-cover box-content opacity-60 rounded-xl pointer-events-none"
                 src={imageUri}
                 alt="background"
                 layout="fill"
@@ -69,7 +71,7 @@ const Card = ({
             <div className={"absolute text-white -bottom-6 right-0 opacity-50 text-sm"}>
                 {publishedAtString} {"•"} {author}
             </div>
-        </a>
+        </section>
     )
 }
 
