@@ -1,8 +1,8 @@
-import os
 import logging
+import os
 import uuid
-import requests
 
+import requests
 
 from .schemas import ArticleStockImpact, Stock
 
@@ -24,6 +24,7 @@ def get_stocks() -> list[Stock]:
     stocks = [Stock(**stock) for stock in response.json()]
     return stocks
 
+
 def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: ArticleStockImpact) -> bool:
     # TODO: #20: Adapt it to the final URL and schema once #6 is completed
     logger.info(
@@ -40,7 +41,9 @@ def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: Artic
     try:
         response = requests.post(url, json=request_body)
     except Exception as e:
-        logger.warning(f"Failed to notify the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'.")
+        logger.warning(
+            f"Failed to notify the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
+        )
         logger.exception(e)
         return False
 

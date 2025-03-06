@@ -1,14 +1,21 @@
+import logging
 from typing import Iterator
-import logging 
-from pydantic import BaseModel, Field, create_model
-from app.schemas import ArticleContent, ArticleStockImpact, ArticleStockImpactSeverity, Stock
-from app.indexer.openai_llm import prompt_openai_llm
 
+from pydantic import BaseModel, Field, create_model
+
+from app.indexer.openai_llm import prompt_openai_llm
+from app.schemas import (
+    ArticleContent,
+    ArticleStockImpact,
+    ArticleStockImpactSeverity,
+    Stock,
+)
 
 logger = logging.getLogger(__name__)
 
+
 def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> Iterator[ArticleStockImpact]:
-    # First: ensure that stock symbols are unique 
+    # First: ensure that stock symbols are unique
     # This will make the LLM processing a little bit easier, we can change this if needed
     stock_symbols = set()
     for stock in stocks:
@@ -19,13 +26,13 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
 
     # Chunk stocks for processing - up to 10 at once to prevent hitting the context limit
     # TODO: tune this value
-    stock_groups = [stocks[i:i + 10] for i in range(0, len(stocks), 10)]
+    stock_groups = [stocks[i : i + 10] for i in range(0, len(stocks), 10)]
     for stock_group in stock_groups:
         response = prompt_openai_llm(
             messages=_generate_openai_messages(article, stock_group),
             model="gpt-4o",
             temperature=0.5,
-            response_format=_generate_response_model(article, stock_group)
+            response_format=_generate_response_model(article, stock_group),
         )
 
         for stock in stocks:
@@ -34,29 +41,36 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
             yield ArticleStockImpact(
                 stock_id=stock.id,
                 impact=stock_response.impact,
-                reason=stock_response.would_the_article_impact_this_stock + "\n" + stock_response.how_severe_would_the_impact_be
+                reason=stock_response.would_the_article_impact_this_stock
+                + "\n"
+                + stock_response.how_severe_would_the_impact_be,
             )
 
 
 class StockImpactReasoning(BaseModel):
-    would_the_article_impact_this_stock: str = Field(description="Reasoning if the article would impact this stock? Why?")
+    would_the_article_impact_this_stock: str = Field(
+        description="Reasoning if the article would impact this stock? Why?"
+    )
     how_severe_would_the_impact_be: str = Field(description="If applies, how severe be the impact?")
     impact: ArticleStockImpactSeverity
+
 
 def _generate_response_model(article: ArticleContent, stocks: list[Stock]) -> BaseModel:
     StockResponseModel = create_model(
         'StockResponseModel',
-        **{stock.symbol: (StockImpactReasoning, Field(description=f"Reasoning for {stock.name}")) for stock in stocks}
+        **{stock.symbol: (StockImpactReasoning, Field(description=f"Reasoning for {stock.name}")) for stock in stocks},
     )
     return StockResponseModel
+
 
 def _generate_openai_messages(article: ArticleContent, stocks: list[Stock]) -> list[dict]:
     openai_messages = [
         {"role": "system", "content": _generate_system_prompt(article, stocks)},
-        {"role": "user", "content": _generate_user_prompt(article, stocks)}
+        {"role": "user", "content": _generate_user_prompt(article, stocks)},
     ]
     logging.info(openai_messages)
     return openai_messages
+
 
 def _generate_system_prompt(article: ArticleContent, stocks: list[Stock]) -> str:
     stocks_description = ""
@@ -80,6 +94,7 @@ def _generate_system_prompt(article: ArticleContent, stocks: list[Stock]) -> str
 
     return system_prompt
 
+
 def _generate_user_prompt(article: ArticleContent, stocks: list[Stock]) -> str:
     # TODO: use date from article.published_at
     user_prompt = f"""<article_name>
@@ -88,6 +103,6 @@ def _generate_user_prompt(article: ArticleContent, stocks: list[Stock]) -> str:
 
 <article_description>
 {article.description}
-</article_description>""" 
-    
+</article_description>"""
+
     return user_prompt

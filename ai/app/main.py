@@ -3,8 +3,8 @@ from uuid import UUID
 
 from fastapi import BackgroundTasks, FastAPI, Response
 
-from . import database, schemas, indexer
-from .schemas import ArticleContent, Article
+from . import database, indexer, schemas
+from .schemas import Article, ArticleContent
 
 # set DEBUG level of logs
 logging.basicConfig(level=logging.DEBUG)
@@ -39,6 +39,7 @@ def get_articles() -> schemas.ApiResponse[schemas.ArticleList]:
         logger.exception(e)
         return schemas.ApiResponse(error=str(e))
 
+
 @app.get("/articles/{id}")
 def get_article(id: UUID, response: Response) -> schemas.ApiResponse[Article]:
     try:
@@ -50,4 +51,3 @@ def get_article(id: UUID, response: Response) -> schemas.ApiResponse[Article]:
     except Exception as e:
         logger.exception(e)
         return schemas.ApiResponse(error=str(e))
-

@@ -2,11 +2,11 @@ import logging
 from time import sleep
 from uuid import UUID
 
-from . import llm
-
 from app import backend_api
 from app.database import get_article, update_article
 from app.schemas import Article, ArticleStatus
+
+from . import llm
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,7 @@ def index_article(id: UUID) -> None:
         return
 
     if article.status != ArticleStatus.queued:
-        logging.error(
-            f"Received an article in an invalid state {article.status}! Abandoning the job."
-        )
+        logging.error(f"Received an article in an invalid state {article.status}! Abandoning the job.")
         return
 
     article.status = ArticleStatus.processing
@@ -49,7 +47,7 @@ def _process_article(article: Article) -> tuple[int, int]:
     for impact in llm.does_article_impact_stocks(article.content, stocks):
         article.impacted_stocks.append(impact)
         if backend_api.send_article_stock_impact(article.id, impact):
-           sent_notifications += 1 
+            sent_notifications += 1
         else:
             omitted_notifications += 1
 
