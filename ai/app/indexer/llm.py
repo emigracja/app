@@ -1,6 +1,10 @@
 from typing import Iterator
+import logging 
+from app.schemas import ArticleContent, ArticleStockImpact, ArticleStockImpactSeverity, Stock
+from app.indexer.openai_llm import prompt_openai_llm
 
-from .schemas import ArticleContent, ArticleStockImpact, ArticleStockImpactSeverity, Stock
+
+logger = logging.getLogger(__name__)
 
 
 def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> Iterator[ArticleStockImpact]:

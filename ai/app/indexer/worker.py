@@ -2,9 +2,11 @@ import logging
 from time import sleep
 from uuid import UUID
 
-from . import backend_api, llm
-from .database import get_article, update_article
-from .schemas import Article, ArticleStatus
+from . import llm
+
+from app import backend_api
+from app.database import get_article, update_article
+from app.schemas import Article, ArticleStatus
 
 logger = logging.getLogger(__name__)
 

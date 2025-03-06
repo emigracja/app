@@ -3,9 +3,10 @@ from os import environ
 from typing import Union
 from uuid import UUID
 
+from .indexer import worker
 from fastapi import BackgroundTasks, FastAPI, Response
 
-from . import database, worker, schemas
+from . import database, schemas
 from .schemas import ArticleContent, Article
 
 # set DEBUG level of logs
@@ -21,16 +22,11 @@ def read_root() -> schemas.ApiResponse[dict]:
     return schemas.ApiResponse(data={"hello": "world"})
 
 
-def index_article(article: ArticleContent, background_tasks: BackgroundTasks) -> Article:
-    article = database.create_article(article)
-    background_tasks.add_task(worker.index_article, article.id)
-    return article
-
-
 @app.post("/articles")
 def process_article(article: ArticleContent, background_tasks: BackgroundTasks) -> schemas.ApiResponse[Article]:
     try:
-        article = index_article(article, background_tasks)
+        article = database.create_article(article)
+        background_tasks.add_task(worker.index_article, article.id)
         return schemas.ApiResponse(data=article)
     except Exception as e:
         logger.exception(e)
