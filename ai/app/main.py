@@ -1,12 +1,10 @@
 import logging
-from os import environ
-from typing import Union
 from uuid import UUID
 
 from fastapi import BackgroundTasks, FastAPI, Response
 
-from . import database, worker, schemas
-from .schemas import ArticleContent, Article
+from . import database, indexer, schemas
+from .schemas import Article, ArticleContent
 
 # set DEBUG level of logs
 logging.basicConfig(level=logging.DEBUG)
@@ -21,16 +19,11 @@ def read_root() -> schemas.ApiResponse[dict]:
     return schemas.ApiResponse(data={"hello": "world"})
 
 
-def index_article(article: ArticleContent, background_tasks: BackgroundTasks) -> Article:
-    article = database.create_article(article)
-    background_tasks.add_task(worker.index_article, article.id)
-    return article
-
-
 @app.post("/articles")
 def process_article(article: ArticleContent, background_tasks: BackgroundTasks) -> schemas.ApiResponse[Article]:
     try:
-        article = index_article(article, background_tasks)
+        article = database.create_article(article)
+        background_tasks.add_task(indexer.index_article, article.id)
         return schemas.ApiResponse(data=article)
     except Exception as e:
         logger.exception(e)
@@ -46,6 +39,7 @@ def get_articles() -> schemas.ApiResponse[schemas.ArticleList]:
         logger.exception(e)
         return schemas.ApiResponse(error=str(e))
 
+
 @app.get("/articles/{id}")
 def get_article(id: UUID, response: Response) -> schemas.ApiResponse[Article]:
     try:
@@ -57,4 +51,3 @@ def get_article(id: UUID, response: Response) -> schemas.ApiResponse[Article]:
     except Exception as e:
         logger.exception(e)
         return schemas.ApiResponse(error=str(e))
-

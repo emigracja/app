@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
@@ -18,6 +18,7 @@ class ApiResponse(GenericModel, Generic[M]):
 
     data: Optional[M] = None
     """Optional data object, for ex. {"jwt_token": "J0HNP4ULTH3SEC0ND"} """
+
 
 class Stock(BaseModel):
     id: uuid.UUID
@@ -45,7 +46,6 @@ class ArticleStockImpactSeverity(int, Enum):
 
 class ArticleStockImpact(BaseModel):
     stock_id: uuid.UUID
-    stock_symbol: Optional[str] = None  # for easier API debugging
     impact: ArticleStockImpactSeverity
     reason: Optional[str] = None
 
@@ -62,6 +62,8 @@ class Article(BaseModel):
     content: ArticleContent
     status: ArticleStatus
     impacted_stocks: list[ArticleStockImpact] = []
+    error_message: Optional[str] = None
+
 
 class ArticleList(BaseModel):
     articles: list[Article]

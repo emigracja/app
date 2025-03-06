@@ -9,7 +9,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard] (>=0.115.10,<0.116.0)",
-    "uuid7 (>=0.1.0,<0.2.0)"
+    "uuid7 (>=0.1.0,<0.2.0)",
+    "openai (>=1.65.4,<2.0.0)",
+    "requests (>=2.32.3,<3.0.0)"
 ]
 package-mode = false
 
