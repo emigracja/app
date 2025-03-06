@@ -1,10 +1,23 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 
+M = TypeVar("M", bound=BaseModel)
+
+
+class ApiResponse(GenericModel, Generic[M]):
+    error: Optional[str] = None
+    """Optional error message, for ex. "You provided a wrong password!" """
+
+    error_code: Optional[str] = None
+    """Optional error code, for ex. "invalid_password" """
+
+    data: Optional[M] = None
+    """Optional data object, for ex. {"jwt_token": "J0HNP4ULTH3SEC0ND"} """
 
 class Stock(BaseModel):
     id: uuid.UUID
@@ -49,3 +62,6 @@ class ArticleIndexingJob(BaseModel):
     article: Article
     status: ArticleIndexingJobStatus
     impacted_stocks: list[ArticleStockImpact] = []
+
+class ArticleIndexingJobs(BaseModel):
+    jobs: list[ArticleIndexingJob]
