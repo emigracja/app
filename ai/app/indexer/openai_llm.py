@@ -17,8 +17,8 @@ def openai_client() -> OpenAI:
     return _openai_client
 
 def prompt_openai_llm(messages: list[dict], model: str, temperature: float = 1.0, max_tokens: int | None = None, 
-                      response_format: Optional[BaseModel] = None) -> str:
-
+                      response_format: Optional[BaseModel] = None) -> str|BaseModel:
+    # TODO: fix type - generics
     client = openai_client()
 
     # Currently client.beta doesn't support response_format = None
@@ -32,6 +32,7 @@ def prompt_openai_llm(messages: list[dict], model: str, temperature: float = 1.0
             frequency_penalty = 0.0,
             presence_penalty = 0.0
         )
+        return chat_completion.choices[0].message.content
     else:
         chat_completion = client.beta.chat.completions.parse(
             messages = messages,
@@ -43,5 +44,6 @@ def prompt_openai_llm(messages: list[dict], model: str, temperature: float = 1.0
             presence_penalty = 0.0,
             response_format = response_format
         )
+        return chat_completion.choices[0].message.parsed
 
-    return chat_completion.choices[0].message.content
+    
