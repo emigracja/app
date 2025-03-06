@@ -1,3 +1,4 @@
+import os
 import logging
 import uuid
 import requests
@@ -7,12 +8,15 @@ from .schemas import ArticleStockImpact, Stock
 
 logger = logging.getLogger(__name__)
 
+BACKEND_API_URL = os.getenv("BACKEND_API_URL", None)
+if BACKEND_API_URL is None:
+    raise ValueError("BACKEND_API_URL environment variable is not set. The application won't work correctly.")
+
 
 def get_stocks() -> list[Stock]:
-    # TODO: Adapt it to the final URL once #3 is completed
-    # TODO: Move the backend URL to env 
+    # TODO: #20: Adapt it to the final URL once #3 is completed
     logging.info("Attempting to fetch the list of stocks from the backend API.")
-    url = "http://backend:8080/stock"
+    url = f"{BACKEND_API_URL}/stock"
     response = requests.get(url)
     response.raise_for_status()
 
@@ -21,8 +25,7 @@ def get_stocks() -> list[Stock]:
     return stocks
 
 def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: ArticleStockImpact) -> bool:
-    # TODO: Adapt it to the final URL and schema once #6 is completed
-    # TODO: Move the backend URL to env 
+    # TODO: #20: Adapt it to the final URL and schema once #6 is completed
     logger.info(
         f"Notifying the backend API about stock {article_stock_impact.stock_id} impacting article {article_id} with {article_stock_impact.impact} impact due to reason '{article_stock_impact.reason}'."
     )
@@ -33,7 +36,7 @@ def send_article_stock_impact(article_id: uuid.UUID, article_stock_impact: Artic
         "reason": article_stock_impact.reason,
     }
 
-    url = "http://backend:8080/article/impact"
+    url = f"{BACKEND_API_URL}/article/impact"
     try:
         response = requests.post(url, json=request_body)
     except Exception as e:
