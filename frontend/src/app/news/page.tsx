@@ -105,7 +105,7 @@ const news: News[] = [
 
 export default function NewsPage() {
     return (
-        <div className="flex flex-col gap-10 p-2 h-full overflow-scroll" style={{
+        <div className="flex flex-col gap-10 p-2 h-auto overflow-scroll" style={{
             backgroundColor: "transparent"
         }}>
             {news.map((element) => (
