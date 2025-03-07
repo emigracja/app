@@ -17,7 +17,6 @@ services:
 
   postgres-db:
     image: postgres:17
-    container_name: ${CONTAINER_NAME}
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
