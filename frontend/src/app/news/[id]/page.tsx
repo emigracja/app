@@ -27,15 +27,15 @@ const news = {
             <article className="relative block text-[13px] text-white mt-10 rounded-xl p-3 box-content bg-white/10 text-justify">
                 {news.text}
             </article>
-            <div className={"flex flex-col gap-2"}>
+            <div className={"flex flex-col gap-2 overflow-hidden"}>
                 <Drawer id={"t"} text="YOUR AFFECTED STOKS (2)" open={selectedDrawer === "t"} onChange={handleDrawerChange}>
-                    <div className={"flex flex-col gap-2"}>
+                    <div className={"flex flex-col gap-2  h-full"}>
                         <p className={"text-white font-bold"}>AAPL</p>
                         <p className={"text-white font-bold"}>GOOGL</p>
                     </div>
                 </Drawer>
                 <Drawer id={"y"} text="AFFECTED STOKS (8)" open={selectedDrawer === "y"} onChange={handleDrawerChange} >
-                    <div className={"flex flex-col gap-2"}>
+                    <div className={"flex flex-col gap-2 overflow-scroll h-[90%]"}>
                         <p className={"text-white font-bold"}>AAPL</p>
                         <p className={"text-white font-bold"}>GOOGL</p>
                         <p className={"text-white font-bold"}>AAPL</p>
