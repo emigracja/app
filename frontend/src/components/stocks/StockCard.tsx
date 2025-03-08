@@ -29,7 +29,7 @@ const StockCard = ({
 }: Props): ReactElement => {
   return (
     <a
-      className="relative block text-xl text-white rounded-xl p-3 box-content bg-[#16324F]"
+      className="relative block text-xl text-white rounded-xl p-3 box-content bg-cardbg"
       href={`/news/${id}`}
     >
       <section className="flex flex-row gap-5 items-start">

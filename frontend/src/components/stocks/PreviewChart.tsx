@@ -10,6 +10,7 @@ import {
   BaselineSeries,
   CrosshairMode,
 } from "lightweight-charts";
+import { getCssVariable } from "@/util/util";
 
 interface Props {
   id: string;
@@ -26,7 +27,10 @@ const PreviewChart = ({ id, CandlestickData }: Props): ReactElement<Props> => {
       height: 100,
       layout: {
         textColor: "white",
-        background: { type: ColorType.Solid, color: "#16324F" },
+        background: {
+          type: ColorType.Solid,
+          color: getCssVariable("--color-cardbg"),
+        },
         panes: {
           enableResize: false,
         },
