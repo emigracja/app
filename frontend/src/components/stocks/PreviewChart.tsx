@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactElement, useRef, useEffect } from "react";
-import { CandlestickData, Period } from "@/types/stocks";
+import { CandlestickData } from "@/types/stocks";
 import {
   ColorType,
   createChart,
@@ -24,18 +24,19 @@ const PreviewChart = ({ id, CandlestickData }: Props): ReactElement<Props> => {
     if (!chartContainerRef.current) return;
     const chartOptions: DeepPartial<TimeChartOptions> = {
       width: chartContainerRef.current.clientWidth,
-      height: 100,
+      height: chartContainerRef.current.clientHeight,
       layout: {
         textColor: "white",
         background: {
           type: ColorType.Solid,
-          color: getCssVariable("--color-cardbg"),
+          color: getCssVariable("--color-card-bg"),
         },
         panes: {
           enableResize: false,
         },
       },
       rightPriceScale: {
+        visible: false,
         scaleMargins: {
           top: 0.0,
           bottom: 0.0,
@@ -65,15 +66,14 @@ const PreviewChart = ({ id, CandlestickData }: Props): ReactElement<Props> => {
       };
     });
 
-    // Tworzymy wykres wewnątrz kontenera
     const chart = createChart(chartContainerRef.current, chartOptions);
 
     const baselineSeries = chart.addSeries(BaselineSeries, {
       baseValue: { type: "price", price: baselineValue },
-      topLineColor: "rgba( 38, 166, 154, 1)",
+      topLineColor: getCssVariable("--color-stock-green"),
       topFillColor1: "rgba( 38, 166, 154, 0.28)",
       topFillColor2: "rgba( 38, 166, 154, 0.05)",
-      bottomLineColor: "rgba( 239, 83, 80, 1)",
+      bottomLineColor: getCssVariable("--color-stock-red"),
       bottomFillColor1: "rgba( 239, 83, 80, 0.05)",
       bottomFillColor2: "rgba( 239, 83, 80, 0.28)",
     });
@@ -84,13 +84,13 @@ const PreviewChart = ({ id, CandlestickData }: Props): ReactElement<Props> => {
     return () => {
       chart.remove();
     };
-  }, []);
+  }, [CandlestickData]);
 
   return (
     <div
       ref={chartContainerRef}
       id={`stock-${id}`}
-      style={{ width: "100%", height: "100px" }}
+      className="h-14 pointer-events-none touch-none"
     />
   );
 };

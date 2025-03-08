@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cardbg: #16324f;
+  --color-card-bg: #16324f;
+  --color-stock-green: #16d057;
+  --color-stock-red: #d01616;
 }
 
 html,
