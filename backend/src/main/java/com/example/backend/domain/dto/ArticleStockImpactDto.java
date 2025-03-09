@@ -12,12 +12,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleStockImpactDto {
+    @NotBlank(message = "Article ID cannot be empty")
+    private String article_id;
     @NotBlank(message = "Stock ID cannot be empty")
     private String stock_id;
-
     @NotBlank(message = "Impact level is required")
     @Pattern(regexp = "none|low|medium|high|severe", message = "Impact must be one of: none, low, medium, high, severe")
     private String impact;
-
     private String reason;
 }
