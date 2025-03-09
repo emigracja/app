@@ -50,7 +50,7 @@ export default function StockPage() {
 
   return (
     <div
-      className="flex flex-col gap-10 p-2"
+      className="flex flex-col gap-10 p-2 h-full overflow-scroll"
       style={{
         backgroundColor: "transparent",
       }}
