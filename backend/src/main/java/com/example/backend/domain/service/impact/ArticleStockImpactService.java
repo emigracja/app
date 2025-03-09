@@ -1,4 +1,4 @@
-package com.example.backend.domain.service;
+package com.example.backend.domain.service.impact;
 
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 
