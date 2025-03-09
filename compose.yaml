@@ -1,5 +1,3 @@
-featversion: '3.8'
-
 services:
   ai:
     build:
