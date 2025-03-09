@@ -1,16 +1,15 @@
 package com.example.backend.api;
 
 import com.example.backend.domain.dto.StockDto;
-import com.example.backend.domain.dto.ArticleStockImpactDto;
-import com.example.backend.domain.service.ArticleStockImpactService;
-import com.example.backend.domain.service.StockService;
+import com.example.backend.domain.service.stock.StockService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -19,12 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockApi {
     private final StockService stockService;
-    private final ArticleStockImpactService stockImpactService;
 
-    @GetMapping("/stock")
+    @GetMapping("/stocks")
     @Operation(summary = "Providing a list of all stocks present in the database")
     public ResponseEntity<List<StockDto>> getStockService() {
         try{
+            log.info("getStockService");
             List<StockDto> list = stockService.getAllStocks();
             return ResponseEntity.ok(list);
         } catch (Exception e) {
@@ -32,20 +31,21 @@ public class StockApi {
         }
     }
 
-    @PostMapping("/article/impact")
-    @Operation(summary = "Endpoint receives article sentiment data sent from the AI module")
-    public ResponseEntity<String> processArticleStockImpact(@Valid @RequestBody ArticleStockImpactDto request,
-                                                            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors().toString());
+    @PostMapping("/stocks")
+    @Operation(summary = "Adds a new stock if it does not exist in the database. If the stock is not found, it fetches " +
+            "data from an external API based on the provided symbol and then saves it to the database.")
+    public ResponseEntity<StockDto> addStock(@RequestBody StockDto stockDto) {
+        if (stockDto == null || stockDto.getSymbol() == null || stockDto.getSymbol().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
-
-        log.info("Received request: {}", request);
+        log.info("addStock");
         try {
-            stockImpactService.processImpact(request);
-            return ResponseEntity.ok().build();
-        }catch (Exception e) {
+            StockDto savedStock = stockService.addStock(stockDto.getSymbol());
+            return ResponseEntity.ok(savedStock);
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+
 }

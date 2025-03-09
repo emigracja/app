@@ -1,4 +1,4 @@
-version: '3.8'
+featversion: '3.8'
 
 services:
   ai:
@@ -37,6 +37,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/radomDB
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+      - ALPHA_VANTAGE_URL=${ALPHA_VANTAGE_URL}
     ports:
       - "8080:8080"
     depends_on:
