@@ -41,7 +41,11 @@ public class AlphaVantageServiceImpl implements StockApiService {
                     .block();
 
             assert responseMap != null;
-            return mapToStockDto(responseMap);
+            StockDto stockDto = mapToStockDto(responseMap);
+            if(stockDto.getSymbol().isEmpty() || stockDto.getName().isEmpty()){
+                throw new RuntimeException("Could not get stock by symbol!");
+            }
+            return stockDto;
         } catch (Exception e) {
             throw new RuntimeException("Error fetching stock data", e);
         }
