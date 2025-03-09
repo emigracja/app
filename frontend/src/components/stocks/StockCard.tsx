@@ -5,6 +5,7 @@ import favEmpty from "../../../public/icons/favEmpty.svg";
 import notfication from "../../../public/icons/notfication.svg";
 import PreviewChart from "./PreviewChart";
 import PreviewPrice from "./PreviewPrice";
+import StockName from "./StockName";
 
 interface Props {
   id: string;
@@ -32,13 +33,10 @@ const StockCard = ({
 }: Props): ReactElement => {
   return (
     <section className="relative block text-xl text-white rounded-xl p-3 box-content bg-card-bg">
-      <a href={`/news/${id}`}>
+      <a href={`/stocks/${id}`}>
         <div className="flex flex-row gap-3 items-start h-full">
           <div className="flex flex-col w-full gap-5 basis-2/3 grow">
-            <div>
-              <h3 className="text-2xl font-bold leading-none">{shortcut}</h3>
-              <p className="text-xs leading-none text-gray-400">{title}</p>
-            </div>
+            <StockName title={title} shortcut={shortcut} />
             <PreviewChart CandlestickData={periodPrices} id={id} />
           </div>
           <div className="basis-1/3 grow flex flex-col items-end justify-between h-full">
