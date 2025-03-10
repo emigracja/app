@@ -5,7 +5,7 @@ import NavBar from "@/components/navbar/NavBar";
 import Image from "next/image";
 import logo from "../../public/icons/logo.svg";
 import back from "../../public/icons/back.svg";
-import { useSyncPath } from "@/store/useStore";
+// import { useSyncPath } from "@/store/useStore";
 import TopBar from "@/components/topbar/TopBar";
 
 const geistSans = Geist({
@@ -44,7 +44,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useSyncPath();
+  // useSyncPath();
   return (
     <html lang="en">
       <body
