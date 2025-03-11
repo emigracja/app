@@ -1,3 +1,5 @@
+"use client";
+
 import StockName from "@/components/stocks/StockName";
 import Image from "next/image";
 import favEmpty from "../../../../public/icons/favEmpty.svg";
@@ -5,54 +7,59 @@ import notfication from "../../../../public/icons/notfication.svg";
 import { Stock, CandlestickData } from "@/types/stocks";
 import MainChart from "@/components/stocks/MainChart";
 import PriceChange from "@/components/stocks/PriceChange";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import useDataStore from "@/store/useDataStore";
+import NewsList from "@/components/news/NewsList";
 
 export default function StockDetail() {
-  const candles: CandlestickData[] = [
-    { time: "2018-12-22", open: 75.16, high: 82.84, low: 36.16, close: 45.72 },
-    { time: "2018-12-23", open: 45.12, high: 53.9, low: 45.12, close: 48.09 },
-    { time: "2018-12-24", open: 60.71, high: 60.71, low: 53.39, close: 59.29 },
-    { time: "2018-12-25", open: 68.26, high: 68.26, low: 59.04, close: 60.5 },
-    { time: "2018-12-26", open: 67.71, high: 105.85, low: 66.67, close: 91.04 },
-    { time: "2018-12-27", open: 91.04, high: 121.4, low: 82.7, close: 111.4 },
-    {
-      time: "2018-12-28",
-      open: 111.51,
-      high: 142.83,
-      low: 103.34,
-      close: 131.25,
-    },
-    {
-      time: "2018-12-29",
-      open: 131.33,
-      high: 151.17,
-      low: 77.68,
-      close: 96.43,
-    },
-    { time: "2018-12-30", open: 106.33, high: 110.2, low: 90.39, close: 98.1 },
-    {
-      time: "2018-12-31",
-      open: 109.87,
-      high: 114.69,
-      low: 85.66,
-      close: 111.26,
-    },
-  ];
+  const params = useParams();
+  const id = params.id;
+  const stock = useDataStore((state) => state.stocks).filter(
+    (s) => s.id == id
+  )[0];
+  const news = useDataStore((state) => state.news);
 
-  const stock: Stock = {
-    id: "abc",
-    title: "APPLE CORP",
-    shortcut: "AAPL.US",
-    currency: "USD",
-    market: "USA",
-    price: 111.26,
-    todaysPriceChange: -1.1,
-    currentPeriod: "1w",
-    tags: ["tech", "mobile"],
-    periodPrices: candles,
-  };
+  const [isNews, setIsNews] = useState(false);
+  const chartSection = useRef<HTMLDivElement | null>(null);
+  const newsSection = useRef<HTMLDivElement | null>(null);
+  const chartButton = useRef<HTMLButtonElement | null>(null);
+  const newsButton = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    if (
+      !chartSection.current ||
+      !newsSection.current ||
+      !chartButton.current ||
+      !newsButton.current
+    )
+      return;
+    const chartClasses = chartSection.current.classList;
+    const newsClasses = newsSection.current.classList;
+    const chartButtonClasses = chartButton.current.classList;
+    const newsButtonClasses = newsButton.current.classList;
+    if (isNews) {
+      newsClasses.remove("hidden");
+      newsButtonClasses.add("font-bold");
+      chartClasses.add("hidden");
+      chartButtonClasses.remove("font-bold");
+    } else {
+      chartClasses.remove("hidden");
+      chartButtonClasses.add("font-bold");
+      newsClasses.add("hidden");
+      newsButtonClasses.remove("font-bold");
+    }
+  }, [isNews]);
+
+  if (!stock || !news) {
+    return (
+      <div className="h-full w-full text-white flex justify-center items-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full w-full h-full overflow-scroll">
+    <div className="flex flex-col h-full w-full overflow-auto">
       <section className="flex justify-between w-full p-5">
         <StockName title={stock.title} shortcut={stock.shortcut} />
         <div className="flex flex-end">
@@ -75,14 +82,31 @@ export default function StockDetail() {
       <section className="flex justify-center text-white items-center mb-5">
         <p className="font-bold text-3xl pr-2">{stock.price}</p>
         <p className="text-3xl pr-2">{stock.currency}</p>
-        <PriceChange todaysPriceChange={stock.todaysPriceChange} />
+        <div className="flex items-center h-full justify-center">
+          <PriceChange todaysPriceChange={stock.todaysPriceChange} />
+        </div>
       </section>
-      <section className="grow">
+      <section className="grow" ref={chartSection}>
         <MainChart CandlestickData={stock.periodPrices} />
       </section>
-      <section className="flex justify-center items-center gap-5 p-5">
-        <div className="h-4 w-4 bg-white rounded-full"></div>
-        <div className="h-4 w-4 bg-gray-600 rounded-full"></div>
+      <section ref={newsSection} className="grow overflow-auto hidden">
+        <NewsList news={news} />
+      </section>
+      <section className="flex justify-center items-center gap-1 p-2">
+        <button
+          ref={chartButton}
+          className="h-full grow text-white uppercase text-xl text-center border-e py-2 font-bold"
+          onClick={() => setIsNews(false)}
+        >
+          <p>Chart</p>
+        </button>
+        <button
+          ref={newsButton}
+          className="h-full grow text-white uppercase text-xl text-center border-s py-2"
+          onClick={() => setIsNews(true)}
+        >
+          <p>News</p>
+        </button>
       </section>
     </div>
   );

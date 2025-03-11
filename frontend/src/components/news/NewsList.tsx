@@ -9,7 +9,7 @@ interface Props {
 const NewsList = ({ news }: Props): ReactElement => {
   return (
     <div
-      className="flex flex-col gap-10 p-2 h-auto overflow-scroll"
+      className="flex flex-col gap-10 p-2 h-full overflow-auto"
       style={{
         backgroundColor: "transparent",
       }}
