@@ -4,6 +4,7 @@
   --color-card-bg: #16324f;
   --color-stock-green: #16d057;
   --color-stock-red: #d01616;
+  --main-bg: radial-gradient(circle, #001f40 20%, #001220 90%);
 }
 
 html,

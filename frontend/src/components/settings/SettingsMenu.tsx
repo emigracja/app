@@ -20,8 +20,26 @@ const SettingsMenu = () => {
   }, [settingsOpen]);
 
   return (
-    <div ref={menuRef} className="text-white hidden">
-      <p>siemaneczko</p>
+    <div
+      ref={menuRef}
+      className="text-white hidden w-full h-full overflow-auto flex-col"
+    >
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <p className="m-3 p-2 text-3xl">siemaneczko</p>
+      <div className="h-[130px]"></div>
     </div>
   );
 };
