@@ -2,11 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar/NavBar";
-import Image from "next/image";
-import logo from "../../public/icons/logo.svg";
-import back from "../../public/icons/back.svg";
-// import { useSyncPath } from "@/store/useStore";
 import TopBar from "@/components/topbar/TopBar";
+import SettingsMenu from "@/components/settings/SettingsMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +41,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // useSyncPath();
   return (
     <html lang="en">
       <body
@@ -52,6 +48,7 @@ export default function RootLayout({
       >
         <main className="flex flex-col overflow-hidden h-full">
           <TopBar />
+          <SettingsMenu />
           {children}
           <NavBar />
         </main>
