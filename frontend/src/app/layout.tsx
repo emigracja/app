@@ -48,9 +48,9 @@ export default function RootLayout({
       >
         <main className="flex flex-col justify-between overflow-hidden g-0 h-screen">
           <TopBar />
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-hidden">
             <SettingsMenu />
-            {children}
+            <div className="overflow-auto h-full">{children}</div>
           </div>
           <NavBar />
         </main>
