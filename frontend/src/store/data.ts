@@ -1,5 +1,49 @@
 import { News } from "@/types/news";
 import { Stock, CandlestickData } from "@/types/stocks";
+import { AppSettings } from "@/types/appSettings";
+
+export const defaultSettings: AppSettings = {
+  interface: {
+    name: "Interface",
+    settings: [
+      {
+        name: "Mode",
+        value: "Dark",
+        possibleValues: ["Dark", "Light"],
+      },
+      {
+        name: "Language",
+        value: "EN",
+        possibleValues: ["EN", "PL"],
+      },
+    ],
+  },
+  notifications: {
+    name: "Notifications",
+    settings: [
+      {
+        name: "Notifications",
+        value: "Off",
+        possibleValues: ["On", "Off"],
+      },
+      {
+        name: "Events Severity",
+        value: "Critical",
+        possibleValues: ["Critical", "Important", "Info"],
+      },
+    ],
+  },
+  charts: {
+    name: "Charts",
+    settings: [
+      {
+        name: "Default Candle Period",
+        value: "1h",
+        possibleValues: ["1w", "1d", "4h", "1h", "15m", "1m"],
+      },
+    ],
+  },
+};
 
 const AppleCandles: CandlestickData[] = [
   { time: "2018-12-22", open: 75.16, high: 82.84, low: 36.16, close: 45.72 },
