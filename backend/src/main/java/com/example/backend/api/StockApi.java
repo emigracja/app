@@ -30,22 +30,4 @@ public class StockApi {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    @PostMapping("/stocks")
-    @Operation(summary = "Adds a new stock if it does not exist in the database. If the stock is not found, it fetches " +
-            "data from an external API based on the provided symbol and then saves it to the database.")
-    public ResponseEntity<StockDto> addStock(@RequestBody StockDto stockDto) {
-        if (stockDto == null || stockDto.getSymbol() == null || stockDto.getSymbol().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        log.info("addStock");
-        try {
-            StockDto savedStock = stockService.addStock(stockDto.getSymbol());
-            return ResponseEntity.ok(savedStock);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-
 }

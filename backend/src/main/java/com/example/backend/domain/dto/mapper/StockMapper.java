@@ -2,7 +2,10 @@ package com.example.backend.domain.dto.mapper;
 
 import com.example.backend.domain.dto.StockDto;
 import com.example.backend.infrastructure.database.entity.StockEntity;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StockMapper {
 
     public static StockDto map(StockEntity stockEntity) {

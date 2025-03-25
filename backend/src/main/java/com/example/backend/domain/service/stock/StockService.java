@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface StockService {
     List<StockDto> getAllStocks();
-
-    StockDto addStock(String symbol);
 }

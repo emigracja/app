@@ -3,6 +3,8 @@ package com.example.backend.infrastructure.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -12,7 +14,6 @@ import lombok.*;
 @Entity
 @Table(name = "STOCKS")
 public class StockEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -37,4 +38,7 @@ public class StockEntity {
 
     @Column(nullable = false)
     private String exchange;
+
+    @OneToMany(mappedBy = "stock")
+    private List<ArticleStockImpactEntity> stockImpacts;
 }

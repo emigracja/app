@@ -34,7 +34,7 @@ public class ArticlesApi {
                 return ResponseEntity.badRequest().body("Article id is required");
             }
 
-            request.setArticle_id(articleId);
+            request.setArticleId(articleId);
             stockImpactService.processImpact(request);
 
             return ResponseEntity.ok().build();
