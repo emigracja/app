@@ -46,6 +46,4 @@ public class StockApi {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
 }
