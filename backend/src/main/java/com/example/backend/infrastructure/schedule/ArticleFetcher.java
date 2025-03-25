@@ -12,6 +12,7 @@ import reactor.core.Disposable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -27,28 +28,38 @@ public class ArticleFetcher {
     private final ArticleService articleService;
     private final ArticleApiService articleApiService;
 
+    //    @Scheduled(fixedRate = 1000000)
     @Scheduled(cron = "0 0 8 * * *")
     public void fetchArticles() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime prevDay = now.minusDays(1);
 
-        List<ArticleDto> articles = articleApiService.fetchNewArticles().stream()
-                .filter(article -> {
-                    LocalDateTime publishedAt = article.getPublishedAt().toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime();
-                    return publishedAt.isAfter(prevDay) && publishedAt.isBefore(now);
-                }).toList();
+        List<ArticleDto> articles = fetchAndFilterArticles(prevDay, now);
 
         if (articles.isEmpty()) {
             return;
         }
 
-        List<ArticleDto> savedArticles = articleService.saveAll(articles);
+        List<ArticleDto> savedArticles = saveArticles(articles);
+
         if (savedArticles.isEmpty()) {
             return;
         }
 
+        sendArticlesToAI(savedArticles);
+    }
+
+    private List<ArticleDto> fetchAndFilterArticles(LocalDateTime prevDay, LocalDateTime now) {
+        return articleApiService.fetchNewArticles().stream()
+                .filter(article -> filterDates(article, prevDay, now))
+                .toList();
+    }
+
+    private List<ArticleDto> saveArticles(List<ArticleDto> articles) {
+        return articleService.saveAll(articles);
+    }
+
+    private void sendArticlesToAI(List<ArticleDto> savedArticles) {
         Disposable subscribe = webClient.mutate()
                 .baseUrl(AI_URL)
                 .build()
@@ -57,10 +68,24 @@ public class ArticleFetcher {
                 .bodyValue(savedArticles)
                 .retrieve()
                 .toBodilessEntity()
-                .doOnSuccess(response -> log.info(SUCCESS, savedArticles))
-                .doOnError(error -> log.error(ERROR, error))
+                .doOnSuccess(response -> log.info("Successfully sent articles: {}", savedArticles))
+                .doOnError(error -> log.error("Error sending articles: ", error))
                 .subscribe();
 
-        log.info(subscribe.toString());
+        log.info("Subscription: {}", subscribe.toString());
+    }
+
+    private static boolean filterDates(ArticleDto article, LocalDateTime prevDay, LocalDateTime now) {
+        Date published = article.getPublishedAt();
+
+        if (published == null) {
+            return false;
+        }
+
+        LocalDateTime publishedAt = published.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        return publishedAt.isAfter(prevDay) && publishedAt.isBefore(now);
     }
 }
