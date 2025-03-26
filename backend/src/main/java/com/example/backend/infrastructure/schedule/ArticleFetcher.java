@@ -21,7 +21,7 @@ import java.util.List;
 public class ArticleFetcher {
     private static final String SUCCESS = "Article sent successfully: {}";
     private static final String ERROR = "Failed to send article: {}";
-    private static final String AI_URL = "http://localhost:5000";
+    private static final String AI_URL = "http://ai:5000";
     private static final String ARTICLES_ENDPOINT = "/articles";
 
     private final WebClient webClient;
