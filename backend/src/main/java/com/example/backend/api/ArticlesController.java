@@ -1,22 +1,23 @@
 package com.example.backend.api;
 
 import com.example.backend.domain.dto.ArticleStockImpactDto;
+import com.example.backend.domain.dto.UserDto;
 import com.example.backend.domain.service.impact.ArticleStockImpactService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ArticlesApi {
+public class ArticlesController {
     private final ArticleStockImpactService stockImpactService;
 
     @PostMapping("/articles/{article_id}/stock-impacts")
@@ -42,5 +43,14 @@ public class ArticlesApi {
             log.error("Error processing stock impact for article {}", articleId, e);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PostMapping("/articles/download")
+    @Operation(summary = "Endpoint for downloading articles with stock impact for user stocks")
+    public ResponseEntity<?> downloadArticlesWithStockImpact(@Valid @RequestBody UserDto userDto,
+                                                             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,13 +14,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class StockApi {
+public class StockController {
     private final StockService stockService;
 
     @GetMapping("/stocks")
     @Operation(summary = "Providing a list of all stocks present in the database")
     public ResponseEntity<List<StockDto>> getStockService() {
-        try{
+        try {
             log.info("getStockService");
             List<StockDto> list = stockService.getAllStocks();
             return ResponseEntity.ok(list);
