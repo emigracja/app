@@ -1,19 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Maven_Pro } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar/NavBar";
 import TopBar from "@/components/topbar/TopBar";
-import Overlay from "@/components/search/Overlay";
 
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const mavenPro = Maven_Pro({
+    variable: "--font-maven-pro",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -45,7 +38,7 @@ export default function RootLayout({
   return (
       <html lang="en">
       <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
+          className={`${mavenPro.variable} antialiased relative`}
       >
       <main className="grid grid-rows-[auto_1fr_auto] h-full overflow-hidden">
         <TopBar/>
