@@ -3,8 +3,8 @@ import Image from "next/image";
 import back from "../../../public/icons/back.svg";
 import logo from "../../../public/icons/logo.svg";
 import settings from "../../../public/icons/settings.svg";
-import { useRouter } from "next/navigation"; // Use next/navigation for client components
-import useStore from "@/store/useStore";
+import { useRouter } from "next/navigation";
+import Link from "next/link"; // Use next/navigation for client components
 
 const TopBar = () => {
   const router = useRouter(); // Using the Next.js 13 useRouter hook
@@ -14,7 +14,6 @@ const TopBar = () => {
     router.back(); // Navigates to the previous page
   };
 
-  const toggleSettingsOpen = useStore((state) => state.toggleSettingsOpen);
 
   return (
     <nav className="flex h-[50px] justify-between items-center p-1">
@@ -34,9 +33,9 @@ const TopBar = () => {
         height={50}
         width={50}
       />
-      <div
+      <Link
         className="p-1 box-border rounded-xl active:bg-white/5 h-50px w-50px"
-        onClick={() => toggleSettingsOpen()}
+        href="/settings"
       >
         <Image
           className="p-1 justify-self-center opacity-75"
@@ -45,7 +44,7 @@ const TopBar = () => {
           height={40}
           width={40}
         />
-      </div>
+      </Link>
     </nav>
   );
 };

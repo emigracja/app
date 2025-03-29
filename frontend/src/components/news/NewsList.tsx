@@ -9,10 +9,7 @@ interface Props {
 const NewsList = ({ news }: Props): ReactElement => {
   return (
     <div
-      className="flex flex-col gap-10 p-2 h-full"
-      style={{
-        backgroundColor: "transparent",
-      }}
+      className="flex flex-col gap-10"
     >
       {news.map((element) => (
         <Card key={element.id} {...element} />

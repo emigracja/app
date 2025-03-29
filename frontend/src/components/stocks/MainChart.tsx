@@ -27,7 +27,7 @@ const MainChart = ({ CandlestickData }: Props): ReactElement<Props> => {
         textColor: "white",
         background: {
           type: ColorType.Solid,
-          color: "black",
+          color: "transparent",
         },
       },
     };

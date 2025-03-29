@@ -12,7 +12,7 @@ const NavBar = (): ReactElement => {
     { src: wallet, alt: "wallet" },
   ];
   return (
-    <nav className="flex w-full justify-center align-center box-border bg-white/5">
+    <nav className="flex w-full justify-center align-center box-border bg-white/5 h-[80px]">
       <ul className="flex gap-8 py-2 mb-2">
         {icons.map((icon, index) => (
           <li key={index}>
