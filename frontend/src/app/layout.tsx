@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar/NavBar";
 import TopBar from "@/components/topbar/TopBar";
+import Overlay from "@/components/search/Overlay";
 
 
 const geistSans = Geist({
@@ -52,6 +53,7 @@ export default function RootLayout({
         <div className="relative bottom-[0px] w-full">
           <NavBar/>
         </div>
+        {/*<Overlay />*/}
       </main>
       </body>
       </html>

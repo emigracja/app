@@ -76,53 +76,67 @@ export default function StockDetail() {
   if (!stock || !news) {
     return (
       <div className="h-full w-full text-white flex justify-center items-center">
-        <p>Loading...</p>
+        <p>Loading...</p>  {/* TODO: Add spinner and lazy loading */}
       </div>
     );
   }
 
+  const handleDotClick = (position: number) => {
+    if (scrollContainer.current) {
+      const scrollLeft = (scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth) * position;
+      scrollContainer.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="relative flex flex-col h-full w-full overflow-hidden">
-      <section className="flex justify-between w-full p-5">
-        <StockName title={stock.title} shortcut={stock.shortcut}/>
-        <div className="flex flex-end">
-          <Image
-              className="box-border mr-2 rounded-xl active:bg-white/5"
-              src={notfication}
-              alt="notification"
-              height={40}
-              width={40}
-          />
-          <Image
-              className="box-border rounded-xl active:bg-white/5"
-              src={favEmpty}
-              alt="favEmpty"
-              height={40}
-              width={40}
-          />
-        </div>
-      </section>
-      <section className="flex justify-center text-white items-center mb-5">
-        <p className="font-bold text-3xl pr-2">{stock.price}</p>
-        <p className="text-3xl pr-2">{stock.currency}</p>
-        <div className="flex items-center h-full justify-center">
-          <PriceChange todaysPriceChange={stock.todaysPriceChange}/>
-        </div>
-      </section>
-      <section ref={scrollContainer} className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory">
-        <div className="flex w-[200vw] box-border justify-between px-1">
-          <div className="w-[100vw] box-border snap-center">
-            <MainChart CandlestickData={stock.periodPrices}/>
+      <div className="relative flex flex-col h-full w-full overflow-hidden">
+        <section className="flex justify-between w-full p-5">
+          <StockName title={stock.title} shortcut={stock.shortcut}/>
+          <div className="flex flex-end">
+            <Image
+                className="box-border mr-2 rounded-xl active:bg-white/5"
+                src={notfication}
+                alt="notification"
+                height={40}
+                width={40}
+            />
+            <Image
+                className="box-border rounded-xl active:bg-white/5"
+                src={favEmpty}
+                alt="favEmpty"
+                height={40}
+                width={40}
+            />
           </div>
-          <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
-            <NewsList news={news}/>
+        </section>
+        <section className="flex justify-center text-white items-center mb-5">
+          <p className="font-bold text-3xl pr-2">{stock.price}</p>
+          <p className="text-3xl pr-2">{stock.currency}</p>
+          <div className="flex items-center h-full justify-center">
+            <PriceChange todaysPriceChange={stock.todaysPriceChange}/>
           </div>
+        </section>
+        <section ref={scrollContainer}
+                 className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory">
+          <div className="flex w-[200vw] box-border justify-between px-1">
+            <div className="w-[100vw] box-border snap-center">
+              <MainChart CandlestickData={stock.periodPrices}/>
+            </div>
+            <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
+              <NewsList news={news}/>
+            </div>
+          </div>
+        </section>
+        <div className="absolute flex w-full h-0 bottom-3 p-1 items-center justify-center">
+          <div
+              className={`dot p-1 ${scrollPosition < 50 ? 'active' : ''}`}
+              onClick={() => handleDotClick(0)}
+          ></div>
+          <div
+              className={`dot p-1 ${scrollPosition >= 50 ? 'active' : ''}`}
+              onClick={() => handleDotClick(1)}
+          ></div>
         </div>
-      </section>
-      <div className="absolute flex w-full h-0 bottom-3 p-1 items-center justify-center">
-        <div className={`dot ${scrollPosition < 50 ? 'active' : ''}`}></div>
-        <div className={`dot ${scrollPosition >= 50 ? 'active' : ''}`}></div>
       </div>
-    </div>
   );
 }
