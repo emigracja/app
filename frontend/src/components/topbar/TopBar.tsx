@@ -4,19 +4,21 @@ import back from "../../../public/icons/back.svg";
 import logo from "../../../public/icons/logo.svg";
 import settings from "../../../public/icons/settings.svg";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // Use next/navigation for client components
+import { usePathname } from 'next/navigation';
+import Link from "next/link";
 
 const TopBar = () => {
-  const router = useRouter(); // Using the Next.js 13 useRouter hook
+  const router = useRouter();
+    const pathname = usePathname();
 
-  // Function to handle back navigation
   const handleBack = () => {
-    router.back(); // Navigates to the previous page
+    router.back();
   };
 
+  const shouldShowSettings = pathname !== '/settings';
 
   return (
-    <nav className="flex h-[50px] justify-between items-center p-1">
+    <nav className="flex justify-between items-center p-1">
       <div onClick={handleBack} className="cursor-pointer">
         <Image
           className="p-2 box-border rounded-xl active:bg-white/5"
@@ -34,7 +36,7 @@ const TopBar = () => {
         width={50}
       />
       <Link
-        className="p-1 box-border rounded-xl active:bg-white/5 h-50px w-50px"
+        className={`p-1 box-border rounded-xl active:bg-white/5 h-50px w-50px ${ shouldShowSettings ? 'visible' : 'invisible' }`}
         href="/settings"
       >
         <Image
