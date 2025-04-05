@@ -1,0 +1,14 @@
+[
+    {
+        "symbol": "APPL",
+        "name": "Apple Inc.",
+        "description": "Apple Inc. is an American multinational technology company that specializes in consumer electronics, computer software, and online services.",
+        "city": "Redmond",
+        "country": "US"
+    },
+    {
+        "symbol": "RYAAY",
+        "name": "Ryanair Holdings plc",
+        "description": "Ryanair Holdings plc, together with its subsidiaries, provides scheduled-passenger airline services in Ireland, the United Kingdom, Spain, Italy, and internationally."
+    }
+]

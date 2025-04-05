@@ -1,0 +1,268 @@
+[
+    {
+        "name": "Rząd wprowadza nowy podatek od sprzedaży detalicznej dla sieci powyżej 1000 mkw.",
+        "description": "Rząd RP przyjął ustawę wprowadzającą nowy podatek w wysokości 2% od miesięcznych przychodów dla wszystkich placówek handlowych o powierzchni sprzedaży przekraczającej 1000 metrów kwadratowych. Przepis ma na celu wsparcie mniejszych sklepów i wejdzie w życie za 3 miesiące.",
+        "stock_impacts": {
+            "ZAB": [
+                "medium",
+                "high"
+            ],
+            "WTN": [
+                "none",
+                "low"
+            ],
+            "OTM": [
+                "none",
+                "low"
+            ],
+            "WPR": [
+                "none"
+            ],
+            "WPL": [
+                "none"
+            ],
+            "XPL": [
+                "none"
+            ],
+            "XTB": [
+                "none"
+            ],
+            "XTP": [
+                "none"
+            ],
+            "YRL": [
+                "none"
+            ],
+            "ZMT": [
+                "none"
+            ],
+            "ZEP": [
+                "none"
+            ],
+            "RPC": [
+                "none"
+            ],
+            "ZRE": [
+                "none"
+            ],
+            "ZUE": [
+                "none"
+            ]
+        }
+    },
+    {
+        "name": "Skokowy wzrost cen energii elektrycznej dla przemysłu o 40% od nowego roku",
+        "description": "Urząd Regulacji Energetyki zatwierdził nowe taryfy na energię elektryczną dla odbiorców przemysłowych, które będą średnio o 40% wyższe niż w bieżącym roku. Podwyżki tłumaczone są rosnącymi kosztami uprawnień do emisji CO2 oraz inwestycjami w modernizację sieci.",
+        "stock_impacts": {
+            "ZEP": [
+                "medium",
+                "high"
+            ],
+            "ZMT": [
+                "medium",
+                "high"
+            ],
+            "RPC": [
+                "high",
+                "severe"
+            ],
+            "OTM": [
+                "low",
+                "medium"
+            ],
+            "ZRE": [
+                "low",
+                "medium"
+            ],
+            "XTP": [
+                "none",
+                "low"
+            ],
+            "WTN": [
+                "none",
+                "low"
+            ],
+            "WPR": [
+                "none",
+                "low"
+            ],
+            "WPL": [
+                "none",
+                "low"
+            ],
+            "XPL": [
+                "none",
+                "low"
+            ],
+            "XTB": [
+                "none",
+                "low"
+            ],
+            "YRL": [
+                "none",
+                "low"
+            ],
+            "ZAB": [
+                "none",
+                "low"
+            ],
+            "ZUE": [
+                "none",
+                "low"
+            ]
+        }
+    },
+    {
+        "name": "KNF zapowiada wprowadzenie wyższych wymogów kapitałowych dla domów maklerskich oferujących CFD",
+        "description": "Komisja Nadzoru Finansowego rozpoczęła konsultacje publiczne projektu zwiększenia wymogów adekwatności kapitałowej dla firm inwestycyjnych oferujących klientom detalicznym kontrakty na różnicę kursową (CFD). Celem jest zwiększenie bezpieczeństwa rynku.",
+        "stock_impacts": {
+            "XTB": [
+                "high",
+                "severe"
+            ],
+            "WTN": [
+                "none"
+            ],
+            "WPR": [
+                "none"
+            ],
+            "WPL": [
+                "none"
+            ],
+            "XPL": [
+                "none"
+            ],
+            "XTP": [
+                "none"
+            ],
+            "YRL": [
+                "none"
+            ],
+            "ZAB": [
+                "none"
+            ],
+            "ZMT": [
+                "none"
+            ],
+            "ZEP": [
+                "none"
+            ],
+            "RPC": [
+                "none"
+            ],
+            "OTM": [
+                "none"
+            ],
+            "ZRE": [
+                "none"
+            ],
+            "ZUE": [
+                "none"
+            ]
+        }
+    },
+    {
+        "name": "Globalne firmy technologiczne inwestują miliardy w rozwój sztucznej inteligencji w Europie Środkowej",
+        "description": "Najwięksi gracze technologiczni, tacy jak Google, Microsoft i Nvidia, ogłosili plany znaczących inwestycji w centra danych i ośrodki badawczo-rozwojowe AI w Polsce i krajach sąsiednich. Poszukiwani będą specjaliści i lokalni partnerzy technologiczni.",
+        "stock_impacts": {
+            "WPR": [
+                "medium",
+                "high"
+            ],
+            "XPL": [
+                "low",
+                "medium"
+            ],
+            "YRL": [
+                "medium",
+                "high"
+            ],
+            "WPL": [
+                "low",
+                "medium"
+            ],
+            "XTP": [
+                "none",
+                "low"
+            ],
+            "WTN": [
+                "none"
+            ],
+            "XTB": [
+                "none"
+            ],
+            "ZAB": [
+                "none"
+            ],
+            "ZMT": [
+                "none"
+            ],
+            "ZEP": [
+                "none"
+            ],
+            "RPC": [
+                "none"
+            ],
+            "OTM": [
+                "none"
+            ],
+            "ZRE": [
+                "none"
+            ],
+            "ZUE": [
+                "none"
+            ]
+        }
+    },
+    {
+        "name": "Rząd zatwierdza program budowy 100 obwodnic miast i modernizacji dróg krajowych",
+        "description": "Rada Ministrów przyjęła wieloletni program inwestycji drogowych o wartości 50 mld PLN, zakładający budowę obwodnic oraz gruntowną modernizację istniejących dróg krajowych w ciągu najbliższych 7 lat. Przetargi mają ruszyć w przyszłym roku.",
+        "stock_impacts": {
+            "ZMT": [
+                "low",
+                "medium"
+            ],
+            "RPC": [
+                "low",
+                "medium"
+            ],
+            "ZRE": [
+                "low",
+                "medium"
+            ],
+            "ZUE": [
+                "none"
+            ],
+            "WTN": [
+                "none"
+            ],
+            "WPR": [
+                "none"
+            ],
+            "WPL": [
+                "none"
+            ],
+            "XPL": [
+                "none"
+            ],
+            "XTB": [
+                "none"
+            ],
+            "XTP": [
+                "none"
+            ],
+            "YRL": [
+                "none"
+            ],
+            "ZAB": [
+                "none"
+            ],
+            "ZEP": [
+                "none"
+            ],
+            "OTM": [
+                "none"
+            ]
+        }
+    }
+]

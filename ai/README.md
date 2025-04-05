@@ -4,7 +4,13 @@ API docs can be found under `/docs` and `/redoc`.
 
 Refer to the main README.md for deployment instructions.
 
-# Development
+## CLI
+
+```
+poetry run python -m app.cli
+```
+
+## Development
 
 Please set up pre-commit hooks on your local machine:
 
