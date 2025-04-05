@@ -36,7 +36,13 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
         )
 
         for stock in stocks:
-            stock_response: StockImpactReasoning = getattr(response, stock.symbol)
+            try:
+                stock_response: StockImpactReasoning = getattr(response, stock.symbol)
+            except AttributeError:
+                logger.warning(
+                    f"Stock {stock.symbol} not found in LLM response, despite being provided in prompt. Skipping."
+                )
+                continue
 
             yield ArticleStockImpact(
                 stock_id=stock.id,
