@@ -30,7 +30,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleDto> findAllBySearchParams(ArticleSearchParams params) {
         Pageable pageable = PageRequest.of(params.getPageNumber(), params.getSize());
-        return articleJpaRepository.findAll(createArticleSpecyfication(params), pageable)
+        return articleJpaRepository.findAll(createArticleSpecification(params), pageable)
                 .stream()
                 .map(ArticleMapper::map)
                 .toList();
@@ -64,7 +64,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
 
-    private Specification<ArticleEntity> createArticleSpecyfication(ArticleSearchParams params) {
+    private Specification<ArticleEntity> createArticleSpecification(ArticleSearchParams params) {
         return (root, query, criteriaBuilder) -> {
             Predicate predicate = criteriaBuilder.conjunction();
 
@@ -100,7 +100,7 @@ public class ArticleServiceImpl implements ArticleService {
                             criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate)
                     );
                 } catch (ParseException e) {
-                    // Handle date parsing exception or log it
+                    log.error("Failed to parse dateFrom: " + params.getDateFrom(), e);
                 }
             }
 
@@ -117,7 +117,7 @@ public class ArticleServiceImpl implements ArticleService {
                             criteriaBuilder.lessThan(root.get("publishedAt"), endDate)
                     );
                 } catch (ParseException e) {
-                    // Handle date parsing exception or log it
+                    log.error("Error parsing dateTo: " + params.getDateTo(), e);
                 }
             }
 
