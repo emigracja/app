@@ -1,0 +1,16 @@
+[
+    {
+        "name": "John Paul II just died",
+        "description": "On April 2, 2005, John Paul II, history’s most well-traveled pope and the first non-Italian to hold the position since the 16th century, dies at his home in the Vatican. Six days later, 2 million people packed Vatican City for his funeral, said to be one of the biggest in history.",
+        "stock_impacts": {
+            "APPL": [
+                "none",
+                "low"
+            ],
+            "RYAAY": [
+                "low",
+                "medium"
+            ]
+        }
+    }
+]
