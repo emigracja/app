@@ -88,9 +88,10 @@ const PreviewChart = ({ id, CandlestickData }: Props): ReactElement<Props> => {
 
   return (
     <div
+
       ref={chartContainerRef}
       id={`stock-${id}`}
-      className="h-14 pointer-events-none touch-none"
+      className="h-14 pointer-events-none touch-none stock-container"
     />
   );
 };

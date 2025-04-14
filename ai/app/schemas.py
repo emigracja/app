@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Generic, Optional, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
 M = TypeVar("M", bound=BaseModel)
@@ -67,3 +67,39 @@ class Article(BaseModel):
 
 class ArticleList(BaseModel):
     articles: list[Article]
+
+
+class CommandIntent(StrEnum):
+    """Enumeration of possible command intents recognized from user text input."""
+
+    all_news = "all_news"
+    """User wants to see all available news. Examples: "pokaż wszystkie wiadomości", "show all news" """
+
+    my_news = "my_news"
+    """User wants personalized or latest news. Examples: "pokaż moje wiadomości", "show my news", "pokaż najnowsze newsy" """
+
+    all_stocks = "all_stocks"
+    """User wants to see all available stocks. Examples: "pokaż wszystkie akcje", "show all stocks" """
+
+    my_stocks = "my_stocks"
+    """User wants to see stocks they follow or own. Examples: "pokaż moje akcje", "show my stocks" """
+
+    wallet = "wallet"
+    """User wants to see their financial portfolio or wallet. Examples: "pokaż mój portfel", "show my wallet" """
+
+    settings = "settings"
+    """User wants to open the application settings. Examples: "otwórz ustawienia", "open settings" """
+
+    homepage = "homepage"
+    """User wants to navigate to the main screen or homepage. Examples: "przejdź na stronę główną", "go to homepage" """
+
+    unknown = "unknown"
+    """The user's command is unrecognized or does not match any other intent."""
+
+
+class ParseCommandRequest(BaseModel):
+    text: str = Field(..., example="i want to configure my stocks")
+
+
+class CommandParseResult(BaseModel):
+    intent: CommandIntent = Field(..., description="The recognized intent based on the user's text input.")

@@ -1,18 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Maven_Pro } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar/NavBar";
 import TopBar from "@/components/topbar/TopBar";
-import SettingsMenu from "@/components/settings/SettingsMenu";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const mavenPro = Maven_Pro({
+    variable: "--font-maven-pro",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -42,19 +36,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+      <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${mavenPro.variable} antialiased relative`}
       >
-        <main className="flex flex-col justify-between overflow-hidden g-0 h-screen">
-          <TopBar />
-          <div className="flex-1 overflow-hidden">
-            <SettingsMenu />
-            <div className="overflow-auto h-full">{children}</div>
-          </div>
-          <NavBar />
-        </main>
+      <main className="grid grid-rows-[auto_1fr_auto] h-full overflow-hidden">
+        <TopBar/>
+        <div className="overflow-auto">{children || <div className="h-full"></div>}</div>
+        <div className="relative bottom-[0px] w-full">
+          <NavBar/>
+        </div>
+        {/*<Overlay />*/}
+      </main>
       </body>
-    </html>
+      </html>
   );
 }

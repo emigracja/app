@@ -1,26 +1,85 @@
 package com.example.backend.api;
 
 import com.example.backend.domain.dto.ArticleStockImpactDto;
-import com.example.backend.domain.dto.UserDto;
 import com.example.backend.domain.service.impact.ArticleStockImpactService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ArticlesController {
+@RequestMapping("/articles")
+public class ArticlesApi {
     private final ArticleStockImpactService stockImpactService;
+    private final ArticleService articleService;
 
-    @PostMapping("/articles/{article_id}/stock-impacts")
+    @Operation(
+            summary = "Get all articles with optional filtering",
+            description = "Retrieves articles with support for various filter parameters",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved articles", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid parameters provided")
+            }
+    )
+    @GetMapping
+    public ResponseEntity<List<ArticleDto>> getAllArticles(
+            @Parameter(description = "General search term")
+            @RequestParam(name = PARAM_SEARCH, required = false) String generalSearch,
+
+            @Parameter(description = "Search by article name")
+            @RequestParam(name = PARAM_NAME, required = false) String articleName,
+
+            @Parameter(description = "Filter articles from this date (yyyy-MM-dd)")
+            @RequestParam(name = PARAM_DATE_FROM, required = false) String dateFrom,
+
+            @Parameter(description = "Filter articles to this date (yyyy-MM-dd)")
+            @RequestParam(name = PARAM_DATE_TO, required = false) String dateTo,
+
+            @Parameter(description = "Filter by stock name")
+            @RequestParam(name = PARAM_STOCK, required = false) String stockName,
+
+            @Parameter(description = "Page number for pagination")
+            @RequestParam(name = PARAM_PAGE, required = false, defaultValue = "0") Integer pageNumber,
+
+            @Parameter(description = "Page size for pagination")
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size
+    ) {
+        return ResponseEntity.ok(articleService.findAllBySearchParams(new ArticleSearchParams(
+                generalSearch,
+                articleName,
+                dateFrom,
+                dateTo,
+                stockName,
+                pageNumber,
+                size
+        )));
+    }
+
+    @GetMapping("/{article_id}")
+    @Operation(
+            summary = "Retrieve an article by its ID",
+            description = "Fetches the article details for the given article ID. Returns a 404 status if the article is not found.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Article found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Article not found")
+            }
+    )
+    public ResponseEntity<ArticleDto> getArticle(@PathVariable("article_id") String articleId) {
+        return articleService.findById(articleId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/{article_id}/stock-impacts")
     @Operation(summary = "Endpoint receives article sentiment data sent from the AI module")
     public ResponseEntity<String> processArticleStockImpact(@PathVariable("article_id") String articleId,
                                                             @Valid @RequestBody ArticleStockImpactDto request,

@@ -3,21 +3,53 @@ import Image from "next/image";
 import back from "../../../public/icons/back.svg";
 import logo from "../../../public/icons/logo.svg";
 import settings from "../../../public/icons/settings.svg";
-import { useRouter } from "next/navigation"; // Use next/navigation for client components
-import useStore from "@/store/useStore";
+import filter from "../../../public/icons/filter.svg";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import {
+  NEWS_ROUTE,
+  SETTINGS_ROUTE,
+  STOCKS_ROUTE,
+  WALLET_ROUTE,
+} from "@/types/routes";
 
 const TopBar = () => {
-  const router = useRouter(); // Using the Next.js 13 useRouter hook
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Function to handle back navigation
   const handleBack = () => {
-    router.back(); // Navigates to the previous page
+    router.back();
   };
 
-  const toggleSettingsOpen = useStore((state) => state.toggleSettingsOpen);
+  const shouldShowSettings = pathname === WALLET_ROUTE;
+  const shouldShowFilter = pathname === NEWS_ROUTE || pathname === STOCKS_ROUTE;
+
+  const shouldShowButton = shouldShowSettings || shouldShowFilter;
+
+  const routeConfig = {
+    [WALLET_ROUTE]: {
+      route: SETTINGS_ROUTE,
+      icon: settings,
+    },
+    [NEWS_ROUTE]: {
+      route: "?filters",
+      icon: filter,
+    },
+    [STOCKS_ROUTE]: {
+      route: "?filters",
+      icon: filter,
+    },
+    default: {
+      route: "",
+      icon: null,
+    },
+  };
+
+  const buttonData = routeConfig[pathname] || routeConfig.default;
 
   return (
-    <nav className="flex h-[50px] justify-between items-center p-1">
+    <nav className="flex justify-between items-center p-1">
       <div onClick={handleBack} className="cursor-pointer">
         <Image
           className="p-2 box-border rounded-xl active:bg-white/5"
@@ -34,18 +66,20 @@ const TopBar = () => {
         height={50}
         width={50}
       />
-      <div
-        className="p-1 box-border rounded-xl active:bg-white/5 h-50px w-50px"
-        onClick={() => toggleSettingsOpen()}
+      <Link
+        className={`p-1 box-border rounded-xl active:bg-white/5 h-50px w-50px ${
+          shouldShowButton ? "visible" : "invisible"
+        }`}
+        href={buttonData.route}
       >
         <Image
           className="p-1 justify-self-center opacity-75"
-          src={settings}
+          src={buttonData.icon}
           alt="settings"
           height={40}
           width={40}
         />
-      </div>
+      </Link>
     </nav>
   );
 };

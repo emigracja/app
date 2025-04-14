@@ -5,14 +5,11 @@ import Card from "./Card";
 interface Props {
   news: News[];
 }
-
+// TODO: Add lazy loading
 const NewsList = ({ news }: Props): ReactElement => {
   return (
     <div
-      className="flex flex-col gap-10 p-2 h-full"
-      style={{
-        backgroundColor: "transparent",
-      }}
+      className="flex flex-col gap-10 px-2"
     >
       {news.map((element) => (
         <Card key={element.id} {...element} />

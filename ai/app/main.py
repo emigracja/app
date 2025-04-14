@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import BackgroundTasks, FastAPI, Response
 
 from . import database, indexer, schemas
+from .commands.routes import router as commands_router
 from .schemas import Article, ArticleContent
 
 # set DEBUG level of logs
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI()
+app.include_router(commands_router)
 
 
 @app.get("/")

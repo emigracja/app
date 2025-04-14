@@ -21,10 +21,13 @@ export default function StockDetail() {
   const news = useDataStore((state) => state.news);
 
   const [isNews, setIsNews] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const chartSection = useRef<HTMLDivElement | null>(null);
   const newsSection = useRef<HTMLDivElement | null>(null);
   const chartButton = useRef<HTMLButtonElement | null>(null);
   const newsButton = useRef<HTMLButtonElement | null>(null);
+  const scrollContainer = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (
       !chartSection.current ||
@@ -50,64 +53,90 @@ export default function StockDetail() {
     }
   }, [isNews]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollContainer.current) {
+        const scrollLeft = scrollContainer.current.scrollLeft;
+        const maxScrollLeft = scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth;
+        setScrollPosition((scrollLeft / maxScrollLeft) * 100);
+      }
+    };
+
+    if (scrollContainer.current) {
+      scrollContainer.current.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (scrollContainer.current) {
+        scrollContainer.current.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
   if (!stock || !news) {
     return (
       <div className="h-full w-full text-white flex justify-center items-center">
-        <p>Loading...</p>
+        <p>Loading...</p>  {/* TODO: Add spinner and lazy loading */}
       </div>
     );
   }
 
+  const handleDotClick = (position: number) => {
+    if (scrollContainer.current) {
+      const scrollLeft = (scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth) * position;
+      scrollContainer.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full w-full overflow-auto">
-      <section className="flex justify-between w-full p-5">
-        <StockName title={stock.title} shortcut={stock.shortcut} />
-        <div className="flex flex-end">
-          <Image
-            className="box-border mr-2 rounded-xl active:bg-white/5"
-            src={notfication}
-            alt="notification"
-            height={40}
-            width={40}
-          />
-          <Image
-            className="box-border rounded-xl active:bg-white/5"
-            src={favEmpty}
-            alt="favEmpty"
-            height={40}
-            width={40}
-          />
+      <div className="relative flex flex-col h-full w-full overflow-hidden">
+        <section className="flex justify-between w-full p-5">
+          <StockName title={stock.title} shortcut={stock.shortcut}/>
+          <div className="flex flex-end">
+            <Image
+                className="box-border mr-2 rounded-xl active:bg-white/5"
+                src={notfication}
+                alt="notification"
+                height={40}
+                width={40}
+            />
+            <Image
+                className="box-border rounded-xl active:bg-white/5"
+                src={favEmpty}
+                alt="favEmpty"
+                height={40}
+                width={40}
+            />
+          </div>
+        </section>
+        <section className="flex justify-center text-white items-center mb-5">
+          <p className="font-bold text-3xl pr-2">{stock.price}</p>
+          <p className="text-3xl pr-2">{stock.currency}</p>
+          <div className="flex items-center h-full justify-center">
+            <PriceChange todaysPriceChange={stock.todaysPriceChange}/>
+          </div>
+        </section>
+        <section ref={scrollContainer}
+                 className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory">
+          <div className="flex w-[200vw] box-border justify-between px-1">
+            <div className="w-[100vw] box-border snap-center">
+              <MainChart CandlestickData={stock.periodPrices}/>
+            </div>
+            <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
+              <NewsList news={news}/>
+            </div>
+          </div>
+        </section>
+        <div className="absolute flex w-full h-0 bottom-3 p-1 items-center justify-center">
+          <div
+              className={`dot p-1 ${scrollPosition < 50 ? 'active' : ''}`}
+              onClick={() => handleDotClick(0)}
+          ></div>
+          <div
+              className={`dot p-1 ${scrollPosition >= 50 ? 'active' : ''}`}
+              onClick={() => handleDotClick(1)}
+          ></div>
         </div>
-      </section>
-      <section className="flex justify-center text-white items-center mb-5">
-        <p className="font-bold text-3xl pr-2">{stock.price}</p>
-        <p className="text-3xl pr-2">{stock.currency}</p>
-        <div className="flex items-center h-full justify-center">
-          <PriceChange todaysPriceChange={stock.todaysPriceChange} />
-        </div>
-      </section>
-      <section className="grow" ref={chartSection}>
-        <MainChart CandlestickData={stock.periodPrices} />
-      </section>
-      <section ref={newsSection} className="grow overflow-auto hidden">
-        <NewsList news={news} />
-      </section>
-      <section className="flex justify-center items-center gap-1 p-2">
-        <button
-          ref={chartButton}
-          className="h-full grow text-white uppercase text-xl text-center border-e py-2 font-bold"
-          onClick={() => setIsNews(false)}
-        >
-          <p>Chart</p>
-        </button>
-        <button
-          ref={newsButton}
-          className="h-full grow text-white uppercase text-xl text-center border-s py-2"
-          onClick={() => setIsNews(true)}
-        >
-          <p>News</p>
-        </button>
-      </section>
-    </div>
+      </div>
   );
 }
