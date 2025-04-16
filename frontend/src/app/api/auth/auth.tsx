@@ -19,10 +19,9 @@ async function getUserFromDb(email: string): Promise<User | null> {
 
 export const config: NextAuthConfig = {
   // Using trustHost is recommended for deployments other than Vercel.
-  // trustHost: true, // Consider enabling this based on your deployment environment
+  // trustHost: true,
   pages: {
     signIn: "/login", // Redirect users to /login if they are not signed in
-    // error: '/auth/error', // Optional: Error page
   },
   providers: [
     CredentialsProvider({
@@ -36,8 +35,7 @@ export const config: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<any> {
-        // --- !! IMPORTANT !! ---
-        // Add validation logic here (e.g., using Zod)
+        // Add validation logic here
         // TODO
         if (!credentials?.email || !credentials?.password) {
           console.error("Missing credentials");
@@ -47,11 +45,11 @@ export const config: NextAuthConfig = {
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        const user = await getUserFromDb(email); // Fetch user from your DB
+        const user = await getUserFromDb(email);
 
         if (!user || !user.passwordHash) {
           console.log("User not found or password missing for:", email);
-          return null; // User not found
+          return null;
         }
 
         // Verify password
@@ -61,24 +59,19 @@ export const config: NextAuthConfig = {
         );
 
         if (passwordsMatch) {
-          console.log("Password match for:", email);
-          // Return user object without the password
           // This object is then encoded in the JWT or saved in the database session.
           return {
             id: user.id,
             username: user.username,
             email: user.email,
-            role: user.role, // Include role for authorization
+            role: user.role,
           };
         } else {
           console.log("Password mismatch for:", email);
-          return null; // Passwords don't match
+          return null;
         }
-        // --- !! IMPORTANT !! ---
       },
     }),
-    // Add other providers like Google, GitHub etc. here
-    // GoogleProvider({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }),
   ],
   callbacks: {
     // The `jwt` callback is invoked when a JWT is created or updated.
@@ -96,49 +89,23 @@ export const config: NextAuthConfig = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string; // Add role to session
+        session.user.role = token.role as string;
       }
       return session;
     },
     // Use authorized callback to implement authorization logic
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-      const isOnAdminArea = nextUrl.pathname.startsWith("/admin");
       const isOnLoginPage = nextUrl.pathname.startsWith("/login");
       console.log(isLoggedIn);
       if (!isLoggedIn) {
         return false;
       }
-
-      if (isOnDashboard || isOnAdminArea) {
-        if (!isLoggedIn) return false; // Redirect unauthenticated users to login page
-
-        // Example: Role-based authorization for /admin
-        if (isOnAdminArea && auth?.user?.role !== "admin") {
-          console.log(
-            `User ${auth?.user?.email} with role ${auth?.user?.role} tried to access admin area.`
-          );
-          // Optionally redirect to an 'unauthorized' page or back to dashboard
-          return Response.redirect(
-            new URL("/dashboard?error=Unauthorized", nextUrl)
-          );
-          // Or just return false to redirect to login
-          // return false;
-        }
-        // Allow access if logged in and meets role requirements (if any)
-        return true;
-      } else if (isLoggedIn && isOnLoginPage) {
-        // If user is logged in and tries to access login page, redirect them away
-        return Response.redirect(new URL("/dashboard", nextUrl));
-      }
-
-      // Allow access to all other pages (public pages, login page for non-logged-in users) by default
       return true;
     },
   },
   // If using JWT strategy (default), the session object is derived from the JWT token
-  session: { strategy: "jwt" }, // Explicitly set strategy (though JWT is default)
+  session: { strategy: "jwt" },
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);
