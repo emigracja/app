@@ -19,6 +19,7 @@ async function createUser(userData: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          username: "toDelete",
           password: userData.password,
           email: userData.email,
           firstName: userData.firstName,
@@ -30,6 +31,7 @@ async function createUser(userData: {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.log(errorData);
       throw new Error(errorData.message || "Rejestracja nie powiodła się");
     }
 
@@ -72,7 +74,7 @@ export async function POST(request: Request) {
     // --- End Validation ---
 
     // --- Check if user already exists ---
-    const existingUser = await getUserFromDb(email); // Use your actual DB fetching function
+    const existingUser = await getUserFromDb(email);
     if (existingUser) {
       return NextResponse.json(
         { message: "User with this email already exists." },

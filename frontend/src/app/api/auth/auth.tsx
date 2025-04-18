@@ -7,7 +7,6 @@ import { users } from "@/store/data";
 import bcrypt from "bcryptjs";
 
 export async function getUserFromDb(email: string): Promise<User | null> {
-  console.log("Attempting to find user:", email);
   // TODO:
   // Replace this with actual database query
   const user = users.filter((u) => u.email === email);
