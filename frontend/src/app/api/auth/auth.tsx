@@ -6,7 +6,7 @@ import { User } from "@/types/users"; // Assuming you have a User type/interface
 import { users } from "@/store/data";
 import bcrypt from "bcryptjs";
 
-async function getUserFromDb(email: string): Promise<User | null> {
+export async function getUserFromDb(email: string): Promise<User | null> {
   console.log("Attempting to find user:", email);
   // TODO:
   // Replace this with actual database query
