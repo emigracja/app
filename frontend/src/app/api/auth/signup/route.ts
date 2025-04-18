@@ -1,22 +1,50 @@
 // src/app/api/auth/register/route.ts
 import { NextResponse } from "next/server";
 import { getUserFromDb } from "../auth";
-import bcrypt from "bcryptjs";
 
 // Replace with your actual user creation logic
 async function createUser(userData: {
+  password: string;
   email: string;
-  username?: string;
-  passwordHash: string;
-  role?: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
 }) {
-  console.log(userData);
+  try {
+    const response = await fetch(
+      `${process.env.BACKEND_API_URL}/users/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password: userData.password,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          phone: userData.phone,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Rejestracja nie powiodła się");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.error("Błąd podczas rejestracji:", err);
+    throw err;
+  }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body; // Add other fields like username if needed
+    const { email, password, firstName, lastName, phone } = body;
 
     // --- Input Validation ---
     if (!email || !password) {
@@ -52,15 +80,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash Password
-    const passwordHash = await bcrypt.hash(password, 10);
-
     // --- Create User ---
     const newUser = await createUser({
-      // Use your actual DB creation function
       email,
-      passwordHash,
-      role: "USER", // Assign a default role
+      password,
+      firstName,
+      lastName,
+      phone,
     });
 
     // --- Success Response ---

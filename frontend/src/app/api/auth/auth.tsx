@@ -96,8 +96,10 @@ export const config: NextAuthConfig = {
     // Use authorized callback to implement authorization logic
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnLoginPage = nextUrl.pathname.startsWith("/login");
-      console.log(isLoggedIn);
+      const isOnSignupPage = nextUrl.pathname.startsWith("/signup");
+      if (isOnSignupPage) {
+        return true;
+      }
       if (!isLoggedIn) {
         return false;
       }
