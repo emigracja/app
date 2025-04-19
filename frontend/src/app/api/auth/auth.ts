@@ -45,41 +45,6 @@ export const config: NextAuthConfig = {
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        try {
-          const response = await fetch(
-            `${process.env.BACKEND_API_URL}/users/auth/login`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: email,
-                password: password,
-              }),
-            }
-          );
-
-          if (!response.ok) {
-            console.error(`Backend login failed: ${response.status}`);
-            return null;
-          }
-          const data = await response.json();
-          // TODO
-          // adjust to working backend auth
-          const backendToken = data.token;
-          const backendUser = data.user;
-          if (!backendToken) {
-            console.error("Backend response missing token");
-            return null;
-          }
-          let userId = backendUser?.id;
-          let userEmail = backendUser?.email;
-          let userRole = backendUser?.role;
-        } catch (err) {
-          console.log("Backend login error: ", err);
-        }
-
         const user = await getUserFromDb(email);
 
         if (!user || !user.passwordHash) {
@@ -111,10 +76,11 @@ export const config: NextAuthConfig = {
               }),
             }
           );
+          console.log(response);
           if (response.ok) {
             isLoggedIn = true;
-            const { token } = await response.json();
-            backendToken = token;
+            backendToken = await response.text();
+            console.log(backendToken);
           }
         } catch (err) {
           console.log("Login attemp failed. error:", err);

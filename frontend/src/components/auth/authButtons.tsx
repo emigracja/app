@@ -5,23 +5,11 @@ import { signOut, useSession } from "next-auth/react";
 export function SignOutButton() {
   const { status } = useSession();
 
-  const handleSubmit = async () => {
-    try {
-      await fetch(`${process.env.BACKEND_API_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.log("Signout error: ", err);
-    }
-    signOut({ callbackUrl: "/" });
-  };
-
   const isLoading = status === "loading";
   return (
     <button
       type="submit"
-      onClick={handleSubmit}
+      onClick={() => signOut({ callbackUrl: "/" })}
       disabled={isLoading}
       className={`
         mx-4 my-3 p-2 rounded-md font-semibold transition duration-150 ease-in-out

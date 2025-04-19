@@ -28,10 +28,7 @@ async function createUser(userData: {
     );
 
     if (!response.ok) {
-      console.log(response);
-      const errorData = await response.json();
-      // console.log(errorData);
-      throw new Error(errorData.message || "Rejestracja nie powiodła się");
+      throw new Error(`Rejestracja nie powiodła się: ${response.status}`);
     }
 
     const result = await response.json();
