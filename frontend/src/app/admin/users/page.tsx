@@ -1,15 +1,14 @@
 "use client";
 
+import UserList from "@/components/admin/UserList";
 import useDataStore from "@/store/useDataStore";
-import StockList from "@/components/stocks/StockList";
 import { useEffect, useCallback, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { debounce } from "lodash";
 
-export default function StockPage() {
-  const stocks = useDataStore((state) => state.stocks);
-
-  const [filteredStocks, setFilteredStocks] = useState(stocks);
+export default function NewsPage() {
+  const users = useDataStore((store) => store.users);
+  const [filteredUsers, setFilteredUsers] = useState(users);
 
   const searchParams = useSearchParams();
 
@@ -17,25 +16,23 @@ export default function StockPage() {
     const searchQuery = searchParams.get("search");
 
     if (!searchQuery) {
-      setFilteredStocks(stocks);
+      setFilteredUsers(users);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     searchQuery
-      ? setFilteredStocks(
-          stocks.filter((stock) =>
-            stock.title.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+      ? setFilteredUsers(
+          users.filter((user) => user.email.includes(searchQuery.toLowerCase()))
         )
-      : setFilteredStocks(stocks);
-  }, [searchParams]);
+      : setFilteredUsers(users);
+  }, [searchParams, users]);
 
   const search = useCallback(
     debounce((query: string) => {
       const url = new URL(window.location.href);
       url.searchParams.set("search", query);
       window.history.pushState({}, "", url);
-    }, 300),
+    }, 50),
     []
   );
 
@@ -54,8 +51,7 @@ export default function StockPage() {
           placeholder="Search..."
         />
       </div>
-
-      <StockList stocks={filteredStocks} />
+      <UserList users={filteredUsers} />;
     </>
   );
 }
