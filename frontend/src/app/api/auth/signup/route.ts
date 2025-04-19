@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { getUserFromDb } from "../auth";
 
-// Replace with your actual user creation logic
 async function createUser(userData: {
   password: string;
   email: string;
@@ -19,7 +18,6 @@ async function createUser(userData: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "toDelete",
           password: userData.password,
           email: userData.email,
           firstName: userData.firstName,
@@ -30,12 +28,15 @@ async function createUser(userData: {
     );
 
     if (!response.ok) {
+      console.log(response);
       const errorData = await response.json();
-      console.log(errorData);
+      // console.log(errorData);
       throw new Error(errorData.message || "Rejestracja nie powiodła się");
     }
 
     const result = await response.json();
+    console.log("SIGN IN RESULT");
+    console.log(result);
     return result;
   } catch (err) {
     console.error("Błąd podczas rejestracji:", err);
