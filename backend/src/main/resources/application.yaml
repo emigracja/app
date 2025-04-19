@@ -3,8 +3,8 @@ spring:
     name: backend
   datasource:
     url: jdbc:postgresql://localhost:5432/radomDB
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -30,3 +30,5 @@ spring:
       doc-expansion: none
   show-actuator: true
 
+jwt:
+  secret: wartosc_domyslna_tylko_dla_dev_nie_produkcja_klucza_sekretnego_ściśle_strzeżonego
