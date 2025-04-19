@@ -72,7 +72,7 @@ public class ArticleFetcher {
                 .doOnError(error -> log.error("Error sending articles: ", error))
                 .subscribe();
 
-        log.info("Subscription: {}", subscribe.toString());
+        log.info("Subscription: {}", subscribe);
     }
 
     private static boolean filterDates(ArticleDto article, LocalDateTime prevDay, LocalDateTime now) {
