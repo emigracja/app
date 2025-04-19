@@ -2,7 +2,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
-import { User } from "@/types/users"; // Assuming you have a User type/interface
+import { User } from "@/types/users";
 import { users } from "@/store/data";
 import bcrypt from "bcryptjs";
 
@@ -13,12 +13,12 @@ export async function getUserFromDb(email: string): Promise<User | null> {
   if (user.length > 0) {
     return user[0];
   }
+
   return null;
 }
 
 export const config: NextAuthConfig = {
-  // Using trustHost is recommended for deployments other than Vercel.
-  // trustHost: true,
+  trustHost: true,
   pages: {
     signIn: "/login", // Redirect users to /login if they are not signed in
   },
@@ -34,8 +34,8 @@ export const config: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<any> {
-        // Add validation logic here
         // TODO
+        // Add validation logic here
         if (!credentials?.email || !credentials?.password) {
           console.error("Missing credentials");
           return null;
@@ -57,11 +57,39 @@ export const config: NextAuthConfig = {
           user.passwordHash
         );
 
+        // TODO
+        // Verify password on backend
+        let isLoggedIn = false;
+        let backendToken;
+        try {
+          const response = await fetch(
+            `${process.env.BACKEND_API_URL}/users/auth/login`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
+          if (response.ok) {
+            isLoggedIn = true;
+            const { token } = await response.json();
+            backendToken = token;
+          }
+        } catch (err) {
+          console.log("Login attemp failed. error:", err);
+          isLoggedIn = false;
+        }
+
+        // change passwordsMatch to isLoggedIn when backend auth will work
         if (passwordsMatch) {
-          // This object is then encoded in the JWT or saved in the database session.
+          // This object is then encoded in the JWT
           return {
             id: user.id,
-            username: user.username,
             email: user.email,
             role: user.role,
           };
@@ -84,7 +112,6 @@ export const config: NextAuthConfig = {
       return token;
     },
     // The `session` callback is invoked when a session is checked.
-    // We add the user's ID and role (from the token) to the session object.
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
@@ -105,7 +132,7 @@ export const config: NextAuthConfig = {
       return true;
     },
   },
-  // If using JWT strategy (default), the session object is derived from the JWT token
+  // the session object is derived from the JWT token
   session: { strategy: "jwt" },
 };
 

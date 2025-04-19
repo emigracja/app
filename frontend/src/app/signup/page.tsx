@@ -40,13 +40,13 @@ export default function SignupPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }), // Include other fields if needed
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle errors returned from the API (e.g., user exists, validation failed)
+        // Handle errors returned from the API
         setError(data.message || "Registration failed. Please try again.");
       } else {
         // --- Registration Successful ---

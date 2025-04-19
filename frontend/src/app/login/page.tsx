@@ -14,7 +14,6 @@ export default function LoginPage() {
 
   // Get callback URL from query parameters, default to dashboard
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-  const loginError = searchParams.get("error"); // Get error from URL (e.g., from middleware redirect)
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
