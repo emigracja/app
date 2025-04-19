@@ -5,14 +5,20 @@ import com.example.backend.domain.dto.ArticleDto;
 import com.example.backend.domain.dto.mapper.ArticleMapper;
 import com.example.backend.infrastructure.database.entity.ArticleEntity;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
+import com.example.backend.infrastructure.database.entity.UserEntity;
 import com.example.backend.infrastructure.database.repository.ArticleJpaRepository;
-import jakarta.persistence.criteria.*;
+import com.example.backend.infrastructure.database.repository.UserJpaRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleJpaRepository articleJpaRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public List<ArticleDto> findAllBySearchParams(ArticleSearchParams params) {
@@ -48,6 +55,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    @Transactional
     @Override
     public List<ArticleDto> saveAll(List<ArticleDto> articles) {
         List<ArticleEntity> list = articles.stream().map(ArticleMapper::map).toList();
@@ -61,6 +69,24 @@ public class ArticleServiceImpl implements ArticleService {
     public Optional<ArticleDto> findById(String id) {
         return articleJpaRepository.findById(id)
                 .map(ArticleMapper::map);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ArticleDto> getArticlesForUser(ArticleSearchParams params, String email) {
+        Optional<UserEntity> optionalUser = userJpaRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("User with email: [%s] not exist!".formatted(email));
+        }
+
+        String userId = optionalUser.get().getId();
+
+        Pageable pageable = PageRequest.of(params.getPageNumber(), params.getSize());
+        return articleJpaRepository.findArticlesByUserId(userId, pageable)
+                .stream()
+                .map(ArticleMapper::map)
+                .toList();
     }
 
 

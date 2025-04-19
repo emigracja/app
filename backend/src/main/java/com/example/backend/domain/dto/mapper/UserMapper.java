@@ -10,7 +10,6 @@ public class UserMapper {
 
     public static UserDto map(UserEntity user) {
         return UserDto.builder()
-                .username(user.getUsername())
                 .password(user.getPassword())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
@@ -21,7 +20,6 @@ public class UserMapper {
 
     public static UserEntity map(UserDto userDto) {
         return UserEntity.builder()
-                .username(userDto.getUsername())
                 .password(userDto.getPassword())
                 .email(userDto.getEmail())
                 .firstName(userDto.getFirstName())

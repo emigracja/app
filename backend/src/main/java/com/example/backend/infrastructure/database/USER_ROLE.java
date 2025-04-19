@@ -1,6 +1,13 @@
 package com.example.backend.infrastructure.database;
 
-public enum USER_ROLE {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum USER_ROLE implements GrantedAuthority {
     ADMIN,
-    USER
+    USER;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

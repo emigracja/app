@@ -1,37 +1,49 @@
 package com.example.backend.domain.service.user;
 
+import com.example.backend.domain.dto.AuthRequest;
 import com.example.backend.domain.dto.UserDto;
 import com.example.backend.domain.dto.mapper.UserMapper;
-import com.example.backend.infrastructure.database.repository.UserRepository;
+import com.example.backend.infrastructure.config.security.jwt.JwtUtils;
+import com.example.backend.infrastructure.database.entity.UserEntity;
+import com.example.backend.infrastructure.database.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @Override
     public void registerUser(UserDto userDto) {
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userRepository.save(UserMapper.map(userDto));
+        userJpaRepository.save(UserMapper.map(userDto));
     }
 
     @Override
-    public boolean authenticateUser(UserDto userDto) {
-        var user = userRepository.findByUsername(userDto.getEmail());
-        boolean isPasswordLegit = user != null && passwordEncoder.matches(userDto.getPassword(), user.getPassword());
+    public Optional<String> authenticateUser(AuthRequest authRequest) {
+        Optional<UserEntity> optionalUser = userJpaRepository.findByEmail(authRequest.email());
 
+        if (optionalUser.isEmpty()) {
+            return Optional.empty();
+        }
+        UserEntity userEntity = optionalUser.get();
+
+        boolean isPasswordLegit = passwordEncoder.matches(authRequest.password(), userEntity.getPassword());
         if (!isPasswordLegit) {
-            return false;
+            return Optional.empty();
         }
 
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
+        userEntity.setLastLogin(LocalDateTime.now());
+        userJpaRepository.save(userEntity);
+
+        return Optional.of(jwtUtils.generateToken(userEntity));
     }
+
 }
