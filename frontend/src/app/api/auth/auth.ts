@@ -34,6 +34,7 @@ export const config: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<any> {
+        // Using 'any' here as User type might conflict before extensions are fully processed by TS
         // TODO
         // Add validation logic here
         if (!credentials?.email || !credentials?.password) {
@@ -43,6 +44,41 @@ export const config: NextAuthConfig = {
 
         const email = credentials.email as string;
         const password = credentials.password as string;
+
+        try {
+          const response = await fetch(
+            `${process.env.BACKEND_API_URL}/users/auth/login`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email,
+                password: password,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            console.error(`Backend login failed: ${response.status}`);
+            return null;
+          }
+          const data = await response.json();
+          // TODO
+          // adjust to working backend auth
+          const backendToken = data.token;
+          const backendUser = data.user;
+          if (!backendToken) {
+            console.error("Backend response missing token");
+            return null;
+          }
+          let userId = backendUser?.id;
+          let userEmail = backendUser?.email;
+          let userRole = backendUser?.role;
+        } catch (err) {
+          console.log("Backend login error: ", err);
+        }
 
         const user = await getUserFromDb(email);
 
@@ -108,6 +144,7 @@ export const config: NextAuthConfig = {
         // User object is available on initial sign-in
         token.id = user.id;
         token.role = user.role;
+        token.backendToken = user.backendToken;
       }
       return token;
     },
@@ -116,6 +153,7 @@ export const config: NextAuthConfig = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.backendToken = token.backendToken as string;
       }
       return session;
     },
