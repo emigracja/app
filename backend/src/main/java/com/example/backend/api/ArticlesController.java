@@ -5,7 +5,11 @@ import com.example.backend.domain.dto.ArticleDto;
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 import com.example.backend.domain.service.article.ArticleService;
 import com.example.backend.domain.service.impact.ArticleStockImpactService;
+import com.example.backend.domain.sse.SSEEntity;
+import com.example.backend.domain.sse.SSEEventProcessor;
 import com.example.backend.infrastructure.annotations.RequireNotEmptyEmail;
+import com.example.backend.infrastructure.database.entity.ArticleEntity;
+import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,6 +38,7 @@ public class ArticlesController {
 
     private final ArticleStockImpactService stockImpactService;
     private final ArticleService articleService;
+    private final SSEEventProcessor sseEventProcessor;
 
     @RequireNotEmptyEmail
     @Operation(
@@ -129,7 +134,15 @@ public class ArticlesController {
             }
 
             request.setArticleId(articleId);
-            stockImpactService.processImpact(request);
+            ArticleStockImpactEntity articleStockImpactDto = stockImpactService.processImpact(request);
+            ArticleEntity articleEntity = articleStockImpactDto.getArticle();
+
+            SSEEntity sseEntity = SSEEntity.builder()
+                    .stockId(articleStockImpactDto.getId())
+                    .name(articleEntity.getTitle())
+                    .description(articleEntity.getDescription()).build();
+
+            sseEventProcessor.emit(sseEntity);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
