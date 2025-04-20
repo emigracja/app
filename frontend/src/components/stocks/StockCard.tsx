@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { Currency, Period, CandlestickData } from "@/types/stocks";
 import Image from "next/image";
 import favEmpty from "../../../public/icons/favEmpty.svg";
-import notfication from "../../../public/icons/notfication.svg";
+import notification from "../../../public/icons/notification.svg";
 import PreviewChart from "./PreviewChart";
 import PreviewPrice from "./PreviewPrice";
 import StockName from "./StockName";
@@ -48,7 +48,7 @@ const StockCard = ({
             <div className="flex flex-end">
               <Image
                 className="box-border mr-2 rounded-xl active:bg-white/5"
-                src={notfication}
+                src={notification}
                 alt="favEmpty"
                 height={40}
                 width={40}

@@ -2,24 +2,27 @@ import { News } from "@/types/news";
 import { Stock, CandlestickData } from "@/types/stocks";
 import { AppSettings } from "@/types/appSettings";
 import { User } from "@/types/users";
-import bcrypt from "bcryptjs";
 
 export const users: User[] = [
   {
     id: "a",
-    username: "wojtek",
     email: "wojtek@wojtek.pl",
     passwordHash:
       "$2b$10$PA1O39WQpzVKelS58rqEiO9Ex6I7Pm8yv2pGsHyiXMvPJbN1NBEzG", // passwd: wasdwasd12
     role: "user",
+    firstName: "wojtek",
+    lastName: "wojtek",
+    phoneNumber: "+1 1331 532 523",
   },
   {
     id: "b",
-    username: "maciek",
     email: "maciek@wojtek.pl",
     passwordHash:
       "$2b$10$1hEKxvNye432jj0MUptL0uqYwg8iorpAvhp.AyQ1L0Me5E/fSXnfO", // passwd: wasd123
     role: "user",
+    firstName: "maciek",
+    lastName: "wojtek",
+    phoneNumber: "+1 1331 532 523",
   },
 ];
 

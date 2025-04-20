@@ -1,8 +1,10 @@
 export interface User {
   id: string;
   email: string;
-  username: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
   passwordHash: string;
   role: string;
-  backendToken: string;
+  backendToken?: string;
 }
