@@ -131,7 +131,7 @@ export const config: NextAuthConfig = {
         return true;
       }
       if (!isLoggedIn) {
-        return false;
+        return true;
       }
       return true;
     },
