@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import Image from "next/image";
 import favEmpty from "../../../public/icons/favEmpty.svg";
-import notification from "../../../public/icons/notfication.svg";
+import notification from "../../../public/icons/notification.svg";
 
 interface Props {
   id: string;

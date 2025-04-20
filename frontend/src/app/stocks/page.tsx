@@ -28,26 +28,27 @@ export default function StockPage() {
           )
         )
       : setFilteredStocks(stocks);
-  }, [searchParams]);
+  }, [searchParams, stocks]);
 
-  const search = useCallback(
-    debounce((query: string) => {
-      const url = new URL(window.location.href);
-      url.searchParams.set("search", query);
-      window.history.pushState({}, "", url);
-    }, 300),
-    []
-  );
+  const search = useCallback((query: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("search", query);
+    window.history.pushState({}, "", url);
+  }, []);
+
+  const debouncedSearch = debounce((query: string) => {
+    search(query);
+  }, 500);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    search(e.target.value);
+    debouncedSearch.cancel();
+    debouncedSearch(e.target.value);
   };
 
   return (
     <>
       <div className="w-full p-2">
         <input
-          value={searchParams.get("search") ?? ""}
           onChange={handleChange}
           className="p-2 w-full text-white border-white border-1 rounded-xl outline-none"
           type="text"

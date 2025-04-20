@@ -7,6 +7,7 @@ docker run --rm -it -v $(pwd):/app -w /app node:22-alpine sh
 ```
 
 ### viewsiki
+
 `GET /login` - logowanie
 
 `GET /signup` - zakładanie konta
@@ -15,7 +16,7 @@ docker run --rm -it -v $(pwd):/app -w /app node:22-alpine sh
 
 `GET /news/[id]` - szczegóły newsa
 
-`GET /stock` - lista spółek
+`GET /stocks` - lista spółek
 
 `GET /stocks/[id]` - szczegóły spółki
 
