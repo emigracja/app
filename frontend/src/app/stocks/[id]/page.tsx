@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import useDataStore from "@/store/useDataStore";
 import NewsList from "@/components/news/NewsList";
+import {periods} from "@/storage/default/chats";
 
 export default function StockDetail() {
   const params = useParams();
@@ -119,8 +120,23 @@ export default function StockDetail() {
         <section ref={scrollContainer}
                  className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory">
           <div className="flex w-[200vw] box-border justify-between px-1">
-            <div className="w-[100vw] box-border snap-center">
-              <MainChart CandlestickData={stock.periodPrices}/>
+            <div className="flex flex-col align-middle gap-2 w-[100vw] box-border snap-center">
+              <div className="flex justify-end ">
+                <div className="text-white flex gap-2 items-center mr-4">
+                  <label>
+                    Period:
+                  </label>
+                  <select
+                      style={{ WebkitAppearance: 'none', MozAppearance: 'none', textAlignLast: 'center' }}
+                      className="block bg-transparent border border-gray-600 rounded-md p-1 text-center appearance-none focus:outline-none focus:border-gray-400 pr-6"
+                  >
+                    {periods.map(period => (
+                        <option key={period} value={period} className="bg-gray-900">{period}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <MainChart CandlestickData={stock.periodPrices} />
             </div>
             <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
               <NewsList news={news}/>
