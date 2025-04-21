@@ -32,3 +32,7 @@ spring:
 
 jwt:
   secret: wartosc_domyslna_tylko_dla_dev_nie_produkcja_klucza_sekretnego_ściśle_strzeżonego
+vapid:
+  public.key: BKpBiJpEMiFP_DHHjoQuulIVbVPCFS0RrOkIdh3EgEO_awvW7_LQA4iU2x5qhCeHemWQHdu4GWpakdLoqiBp1WA
+  private.key: Kgosx01sBrGh0FazCqS6hRVG-inT4vhnTtk2-Bi9lHk
+  subject: mailto:dummy@yourdomain.com

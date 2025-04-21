@@ -1,0 +1,39 @@
+ ### IntelliJ HTTP Client File for User Registration
+# Location: Radom, Masovian Voivodeship, Poland
+# Date: April 21, 2025
+
+# --- Variables ---
+# Define base URL (modify if needed or use environment variables)
+@baseUrl = http://localhost:8080
+# Generate a random element for email uniqueness in tests
+@randomSuffix = {{$randomInt}}
+
+###
+# POST Request - Register a Valid New User
+# Sends valid data according to UserDto validation rules.
+# Expects a 200 OK response with "User registered successfully".
+POST {{baseUrl}}/users/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "password": "validPassword123",
+  "email": "mock.user.{{randomSuffix}}@example.com",
+  "firstName": "MockFirstName",
+  "lastName": "MockLastName",
+  "phone": "1234567890"
+}
+
+
+POST {{baseUrl}}/subscribe
+Content-Type: application/json
+
+{
+  "userId": "test-user-123",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/fYp9z...AAAA",
+  "p256dh": "BIPUL12DLfytvTajnryr2PR...",
+  "auth": "BME81234567BME8A=="
+}
+
+
+
