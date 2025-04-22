@@ -1,0 +1,10 @@
+CREATE TABLE WEB_PUSH_SUBSCRIPTIONS
+(
+    id       VARCHAR(36)  NOT NULL,
+    endpoint VARCHAR(255) NOT NULL,
+    p256dh   VARCHAR(255) NULL,
+    auth     VARCHAR(255) NULL,
+    user_id  VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_subscriptions PRIMARY KEY (id),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);

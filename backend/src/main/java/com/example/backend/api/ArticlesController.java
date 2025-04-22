@@ -5,7 +5,11 @@ import com.example.backend.domain.dto.ArticleDto;
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 import com.example.backend.domain.service.article.ArticleService;
 import com.example.backend.domain.service.impact.ArticleStockImpactService;
+import com.example.backend.domain.service.user.UserService;
+import com.example.backend.domain.service.webpush.notification.WebPushNotificationService;
 import com.example.backend.infrastructure.annotations.RequireNotEmptyEmail;
+import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
+import com.example.backend.infrastructure.database.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,6 +38,8 @@ public class ArticlesController {
 
     private final ArticleStockImpactService stockImpactService;
     private final ArticleService articleService;
+    private final UserService userService;
+    private final WebPushNotificationService webPushNotificationService;
 
     @RequireNotEmptyEmail
     @Operation(
@@ -129,7 +135,12 @@ public class ArticlesController {
             }
 
             request.setArticleId(articleId);
-            stockImpactService.processImpact(request);
+            ArticleStockImpactEntity impact = stockImpactService.processImpact(request);
+            List<UserEntity> affectedUsers = userService.findAllByStocksId(request.getStockId());
+
+            String payload = webPushNotificationService.prepareMessage(impact);
+
+            webPushNotificationService.notifyAll(affectedUsers, payload);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
