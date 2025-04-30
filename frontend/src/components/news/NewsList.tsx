@@ -12,7 +12,7 @@ const NewsList = ({ news }: Props): ReactElement => {
       className="flex flex-col gap-10 px-2"
     >
       {news.map((element) => (
-        <Card key={element.id} {...element} />
+        <Card key={element.externalId} {...element} />
       ))}
     </div>
   );
