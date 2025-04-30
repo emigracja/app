@@ -9,7 +9,7 @@ import {
     DeepPartial,
     CandlestickSeries,
 } from "lightweight-charts";
-import {getCssVariable} from "@/util/util";
+import {getCssVariable} from "@/utils/util";
 
 interface Props {
     CandlestickData: CandlestickData[];

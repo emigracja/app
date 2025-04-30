@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/navbar/NavBar";
 import TopBar from "@/components/topbar/TopBar";
 import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
+import QueryProvider from "@/components/providers/QueryProvider";
 
 const mavenPro = Maven_Pro({
   variable: "--font-maven-pro",
@@ -37,21 +38,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionProviderWrapper>
-      <html lang="en">
-        <body className={`${mavenPro.variable} antialiased relative`}>
-          <main className="grid grid-rows-[auto_1fr_auto] h-full overflow-hidden">
-            <TopBar />
-            <div className="overflow-auto">
-              {children || <div className="h-full"></div>}
-            </div>
-            <div className="relative bottom-[0px] w-full">
-              <NavBar />
-            </div>
-            {/*<Overlay />*/}
-          </main>
-        </body>
-      </html>
-    </SessionProviderWrapper>
+      <QueryProvider>
+        <SessionProviderWrapper>
+          <html lang="en">
+            <body className={`${mavenPro.variable} antialiased relative`}>
+              <main className="grid grid-rows-[auto_1fr_auto] h-full overflow-hidden">
+                <TopBar />
+                <div className="overflow-auto">
+                  {children || <div className="h-full"></div>}
+                </div>
+                <div className="relative bottom-[0px] w-full">
+                  <NavBar />
+                </div>
+                {/*<Overlay />*/}
+              </main>
+            </body>
+          </html>
+        </SessionProviderWrapper>
+      </QueryProvider>
   );
 }

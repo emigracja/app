@@ -9,7 +9,7 @@ const news = {
     publishedAt: "1741209855234",
     author: "New York Times",
     affectedStocks: 2,
-    imageUri: "/images/image.png",
+    imageUri: "/images/image1.jpg",
     text: "Prime Minister Justin Trudeau of Canada on Tuesday harshly condemned the tariffs that President Trump imposed on Canada, as well as Mexico and China, saying in a televised address that they would hurt people on both sides of the U.S.- Canadian border and that Canada would “relentlessly fight” to protect its economy. 2 minutes ago 55 minutes ago Canada and China quickly announced retaliatory tariffs after the U.S. levies — an ter midnight on Monday. Mexico said it could impose its own countermeasures by Sunday. The moves driving down stock prices and worrying global markets...",
     tags: ["TAG1", "TAG2"],
 }

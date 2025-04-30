@@ -8,6 +8,5 @@ export default function SessionProviderWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  // SessionProvider requires a client component boundary
   return <SessionProvider>{children}</SessionProvider>;
 }
