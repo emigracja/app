@@ -11,10 +11,11 @@ export interface CandlestickData {
 
 export interface Stock {
   id: string;
-  title: string;
-  shortcut: string;
+  name: string;
+  symbol: string;
   currency: Currency;
-  market: string;
+  exchange: string;
+  ekd: string;
   price: number;
   todaysPriceChange: number;
   currentPeriod: Period;
