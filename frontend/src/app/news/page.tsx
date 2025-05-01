@@ -5,7 +5,6 @@ import NewsList from "@/components/news/NewsList";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { News } from "@/types/news";
-
 import axios from "@/utils/axios";
 
 interface FetchResponse {

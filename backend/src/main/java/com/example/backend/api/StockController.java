@@ -30,6 +30,7 @@ import static com.example.backend.api.params.StocksSearchParams.*;
 @RestController
 @RequiredArgsConstructor
 @RequireNotEmptyEmail
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class StockController {
     public static final String ALL_STOCKS = "/stocks";
     public static final String USER_STOCKS = "/user/stocks";

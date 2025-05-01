@@ -9,10 +9,11 @@ import StockName from "./StockName";
 
 interface Props {
   id: string;
-  title: string;
-  shortcut: string;
+  name: string;
+  symbol: string;
   currency: Currency;
-  market: string;
+  exchange: string;
+  ekd: string;
   price: number;
   todaysPriceChange: number;
   currentPeriod: Period;
@@ -22,8 +23,8 @@ interface Props {
 
 const StockCard = ({
   id,
-  title,
-  shortcut,
+  name,
+  symbol,
   currency,
   // market,
   price,
@@ -36,7 +37,7 @@ const StockCard = ({
       <a href={`/stocks/${id}`}>
         <div className="flex flex-row gap-3 items-start h-full">
           <div className="flex flex-col w-full gap-5 basis-2/3 grow">
-            <StockName title={title} shortcut={shortcut} />
+            <StockName name={name} symbol={symbol} />
             <PreviewChart CandlestickData={periodPrices} id={id} />
           </div>
           <div className="basis-1/3 grow flex flex-col items-end justify-between h-full">
