@@ -17,4 +17,6 @@ public interface ArticleService {
     Optional<ArticleDto> findById(String id);
 
     List<ArticleDto> getArticlesForUser(ArticleSearchParams params, String email);
+
+    Optional<ArticleDto> findBySlug(String slug);
 }

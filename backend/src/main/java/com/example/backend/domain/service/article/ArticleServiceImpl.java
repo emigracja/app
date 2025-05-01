@@ -71,6 +71,11 @@ public class ArticleServiceImpl implements ArticleService {
                 .map(ArticleMapper::map);
     }
 
+    @Override
+    public Optional<ArticleDto> findBySlug(String slug) {
+        return articleJpaRepository.findBySlug(slug).map(ArticleMapper::map);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<ArticleDto> getArticlesForUser(ArticleSearchParams params, String email) {

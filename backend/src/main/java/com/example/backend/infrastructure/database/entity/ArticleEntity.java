@@ -21,6 +21,9 @@ public class ArticleEntity {
     @Column(name = "title", unique = true, nullable = false)
     private String title;
 
+    @Column(name = "slug", unique = true, nullable = false)
+    private String slug;
+
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
@@ -37,5 +40,5 @@ public class ArticleEntity {
     private String url;
 
     @OneToMany(mappedBy = "article")
-    private List<ArticleStockImpactEntity> articleImpacts;
+    private List<ArticleStockImpactEntity> articleImpacts = List.of();
 }

@@ -28,7 +28,7 @@ public class ArticleFetcher {
     private final ArticleService articleService;
     private final ArticleApiService articleApiService;
 
-    //    @Scheduled(fixedRate = 1000000)
+//    @Scheduled(fixedRate = 100000)
     @Scheduled(cron = "0 0 8 * * *")
     public void fetchArticles() {
         LocalDateTime now = LocalDateTime.now();
@@ -41,7 +41,7 @@ public class ArticleFetcher {
         }
 
         List<ArticleDto> savedArticles = saveArticles(articles);
-
+        log.info("Saved articles: {}", savedArticles.size());
         if (savedArticles.isEmpty()) {
             return;
         }

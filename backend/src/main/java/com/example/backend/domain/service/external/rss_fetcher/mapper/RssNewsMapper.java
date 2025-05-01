@@ -1,6 +1,7 @@
 package com.example.backend.domain.service.external.rss_fetcher.mapper;
 
 import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.service.article.slug.SlugGenerator;
 import com.example.backend.domain.service.external.rss_fetcher.model.RssNewsObject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class RssNewsMapper {
     public static ArticleDto getArticleDto(RssNewsObject.Item item) {
         return ArticleDto.builder()
                 .title(item.getTitle())
+                .slug(SlugGenerator.createSlugFromTitle(item.getTitle()))
                 .description(item.getParsedDescription())
                 .url(item.getLink())
                 .publishedAt(getPublishedAt(item))
@@ -33,4 +35,5 @@ public class RssNewsMapper {
             return null;
         }
     }
+
 }

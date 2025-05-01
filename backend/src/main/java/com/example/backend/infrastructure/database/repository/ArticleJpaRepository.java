@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ArticleJpaRepository extends JpaRepository<ArticleEntity, String> {
@@ -36,4 +37,5 @@ public interface ArticleJpaRepository extends JpaRepository<ArticleEntity, Strin
                     "WHERE u.id = :userId")
     Page<ArticleEntity> findArticlesByUserId(@Param("userId") String userId, Pageable pageable);
 
+    Optional<ArticleEntity> findBySlug(String slug);
 }

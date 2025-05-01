@@ -5,6 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
+import lombok.ToString;
 import org.jsoup.Jsoup;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @XmlRootElement(name = "rss")
 @XmlAccessorType(XmlAccessType.FIELD)
+@ToString
 public class RssNewsObject {
 
     @XmlElement(name = "channel")
@@ -19,6 +21,7 @@ public class RssNewsObject {
 
     @Getter
     @XmlAccessorType(XmlAccessType.FIELD)
+    @ToString
     public static class Channel {
         @XmlElement(name = "title")
         private String title;
