@@ -1,7 +1,9 @@
 import {ReactElement} from "react";
 import Image from "next/image";
 import {getRandomInt, getTimeDifference} from "@/utils/util";
+
 import Tag from "@/components/news/Tag";
+
 
 interface Props {
     id: string | null;
@@ -11,8 +13,6 @@ interface Props {
     stocks: string[];
     author: string;
     imageUri: string;
-    slug: string;
-}
 
 const Card = ({
                    title, publishedAt, affectedStocks, author, stocks, slug
@@ -21,15 +21,19 @@ const Card = ({
     const publishedAtString = getTimeDifference(publishedAt);
 
     const randomImageUrl = `/images/image${getRandomInt(1,3)}.jpg`;
+
     return (
         <section className="min-h-32 relative block text-xl text-white rounded-xl p-3 box-content" >
             <a href={`/news/${slug}`} className="flex flex-col gap-5 justify-end">
+
                 <p className={"text-white font-bold"}>
                     {title}
                 </p>
                 <div className={"flex justify-between content-center"}>
                     <div className={"flex gap-2"}>
+
                         {stocks.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+
                     </div>
                     {affectedStocks &&
                     <p className={"text-white font-bold text-sm h-0 mt-3"}>
