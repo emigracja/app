@@ -1,5 +1,6 @@
 package com.example.backend.domain.service.stock;
 
+import com.example.backend.api.params.StocksSearchParams;
 import com.example.backend.domain.dto.StockDto;
 import com.example.backend.domain.dto.mapper.StockMapper;
 import com.example.backend.infrastructure.database.entity.StockEntity;
@@ -8,14 +9,18 @@ import com.example.backend.infrastructure.database.repository.StockJpaRepository
 import com.example.backend.infrastructure.database.repository.UserJpaRepository;
 import com.example.backend.infrastructure.exceptions.StockAlreadyAssociatedException;
 import com.example.backend.infrastructure.exceptions.StockNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Slf4j
 @Service
@@ -65,5 +70,51 @@ public class StockServiceImpl implements StockService {
 
         return StockMapper.map(stockToAdd);
     }
+
+    @Override
+    public List<StockDto> findAllBySearchParams(StocksSearchParams params) {
+        Pageable pageable = PageRequest.of(params.page(), params.size());
+        return stockJpaRepository.findAll(createStockSpecification(params), pageable)
+                .stream()
+                .map(StockMapper::map)
+                .toList();
+    }
+
+    private Specification<StockEntity> createStockSpecification(StocksSearchParams params) {
+        return (root, query, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.conjunction();
+
+            if (params.symbol() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("symbol"), params.symbol()));
+            }
+
+            if (params.stockName() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("name"), "%" + params.stockName() + "%"));
+            }
+
+            if (params.country() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("country"), "%" + params.country() + "%"));
+            }
+
+            if (params.exchange() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("exchange"), "%" + params.exchange() + "%"));
+            }
+
+            if (params.generalSearch() != null) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("name"), "%" + params.generalSearch() + "%"),
+                                criteriaBuilder.like(root.get("symbol"), "%" + params.generalSearch() + "%"),
+                                criteriaBuilder.like(root.get("country"), "%" + params.generalSearch() + "%"),
+                                criteriaBuilder.like(root.get("exchange"), "%" + params.generalSearch() + "%")
+                        )
+                );
+            }
+
+            return predicate;
+        };
+    }
+
+
 
 }

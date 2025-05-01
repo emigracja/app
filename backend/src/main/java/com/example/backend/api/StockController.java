@@ -1,5 +1,6 @@
 package com.example.backend.api;
 
+import com.example.backend.api.params.StocksSearchParams;
 import com.example.backend.domain.dto.AddStockRequestDto;
 import com.example.backend.domain.dto.StockDto;
 import com.example.backend.domain.service.stock.StockService;
@@ -7,6 +8,7 @@ import com.example.backend.infrastructure.annotations.RequireNotEmptyEmail;
 import com.example.backend.infrastructure.exceptions.StockAlreadyAssociatedException;
 import com.example.backend.infrastructure.exceptions.StockNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+
+import static com.example.backend.api.params.StocksSearchParams.*;
+
 
 @Slf4j
 @RestController
@@ -47,10 +49,41 @@ public class StockController {
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
-    public ResponseEntity<List<StockDto>> getStocks() {
+    public ResponseEntity<List<StockDto>> getStocks(
+            @Parameter(description = "General search term")
+            @RequestParam(name = PARAM_SEARCH, required = false) String generalSearch,
+
+            @Parameter(description = "Search by article name")
+            @RequestParam(name = PARAM_NAME, required = false) String stockName,
+
+            @Parameter(description = "Filter by exchange name")
+            @RequestParam(name = PARAM_EXCHANGE, required = false) String exchangeName,
+
+            @Parameter(description = "Filter by country name")
+            @RequestParam(name = PARAM_COUNTRY, required = false) String country,
+
+            @Parameter(description = "Filter by symbol")
+            @RequestParam(name = PARAM_SYMBOL, required = false) String symbol,
+
+            @Parameter(description = "Page number for pagination")
+            @RequestParam(name = PARAM_PAGE, required = false, defaultValue = "0") Integer pageNumber,
+
+            @Parameter(description = "Page size for pagination")
+            @RequestParam(name = PARAM_SIZE, required = false, defaultValue = "10") Integer size
+    ) {
         try {
             log.info("getStocks");
-            List<StockDto> list = stockService.getAllStocks();
+            List<StockDto> list = stockService.findAllBySearchParams(
+                    new StocksSearchParams(
+                            generalSearch,
+                            stockName,
+                            symbol,
+                            country,
+                            exchangeName,
+                            size,
+                            pageNumber
+                    )
+            );
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
