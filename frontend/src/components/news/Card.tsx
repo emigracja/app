@@ -1,59 +1,39 @@
 import {ReactElement} from "react";
-import Tag from "@/components/news/Tag";
 import Image from "next/image";
+import {getRandomInt, getTimeDifference} from "@/utils/util";
+
+import Tag from "@/components/news/Tag";
+
 
 interface Props {
     id: string | null;
     title: string;
     publishedAt: string;
     affectedStocks: number | null;
-    tags: string[];
+    stocks: string[];
     author: string;
     imageUri: string;
-}
-
-const getTimeDifference = (publishedAt: string): string => {
-    const now = Date.now();
-    const published = parseInt(publishedAt);
-    const diff = now - published;
-
-    const timeUnits = [
-        { unit: "year", value: 1000 * 60 * 60 * 24 * 365 },
-        { unit: "month", value: 1000 * 60 * 60 * 24 * 30 },
-        { unit: "week", value: 1000 * 60 * 60 * 24 * 7 },
-        { unit: "day", value: 1000 * 60 * 60 * 24 },
-        { unit: "hour", value: 1000 * 60 * 60 },
-        { unit: "minute", value: 1000 * 60 }
-    ];
-
-    let publishedAtString = "just now";
-
-    for (const { unit, value } of timeUnits) {
-        const diffInUnit = Math.floor(diff / value);
-        if (diffInUnit > 0) {
-            publishedAtString = `${diffInUnit} ${unit}${diffInUnit > 1 ? "s" : ""} ago`;
-            break;
-        }
-    }
-
-    return publishedAtString;
-}
 
 const Card = ({
-                  id, title, publishedAt, affectedStocks, tags, author, imageUri
+                   title, publishedAt, affectedStocks, author, stocks, slug
               }: Props): ReactElement => {
 
     const publishedAtString = getTimeDifference(publishedAt);
 
+    const randomImageUrl = `/images/image${getRandomInt(1,3)}.jpg`;
+
     return (
-        <section className="relative block text-xl text-white rounded-xl p-3 box-content" >
-            <a href={ id != null ? `/news/${id}` : ''} className="flex flex-col gap-5 justify-end">
+        <section className="min-h-32 relative block text-xl text-white rounded-xl p-3 box-content" >
+            <a href={`/news/${slug}`} className="flex flex-col gap-5 justify-end">
+
                 <p className={"text-white font-bold"}>
                     {title}
                 </p>
                 <div className={"flex justify-between content-center"}>
                     <div className={"flex gap-2"}>
-                        {tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+
+                        {stocks.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+
                     </div>
                     {affectedStocks &&
                     <p className={"text-white font-bold text-sm h-0 mt-3"}>
@@ -63,13 +43,14 @@ const Card = ({
                 </div>
             </a>
             <Image
-                className="absolute inset-0 object-cover box-content opacity-60 rounded-xl pointer-events-none"
-                src={imageUri}
+                quality={50}
+                className="absolute inset-0 object-cover box-content opacity-40 rounded-xl pointer-events-none"
+                src={randomImageUrl}
                 alt="background"
                 layout="fill"
             />
-            <div className={"absolute text-white -bottom-6 right-0 opacity-50 text-sm"}>
-                {publishedAtString} {"•"} {author}
+            <div className={"absolute text-white -bottom-6 right-0 opacity-70 text-sm"}>
+                 {author} {"•"} {publishedAtString}
             </div>
         </section>
     )

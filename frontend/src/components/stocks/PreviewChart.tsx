@@ -10,7 +10,7 @@ import {
   BaselineSeries,
   CrosshairMode,
 } from "lightweight-charts";
-import { getCssVariable } from "@/util/util";
+import { getCssVariable } from "@/utils/util";
 
 interface Props {
   id: string;

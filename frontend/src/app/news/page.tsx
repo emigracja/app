@@ -1,10 +1,28 @@
 "use client";
 
 import NewsList from "@/components/news/NewsList";
-import useDataStore from "@/store/useDataStore";
+import { useQuery } from "@tanstack/react-query";
+import axios from "@/utils/axios";
+
+
+const fetchNews = async () => {
+
+  const response = await axios.get(`/articles?size=20`);
+
+  return response.data;
+};
 
 export default function NewsPage() {
-  const news = useDataStore((store) => store.news);
+  const { data, isLoading } = useQuery({
+    queryKey: ['news'],
+    queryFn: fetchNews,
+  });
 
-  return <NewsList news={news} />;
+  if(isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  console.log(data)
+
+  return <NewsList news={data} />;
 }

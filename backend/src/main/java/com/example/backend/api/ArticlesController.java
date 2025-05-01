@@ -32,6 +32,7 @@ import static com.example.backend.api.params.ArticleSearchParams.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ArticlesController {
     public static final String API_ARTICLES_PATH = "/articles";
     public static final String API_USER_ARTICLES_PATH = "/user/articles";
@@ -82,6 +83,21 @@ public class ArticlesController {
                 pageNumber,
                 size
         )));
+    }
+
+    @GetMapping(API_ARTICLES_PATH + "/slug/{slug}")
+    @Operation(
+            summary = "Retrieve an article by its slug",
+            description = "Fetches the article details for the given slug. Returns a 404 status if the article is not found.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Article found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Article not found")
+            }
+    )
+    public ResponseEntity<ArticleDto> getArticleBySlug(@PathVariable("slug") String slug) {
+        return articleService.findBySlug(slug)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @RequireNotEmptyEmail
