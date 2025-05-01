@@ -6,7 +6,7 @@ import axios from "@/utils/axios";
 
 
 const fetchNews = async () => {
-  const response = await axios.get(`/articles`);
+  const response = await axios.get(`/articles?size=20`);
   return response.data;
 };
 

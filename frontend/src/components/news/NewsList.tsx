@@ -5,7 +5,7 @@ import Card from "./Card";
 interface Props {
   news: News[];
 }
-// TODO: Add lazy loading
+
 const NewsList = ({ news }: Props): ReactElement => {
   return (
     <div
