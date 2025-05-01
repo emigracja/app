@@ -13,6 +13,8 @@ interface Props {
     stocks: string[];
     author: string;
     imageUri: string;
+    slug: string;
+}
 
 const Card = ({
                    title, publishedAt, affectedStocks, author, stocks, slug

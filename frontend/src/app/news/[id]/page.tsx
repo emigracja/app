@@ -47,6 +47,8 @@ const fetchNews = async (slug: string) => {
          </div>
      }
 
+     console.log(data)
+
     const handleDrawerChange = (id: string) => {
         setSelectedDrawer(selectedDrawer === id ? null : id);
     }
