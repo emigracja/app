@@ -43,7 +43,9 @@ public class RssNewsService extends RssFetcher<RssNewsObject> {
 
         List<ArticleDto> articles = new ArrayList<>();
         for (RssNewsObject.Item item : rssNewsObject.getChannel().getItems()) {
-            articles.add(RssNewsMapper.getArticleDto(item));
+            ArticleDto articleDto = RssNewsMapper.getArticleDto(item);
+            articleDto.setAuthor(rssNewsObject.getChannel().getTitle());
+            articles.add(articleDto);
         }
         return articles;
     }
