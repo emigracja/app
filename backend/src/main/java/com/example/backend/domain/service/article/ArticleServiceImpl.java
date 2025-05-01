@@ -36,7 +36,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleDto> findAllBySearchParams(ArticleSearchParams params) {
-        Pageable pageable = PageRequest.of(params.getPageNumber(), params.getSize());
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
         return articleJpaRepository.findAll(createArticleSpecification(params), pageable)
                 .stream()
                 .map(ArticleMapper::map)
@@ -87,7 +87,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         String userId = optionalUser.get().getId();
 
-        Pageable pageable = PageRequest.of(params.getPageNumber(), params.getSize());
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
         return articleJpaRepository.findArticlesByUserId(userId, pageable)
                 .stream()
                 .map(ArticleMapper::map)
@@ -99,17 +99,17 @@ public class ArticleServiceImpl implements ArticleService {
         return (root, query, criteriaBuilder) -> {
             Predicate predicate = criteriaBuilder.conjunction();
 
-            if (params.getArticleName() != null) {
+            if (params.articleName() != null) {
                 predicate = criteriaBuilder.and(predicate,
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(root.get("title")),
-                                "%" + params.getArticleName().toLowerCase() + "%"
+                                "%" + params.articleName().toLowerCase() + "%"
                         )
                 );
             }
 
-            if (params.getGeneralSearch() != null) {
-                String searchTerm = "%" + params.getGeneralSearch().toLowerCase() + "%";
+            if (params.generalSearch() != null) {
+                String searchTerm = "%" + params.generalSearch().toLowerCase() + "%";
                 Predicate titlePredicate = criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("title")),
                         searchTerm
@@ -123,22 +123,22 @@ public class ArticleServiceImpl implements ArticleService {
                 );
             }
 
-            if (params.getDateFrom() != null) {
+            if (params.dateFrom() != null) {
                 try {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date fromDate = dateFormat.parse(params.getDateFrom());
+                    Date fromDate = dateFormat.parse(params.dateFrom());
                     predicate = criteriaBuilder.and(predicate,
                             criteriaBuilder.greaterThanOrEqualTo(root.get("publishedAt"), fromDate)
                     );
                 } catch (ParseException e) {
-                    log.error("Failed to parse dateFrom: " + params.getDateFrom(), e);
+                    log.error("Failed to parse dateFrom: " + params.dateFrom(), e);
                 }
             }
 
-            if (params.getDateTo() != null) {
+            if (params.dateTo() != null) {
                 try {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date toDate = dateFormat.parse(params.getDateTo());
+                    Date toDate = dateFormat.parse(params.dateTo());
                     Calendar c = Calendar.getInstance();
                     c.setTime(toDate);
                     c.add(Calendar.DATE, 1);
@@ -148,16 +148,16 @@ public class ArticleServiceImpl implements ArticleService {
                             criteriaBuilder.lessThan(root.get("publishedAt"), endDate)
                     );
                 } catch (ParseException e) {
-                    log.error("Error parsing dateTo: " + params.getDateTo(), e);
+                    log.error("Error parsing dateTo: " + params.dateTo(), e);
                 }
             }
 
-            if (params.getStockName() != null) {
+            if (params.stockName() != null) {
                 Join<ArticleEntity, ArticleStockImpactEntity> stockImpactJoin = root.join("articleImpacts", JoinType.INNER);
                 predicate = criteriaBuilder.and(predicate,
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(stockImpactJoin.get("stockName")),
-                                "%" + params.getStockName().toLowerCase() + "%"
+                                "%" + params.stockName().toLowerCase() + "%"
                         )
                 );
             }
