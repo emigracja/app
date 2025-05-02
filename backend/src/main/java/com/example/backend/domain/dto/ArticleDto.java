@@ -15,6 +15,7 @@ public class ArticleDto {
     private String externalId;
     private String title;
     private String author;
+    private String backgroundImage;
     private String url;
     private String description;
     private Date publishedAt;

@@ -36,15 +36,13 @@ const fetchNews = async (slug: string) => {
          return <Loader />
      }
 
-     console.log(data)
-
     const handleDrawerChange = (id: string) => {
         setSelectedDrawer(selectedDrawer === id ? null : id);
     }
 
     return (
         <div className="flex flex-col p-2 h-100vh overflow-auto" style={{ backgroundColor: "transparent" }}>
-            <Card slug={data.slug} id={null} title={data.title} publishedAt={data.publishedAt} affectedStocks={null} stocks={[]} author={data.author} />
+            <Card slug={data.slug} id={null} title={data.title} publishedAt={data.publishedAt} affectedStocks={null} stocks={[]} author={data.author} backgroundImage={data.backgroundImage} />
             <article className="relative block text-[13px] text-white mt-10 rounded-xl p-3 box-content bg-white/10 text-justify">
                 {data.description}
                 <br/>
