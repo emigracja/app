@@ -39,6 +39,9 @@ public class ArticleEntity {
     @Column(name = "url")
     private String url;
 
+    @Column(name = "background_image")
+    private String backgroundImage;
+
     @OneToMany(mappedBy = "article")
     private List<ArticleStockImpactEntity> articleImpacts = List.of();
 }

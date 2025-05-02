@@ -1,10 +1,34 @@
-import type { NextConfig } from "next";
-import withPWA from "next-pwa";
+
 require("dotenv").config({ path: "../.env" });
 
-export default withPWA({
-  dest: "public", // destination directory for the PWA files
-  disable: process.env.NODE_ENV === "development", // disable PWA in the development environment
-  register: true, // register the PWA service worker
-  skipWaiting: true, // skip waiting for service worker activation
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
 });
+
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'galeria.bankier.pl',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ipla.pluscdn.pl',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.polsatnews.pl',
+        pathname: '/**',
+      }
+    ],
+  },
+  reactStrictMode: true,
+};
+
+module.exports = withPWA(nextConfig);

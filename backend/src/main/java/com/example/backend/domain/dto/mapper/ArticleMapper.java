@@ -19,6 +19,7 @@ public class ArticleMapper {
                 .slug(articleDto.getSlug())
                 .author(articleDto.getAuthor())
                 .url(articleDto.getUrl())
+                .backgroundImage(articleDto.getBackgroundImage())
                 .description(articleDto.getDescription())
                 .publishedAt(articleDto.getPublishedAt())
                 .build();
@@ -33,6 +34,7 @@ public class ArticleMapper {
                 .title(articleEntity.getTitle())
                 .author(articleEntity.getAuthor())
                 .slug(articleEntity.getSlug())
+                .backgroundImage(articleEntity.getBackgroundImage())
                 .url(articleEntity.getUrl())
                 .description(articleEntity.getDescription())
                 .publishedAt(articleEntity.getPublishedAt())

@@ -1,4 +1,4 @@
-package com.example.backend.domain.service.external.rss_fetcher;
+package com.example.backend.domain.service.external.rss_fetcher.fetcher;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
@@ -15,6 +15,7 @@ public abstract class RssFetcher<T> {
 
     protected T fetchRss(String urlString, Class<T> clazz) {
         try {
+            log.info("Fetching RSS from: {}", urlString);
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -35,7 +36,6 @@ public abstract class RssFetcher<T> {
             T result = (T) unmarshaller.unmarshal(inputStream);
 
             inputStream.close();
-
             return result;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
