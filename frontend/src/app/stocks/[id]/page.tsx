@@ -5,21 +5,56 @@ import Image from "next/image";
 import favEmpty from "../../../../public/icons/favEmpty.svg";
 import notification from "../../../../public/icons/notification.svg";
 import { Stock, CandlestickData } from "@/types/stocks";
+import { useQuery } from "@tanstack/react-query";
 import MainChart from "@/components/stocks/MainChart";
 import PriceChange from "@/components/stocks/PriceChange";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import useDataStore from "@/store/useDataStore";
 import NewsList from "@/components/news/NewsList";
-import {periods} from "@/storage/default/chats";
+import { periods } from "@/storage/default/chats";
+import axios from "@/utils/axios";
+import { addCandlestickMockData } from "@/utils/mockData";
+import { News } from "@/types/news";
+
+const fetchStock = async (stockId: string): Promise<Stock> => {
+  try {
+    const response = await axios.get(`/stocks`);
+    const stock = addCandlestickMockData([response.data[0]])[0];
+    return stock as Stock;
+  } catch (err) {
+    console.error(`Error fetching stock ${stockId}:`, err);
+    throw err;
+  }
+};
+
+const fetchNews = async (): Promise<News[]> => {
+  try {
+    const response = await axios.get(`/articles?page=2`);
+    return response.data as News[];
+  } catch (err) {
+    console.error(`Error fetching news:`, err);
+    throw err;
+  }
+};
 
 export default function StockDetail() {
   const params = useParams();
-  const id = params.id;
-  const stock = useDataStore((state) => state.stocks).filter(
-    (s) => s.id == id
-  )[0];
-  const news = useDataStore((state) => state.news);
+  const id = params.id as string;
+
+  const newsQuery = useQuery({
+    queryKey: ["news"],
+    queryFn: fetchNews,
+  });
+
+  const stockQuery = useQuery({
+    queryKey: [`stock-${id}`],
+    queryFn: () => fetchStock(id),
+  });
+
+  const stock = stockQuery.data;
+  const news = newsQuery.data;
+  const isLoading = stockQuery.isLoading || newsQuery.isLoading;
 
   const [isNews, setIsNews] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -65,18 +100,20 @@ export default function StockDetail() {
       }
     };
 
+    const scrollContCurrent = scrollContainer.current;
+
     if (scrollContainer.current) {
       scrollContainer.current.addEventListener("scroll", handleScroll);
     }
 
     return () => {
-      if (scrollContainer.current) {
-        scrollContainer.current.removeEventListener("scroll", handleScroll);
+      if (scrollContCurrent) {
+        scrollContCurrent.removeEventListener("scroll", handleScroll);
       }
     };
   }, []);
 
-  if (!stock || !news) {
+  if (isLoading || !news || !stock) {
     return (
       <div className="h-full w-full text-white flex justify-center items-center">
         <p>Loading...</p> {/* TODO: Add spinner and lazy loading */}
@@ -100,7 +137,7 @@ export default function StockDetail() {
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
       <section className="flex justify-between w-full p-5">
-        <StockName title={stock.title} shortcut={stock.shortcut} />
+        <StockName name={stock.name} symbol={stock.symbol} />
         <div className="flex flex-end">
           <Image
             className="box-border mr-2 rounded-xl active:bg-white/5"
@@ -133,31 +170,37 @@ export default function StockDetail() {
           <div className="w-[100vw] box-border snap-center">
             <MainChart CandlestickData={stock.periodPrices} />
           </div>
-        </section>
-        <section ref={scrollContainer}
-                 className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory">
-          <div className="flex w-[200vw] box-border justify-between px-1">
-            <div className="flex flex-col align-middle gap-2 w-[100vw] box-border snap-center">
-              <div className="flex justify-end ">
-                <div className="text-white flex gap-2 items-center mr-4">
-                  <label>
-                    Period:
-                  </label>
-                  <select
-                      style={{ WebkitAppearance: 'none', MozAppearance: 'none', textAlignLast: 'center' }}
-                      className="block bg-transparent border border-gray-600 rounded-md p-1 text-center appearance-none focus:outline-none focus:border-gray-400 pr-6"
-                  >
-                    {periods.map(period => (
-                        <option key={period} value={period} className="bg-gray-900">{period}</option>
-                    ))}
-                  </select>
-                </div>
+        </div>
+      </section>
+      <section
+        ref={scrollContainer}
+        className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory"
+      >
+        <div className="flex w-[200vw] box-border justify-between px-1">
+          <div className="flex flex-col align-middle gap-2 w-[100vw] box-border snap-center">
+            <div className="flex justify-end ">
+              <div className="text-white flex gap-2 items-center mr-4">
+                <label>Period:</label>
+                <select
+                  style={{
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    textAlignLast: "center",
+                  }}
+                  className="block bg-transparent border border-gray-600 rounded-md p-1 text-center appearance-none focus:outline-none focus:border-gray-400 pr-6"
+                >
+                  {periods.map((period) => (
+                    <option key={period} value={period} className="bg-gray-900">
+                      {period}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <MainChart CandlestickData={stock.periodPrices} />
             </div>
-            <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
-              <NewsList news={news}/>
-            </div>
+            <MainChart CandlestickData={stock.periodPrices} />
+          </div>
+          <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
+            <NewsList news={news} />
           </div>
         </div>
       </section>
