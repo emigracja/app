@@ -6,6 +6,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { News } from "@/types/news";
 import axios from "@/utils/axios";
+import {BeatLoader, MoonLoader} from "react-spinners";
+import Loader from "@/components/loader/Loader";
 
 interface FetchResponse {
   data: News[];
@@ -59,10 +61,8 @@ export default function NewsPage() {
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (isLoading) {
-    return (
-      <div className="my-5 text-center text-white opacity-70">Loading...</div>
-    );
+  if(isLoading) {
+    return <Loader />;
   }
 
   if (status === "error") {
@@ -78,19 +78,15 @@ export default function NewsPage() {
   return (
     <div>
       <NewsList news={allNews} />
-
-      {/* --- Loading/Trigger Area --- */}
       <div
         ref={ref}
-        className="h-[50px] my-5 text-center text-white opacity-70"
+        className="h-[50px] text-center text-white opacity-70"
       >
         {isFetchingNextPage ? (
-          <span>Loading more news...</span>
-        ) : hasNextPage ? (
-          <span>Scroll down to load more...</span> // Optional: Hide this text if you prefer a silent trigger
-        ) : (
-          <span>No more news to load.</span>
-        )}
+          <span className="flex align-middle justify-center w-full mt-15">
+              <BeatLoader className="flex align-middle justify-center" color="white" />
+          </span>
+        ) : null}
       </div>
     </div>
   );

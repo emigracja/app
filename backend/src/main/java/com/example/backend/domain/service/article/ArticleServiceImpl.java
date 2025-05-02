@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleDto> findAllBySearchParams(ArticleSearchParams params) {
-        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
+        Sort sortDesc = Sort.by("publishedAt").descending();
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size(), sortDesc);
         return articleJpaRepository.findAll(createArticleSpecification(params), pageable)
                 .stream()
                 .map(ArticleMapper::map)
@@ -86,8 +88,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         String userId = optionalUser.get().getId();
-
-        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
+        Sort sortAsc = Sort.by("publishedAt");
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size(), sortAsc);
         return articleJpaRepository.findArticlesByUserId(userId, pageable)
                 .stream()
                 .map(ArticleMapper::map)

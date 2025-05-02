@@ -4,16 +4,7 @@ import Drawer from '@/components/drawer/Drawer';
 import Card from '@/components/news/Card';
 import axios from "@/utils/axios";
 import {useQuery} from "@tanstack/react-query";
-
-const news = {
-    id: "1",
-    title: "China and Canada Retaliate Against Trump Tariffs, With Mexico to Counter on Sunday: Live Updates",
-    publishedAt: "1741209855234",
-    author: "New York Times",
-    affectedStocks: 2,
-    text: "Prime Minister Justin Trudeau of Canada on Tuesday harshly condemned the tariffs that President Trump imposed on Canada, as well as Mexico and China, saying in a televised address that they would hurt people on both sides of the U.S.- Canadian border and that Canada would “relentlessly fight” to protect its economy. 2 minutes ago 55 minutes ago Canada and China quickly announced retaliatory tariffs after the U.S. levies — an ter midnight on Monday. Mexico said it could impose its own countermeasures by Sunday. The moves driving down stock prices and worrying global markets...",
-    tags: ["TAG1", "TAG2"],
-}
+import Loader from "@/components/loader/Loader";
 
 type NewsProps = {
     params: {
@@ -42,9 +33,7 @@ const fetchNews = async (slug: string) => {
      });
 
      if(isLoading) {
-         return <div>
-             Loading...
-         </div>
+         return <Loader />
      }
 
      console.log(data)

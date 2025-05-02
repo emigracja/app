@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface ArticleJpaRepository extends JpaRepository<ArticleEntity, String> {
+
     List<ArticleEntity> findAll(Specification<ArticleEntity> spec, Pageable pageable);
 
     /**
