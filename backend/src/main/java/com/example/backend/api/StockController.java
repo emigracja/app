@@ -1,6 +1,7 @@
 package com.example.backend.api;
 
 import com.example.backend.api.params.StocksSearchParams;
+import com.example.backend.api.response.CustomApiResponse;
 import com.example.backend.domain.dto.AddStockRequestDto;
 import com.example.backend.domain.dto.StockDto;
 import com.example.backend.domain.service.stock.StockService;
@@ -150,19 +151,24 @@ public class StockController {
             return ResponseEntity.ok(addedStock);
         } catch (UsernameNotFoundException e) {
             log.error("User not found for username obtained from token: {}", email, e);
+            String message = "User specified in token not found.";
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("User specified in token not found.");
+                    .body(new CustomApiResponse(message, HttpStatus.FORBIDDEN.value()));
         } catch (StockNotFoundException e) {
-            log.warn("Stock not found with symbol '{}' for user '{}'", stockSymbol, email, e);
+            String message = "Stock not found with symbol '%s' for user '%s'".formatted(stockSymbol, email);
+            log.warn(message, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+                    .body(new CustomApiResponse(message, HttpStatus.NOT_FOUND.value()));
         } catch (StockAlreadyAssociatedException e) {
-            log.warn("Stock '{}' already associated with user '{}'", stockSymbol, email, e);
+            String message = "Stock '%s' already associated with user '%s'".formatted(stockSymbol, email);
+            log.warn(message, e);
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(e.getMessage());
+                    .body(new CustomApiResponse(message, HttpStatus.CONFLICT.value()));
         } catch (Exception e) {
             log.error("Error adding stock '{}' for user '{}'", stockSymbol, email, e);
-            return ResponseEntity.internalServerError().body("An unexpected error occurred.");
+            return ResponseEntity.internalServerError().body(new CustomApiResponse(
+                    "An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()
+            ));
         }
     }
 }
