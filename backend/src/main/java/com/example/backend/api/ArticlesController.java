@@ -1,6 +1,7 @@
 package com.example.backend.api;
 
 import com.example.backend.api.params.ArticleSearchParams;
+import com.example.backend.api.response.CustomApiResponse;
 import com.example.backend.domain.dto.ArticleDto;
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 import com.example.backend.domain.service.article.ArticleService;
@@ -137,17 +138,22 @@ public class ArticlesController {
                     @ApiResponse(responseCode = "500", description = "Internal server error while processing sentiment data")
             }
     )
-    public ResponseEntity<String> processArticleStockImpact(@PathVariable("article_id") String articleId,
-                                                            @Valid @RequestBody ArticleStockImpactDto request,
-                                                            BindingResult bindingResult) {
+    public ResponseEntity<?> processArticleStockImpact(@PathVariable("article_id") String articleId,
+                                                       @Valid @RequestBody ArticleStockImpactDto request,
+                                                       BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors().toString());
+            String errorMessage = bindingResult.getAllErrors().toString();
+            return ResponseEntity.badRequest().body(new CustomApiResponse(
+                    errorMessage, HttpStatus.BAD_REQUEST.value()
+            ));
         }
 
         log.info("Received request for article {}: {}", articleId, request);
         try {
             if (articleId == null || articleId.isEmpty()) {
-                return ResponseEntity.badRequest().body("Article id is required");
+                return ResponseEntity.badRequest().body(new CustomApiResponse(
+                        "Article id is required", HttpStatus.BAD_REQUEST.value()
+                ));
             }
 
             request.setArticleId(articleId);
@@ -160,8 +166,10 @@ public class ArticlesController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Error processing stock impact for article {}", articleId, e);
-            return ResponseEntity.internalServerError().build();
+            String errorMessage = "Error processing stock impact for article %s".formatted(articleId);
+            log.error(errorMessage, e);
+            return ResponseEntity.internalServerError()
+                    .body(new CustomApiResponse(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
@@ -177,7 +185,7 @@ public class ArticlesController {
             }
     )
     @GetMapping(API_USER_ARTICLES_PATH)
-    public ResponseEntity<List<ArticleDto>> getUserArticles(
+    public ResponseEntity<?> getUserArticles(
             Principal principal,
 
             @Parameter(description = "General search term")
@@ -219,14 +227,19 @@ public class ArticlesController {
             log.info("Successfully retrieved {} articles for user '{}'", articles.size(), email);
             return ResponseEntity.ok(articles);
         } catch (UsernameNotFoundException e) {
-            log.error("User not found for username obtained from token: {}", email, e);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            String errorMessage = String.format("User '%s' not found", email);
+            log.error(errorMessage, e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new CustomApiResponse(
+                    errorMessage, HttpStatus.FORBIDDEN.value()
+            ));
         } catch (IllegalArgumentException e) {
-            log.warn("Invalid arguments provided for article search by user '{}': {}", email, e.getMessage());
-            return ResponseEntity.badRequest().build();
+            String message = "Invalid arguments provided for article search by user '%s': %s".formatted(email, e.getMessage());
+            log.warn(message);
+            return ResponseEntity.badRequest().body(new CustomApiResponse(message, HttpStatus.BAD_REQUEST.value()));
         } catch (Exception e) {
-            log.error("Error retrieving articles for user '{}'", email, e);
-            return ResponseEntity.internalServerError().build();
+            String message = "Error retrieving articles for user '%s'".formatted(email);
+            log.error(message, e);
+            return ResponseEntity.internalServerError().body(message);
         }
     }
 

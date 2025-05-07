@@ -1,5 +1,6 @@
 package com.example.backend.infrastructure.annotations;
 
+import com.example.backend.api.response.CustomApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,7 +22,10 @@ public class AuthenticationCheckAspect {
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof Principal methodPrincipal) {
                 if (Strings.isEmpty(methodPrincipal.getName())) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new CustomApiResponse(
+                            "User email is empty. Please check your authentication.",
+                            HttpStatus.FORBIDDEN.value()
+                    ));
                 }
                 break;
             }

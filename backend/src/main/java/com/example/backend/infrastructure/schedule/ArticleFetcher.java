@@ -28,8 +28,8 @@ public class ArticleFetcher {
     private final ArticleService articleService;
     private final ArticleApiService articleApiService;
 
-    @Scheduled(fixedRate = 100000)
-//    @Scheduled(cron = "0 0 8 * * *")
+//    @Scheduled(fixedRate = 100000)
+    @Scheduled(cron = "0 0 8 * * *")
     public void fetchArticles() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime prevDay = now.minusDays(1);
