@@ -34,6 +34,7 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleDrawerChange = (id: string) => {
     setSelectedDrawer(selectedDrawer === id ? null : id);
   };
+  console.log(data);
 
   return (
     <div

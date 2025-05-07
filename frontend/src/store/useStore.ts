@@ -5,18 +5,18 @@ import { create } from "zustand";
 export interface State {
   currentPath: string;
   setPath: (path: string) => void;
-  settingsOpen: boolean;
-  setSettingsOpen: (setTo: boolean) => void;
-  toggleSettingsOpen: () => void;
+  filtersOpen: boolean;
+  setFiltersOpen: (setTo: boolean) => void;
+  toggleFiltersOpen: () => void;
 }
 
 const useStore = create<State>((set) => ({
   currentPath: "/",
   setPath: (path) => set({ currentPath: path }),
-  settingsOpen: false,
-  setSettingsOpen: (setTo) => set({ settingsOpen: setTo }),
-  toggleSettingsOpen: () =>
-    set((state) => ({ settingsOpen: !state.settingsOpen })),
+  filtersOpen: false,
+  setFiltersOpen: (setTo) => set({ filtersOpen: setTo }),
+  toggleFiltersOpen: () =>
+    set((state) => ({ filtersOpen: !state.filtersOpen })),
 }));
 
 // export const useSyncPath = () => {
