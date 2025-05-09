@@ -62,7 +62,16 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleDto> saveAll(List<ArticleDto> articles) {
         List<ArticleEntity> list = articles.stream().map(ArticleMapper::map).toList();
 
-        List<ArticleEntity> articleEntities = articleJpaRepository.saveAll(list);
+        List<String> existing = articleJpaRepository.findBySlugIsIn(list.stream().map(ArticleEntity::getSlug).toList())
+                .stream().map(ArticleEntity::getSlug).toList();
+
+        List<ArticleEntity> nonExisting = list
+                .stream().filter(
+                        e -> !existing.contains(e.getSlug())
+                )
+                .toList();
+
+        List<ArticleEntity> articleEntities = articleJpaRepository.saveAll(nonExisting);
 
         return articleEntities.stream().map(ArticleMapper::map).toList();
     }
