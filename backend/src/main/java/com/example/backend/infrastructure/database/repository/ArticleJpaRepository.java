@@ -17,6 +17,7 @@ public interface ArticleJpaRepository extends JpaRepository<ArticleEntity, Strin
 
     List<ArticleEntity> findAll(Specification<ArticleEntity> spec, Pageable pageable);
 
+    List<ArticleEntity> findBySlugIsIn(List<String> slugs);
     /**
      * Version with pagination and sorting.
      * Finds unique articles related to stocks observed by a specific user.
