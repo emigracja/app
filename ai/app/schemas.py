@@ -36,12 +36,12 @@ class ArticleContent(BaseModel):
     published_at: Optional[datetime] = None
 
 
-class ArticleStockImpactSeverity(int, Enum):
-    none = 0
-    low = 10
-    medium = 20
-    high = 30
-    severe = 40
+class ArticleStockImpactSeverity(str, Enum):
+    none = "none"
+    low = "low"
+    medium = "medium"
+    high = "high"
+    severe = "severe"
 
 
 class ArticleStockImpact(BaseModel):
