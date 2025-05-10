@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 import uuid
 from datetime import datetime, timezone
@@ -11,10 +12,8 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 import typer
 from pydantic import BaseModel, Field, ValidationError
 
-# Assuming imports are set up correctly after refactor
 from app.indexer.llm import does_article_impact_stocks
 from app.indexer.llm_variants import get_selected_variant_symbol
-from app.llm_providers import NEWS_IMPACT_LLM_CONFIG
 from app.schemas import (
     ArticleContent,
     ArticleStockImpact,
@@ -49,14 +48,34 @@ def run(
     # Base directories for suites and results
     suites_dir: Path = typer.Option(SUITES_DIR, help="Base directory containing test suites."),
     results_dir: Path = typer.Option(RESULTS_DIR, help="Directory to save benchmark results."),
+    llm: Optional[str] = typer.Option(
+        None, "--llm", help="LLM model to use (e.g., 'openai/gpt-4o'). Overrides NEWS_IMPACT_LLM env var."
+    ),
+    variant: Optional[str] = typer.Option(
+        None,
+        "--variant",
+        help="LLM variant symbol to use (e.g., 'DEFAULT_COT'). Overrides NEWS_IMPACT_VARIANT env var.",
+    ),
 ):
     """
     Runs a specific benchmark test suite for stock impact prediction accuracy.
     """
-    llm_identifier = NEWS_IMPACT_LLM_CONFIG
-    active_news_impact_variant_symbol = get_selected_variant_symbol().value  # Added
+    # Determine effective LLM identifier and Variant Symbol for the run
+    # NEWS_IMPACT_LLM_CONFIG holds the value from the environment at startup
+    effective_llm_identifier = os.getenv("NEWS_IMPACT_LLM", "")
+    if llm:
+        os.environ["NEWS_IMPACT_LLM"] = llm
+        effective_llm_identifier = llm
+        logger.info(f"Overriding NEWS_IMPACT_LLM with CLI option: {llm}")
+
+    if variant:
+        os.environ["NEWS_IMPACT_VARIANT"] = variant
+        logger.info(f"Overriding NEWS_IMPACT_VARIANT with CLI option: {variant}")
+
+    effective_variant_symbol = get_selected_variant_symbol().value
+
     logger.info(
-        f"--- Starting Benchmark Run for Suite: {suite_name} using LLM: {llm_identifier} and News Impact Variant: {active_news_impact_variant_symbol} ---"
+        f"--- Starting Benchmark Run for Suite: {suite_name} using LLM: {effective_llm_identifier} and News Impact Variant: {effective_variant_symbol} ---"
     )
 
     # --- Dynamically build paths based on suite_name ---
@@ -119,8 +138,7 @@ def run(
             continue
 
         try:
-            # --- Call the core function (assuming token updates are included) ---
-            impact_iterator: Iterator[ArticleStockImpact]
+            impact_iterator: Iterator[ArticleStockImpact | LLMUsage]
             impact_iterator = does_article_impact_stocks(article_content, stocks_to_analyze)
 
             for impact_result in impact_iterator:
@@ -179,8 +197,8 @@ def run(
     # Include suite_name in the data to be saved
     run_data = BenchmarkRun(
         suite_name=suite_name,
-        llm_identifier=llm_identifier,
-        llm_variant_symbol=active_news_impact_variant_symbol,
+        llm_identifier=effective_llm_identifier,
+        llm_variant_symbol=effective_variant_symbol,
         date=datetime.now(timezone.utc),
         time_ms=duration_ms,
         input_tokens_used=total_input_tokens,
@@ -205,8 +223,8 @@ def run(
 
     # --- 6. Print Summary ---
     logger.info(f"--- Benchmark Run Summary for Suite: {suite_name} ---")
-    logger.info(f"LLM Used: {llm_identifier}")
-    logger.info(f"News Impact LLM Variant: {active_news_impact_variant_symbol}")
+    logger.info(f"LLM Used: {effective_llm_identifier}")
+    logger.info(f"News Impact LLM Variant: {effective_variant_symbol}")
     logger.info(f"Execution Time: {duration_ms:.2f} ms")
     logger.info(f"Test Cases Processed: {len(test_cases)}")
     logger.info(f"Total Stock Impacts Evaluated: {total_evaluated}")
