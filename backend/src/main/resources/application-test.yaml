@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: INFO
+    com.example.articles: DEBUG
+    org.springframework.web: INFO
+
+article:
+  scheduler:
+    fixed-rate: 60000 # 1 minute
