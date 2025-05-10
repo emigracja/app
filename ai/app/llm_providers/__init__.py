@@ -2,12 +2,7 @@ import logging
 import os
 from functools import lru_cache
 
-from dotenv import load_dotenv
-
 from .base import LLMProvider
-
-# Load .env file for API keys and LLM selection
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
