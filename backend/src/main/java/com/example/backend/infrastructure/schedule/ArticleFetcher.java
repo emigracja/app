@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ArticleFetcher {
+public abstract class ArticleFetcher {
     private static final String SUCCESS = "Article sent successfully: {}";
     private static final String ERROR = "Failed to send article: {}";
     private static final String AI_URL = "http://ai:5000";
@@ -30,9 +30,7 @@ public class ArticleFetcher {
     private final ArticleService articleService;
     private final ArticleApiService articleApiService;
 
-//    @Scheduled(fixedRate = 10000000)
-    @Scheduled(cron = "0 0 8 * * *")
-    public void fetchArticles() {
+    protected void fetchArticles() {
         log.info("Fetching articles");
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime prevDay = now.minusDays(1);

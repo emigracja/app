@@ -186,7 +186,6 @@ public class ArticlesController {
         }
     }
 
-    @RequireNotEmptyEmail
     @Operation(
             summary = "Get authenticated user's articles with optional filtering",
             description = "Retrieves articles associated with the authenticated user, with support for various filter parameters.",

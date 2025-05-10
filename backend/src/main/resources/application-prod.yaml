@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: INFO
+    com.example.articles: INFO
+    org.springframework.web: WARN
+
+article:
+  scheduler:
+    cron: "0 0 7 * * *"

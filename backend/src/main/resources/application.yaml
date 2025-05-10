@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: backend
   datasource:
@@ -36,3 +38,8 @@ vapid:
   public.key: BKpBiJpEMiFP_DHHjoQuulIVbVPCFS0RrOkIdh3EgEO_awvW7_LQA4iU2x5qhCeHemWQHdu4GWpakdLoqiBp1WA
   private.key: Kgosx01sBrGh0FazCqS6hRVG-inT4vhnTtk2-Bi9lHk
   subject: mailto:dummy@yourdomain.com
+
+article:
+  scheduler:
+    fixed-rate: 10000000
+    cron: 0 0 8 * * *
