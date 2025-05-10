@@ -2,7 +2,7 @@ from uuid import UUID
 
 from uuid_extensions import uuid7
 
-from .schemas import ArticleContent, Article
+from .schemas import Article, ArticleContent
 
 # Using an in-memory store, as there's no need for persistance atm
 articles = {
@@ -12,7 +12,7 @@ articles = {
 
 
 def create_article(content: ArticleContent) -> Article:
-    article = Article(id=uuid7(), content=content, status="queued", impacted_stocks=[])
+    article = Article(id=uuid7(), content=content, status="queued", impacted_stocks=[], external_id=content.external_id)
     articles[article.id] = article
     return article
 

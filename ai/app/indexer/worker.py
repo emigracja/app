@@ -46,7 +46,12 @@ def _process_article(article: Article) -> tuple[int, int]:
     sent_notifications, omitted_notifications = 0, 0
     for impact in llm.does_article_impact_stocks(article.content, stocks):
         article.impacted_stocks.append(impact)
-        if backend_api.send_article_stock_impact(article.id, impact):
+        if article.external_id is None:
+            logging.info(f"Article {article.id} has no external ID. Skipping notification.")
+            omitted_notifications += 1
+            continue
+
+        if backend_api.send_article_stock_impact(article.external_id, impact):
             sent_notifications += 1
         else:
             omitted_notifications += 1
