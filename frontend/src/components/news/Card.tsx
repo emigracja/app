@@ -1,8 +1,10 @@
-import {ReactElement} from "react";
+'use client'
+import {ReactElement, useState} from "react";
 import Image from "next/image";
-import {getRandomInt, getTimeDifference} from "@/utils/util";
+import {getTimeDifference} from "@/utils/util";
 
 import Tag from "@/components/news/Tag";
+import {MoonLoader} from "react-spinners";
 
 interface Props {
     externalId: string | null;
@@ -27,6 +29,8 @@ const Card = ({
               }: Props): ReactElement => {
     const publishedAtString = getTimeDifference(publishedAt);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     return (
         <section className="min-h-32 relative block text-xl text-white rounded-xl p-3 box-content">
             <a href={`/news/${slug}`} className="flex flex-col gap-5 justify-end">
@@ -44,13 +48,19 @@ const Card = ({
                     )}
                 </div>
             </a>
-            <Image
-                quality={50}
-                className="absolute inset-0 object-cover box-content opacity-40 rounded-xl pointer-events-none"
-                src={backgroundImage}
-                alt="background"
-                layout="fill"
-            />
+            <div
+                className="flex absolute inset-0 rounded-xl pointer-events-none"
+            >
+                {isLoading ? <MoonLoader className='m-auto' color='white' /> : null}
+                <Image
+                    onLoad={() => {setIsLoading(false)}}
+                    className=' opacity-40 pointer-events-none'
+                    quality={50}
+                    src={backgroundImage}
+                    alt="background"
+                    layout="fill"
+                />
+            </div>
             <div
                 className={"absolute text-white -bottom-6 right-0 opacity-70 text-sm"}
             >

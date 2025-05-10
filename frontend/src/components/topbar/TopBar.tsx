@@ -6,6 +6,7 @@ import settings from "../../../public/icons/settings.svg";
 import filter from "../../../public/icons/filter.svg";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import useStore from "@/store/useStore";
 import Link from "next/link";
 import {
   NEWS_ROUTE,
@@ -15,6 +16,7 @@ import {
 } from "@/types/routes";
 
 const TopBar = () => {
+  const toggleFiltersOpen = useStore((state) => state.toggleFiltersOpen);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -71,6 +73,7 @@ const TopBar = () => {
           shouldShowButton ? "visible" : "invisible"
         }`}
         href={buttonData.route}
+        onClick={shouldShowFilter ? toggleFiltersOpen : () => {}}
       >
         <Image
           className="p-1 justify-self-center opacity-75"
