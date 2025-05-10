@@ -9,6 +9,7 @@ from app.schemas import (
     ArticleContent,
     ArticleStockImpact,
     ArticleStockImpactSeverity,
+    LLMUsage,
     Stock,
 )
 
@@ -83,7 +84,7 @@ Please provide your analysis for the impact of this article on the specified sto
     return messages
 
 
-def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> Iterator[ArticleStockImpact]:
+def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> Iterator[ArticleStockImpact | LLMUsage]:
     """
     Analyzes if an article impacts a list of stocks using the configured LLM provider.
 
@@ -131,11 +132,12 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
 
         try:
             # Call the abstracted provider method
-            structured_response = llm_provider.prompt_structured(
+            structured_response, usage = llm_provider.prompt_structured(
                 messages=messages,
                 response_format=ResponseModel,
                 temperature=0.5,
             )
+            yield usage
 
             # Process the structured response
             for stock in stock_group:

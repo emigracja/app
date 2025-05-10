@@ -4,6 +4,8 @@ from typing import Any, Type
 
 from pydantic import BaseModel
 
+from app.schemas import LLMUsage
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +23,7 @@ class LLMProvider(ABC):
         response_format: Type[BaseModel],
         temperature: float = 0.5,
         max_tokens: int | None = None,
-    ) -> BaseModel:
+    ) -> tuple[BaseModel, LLMUsage]:
         """
         Sends a prompt to the LLM and expects a structured response conforming
         to the provided Pydantic model.

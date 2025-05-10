@@ -4,7 +4,7 @@ from uuid import UUID
 
 from app import backend_api
 from app.database import get_article, update_article
-from app.schemas import Article, ArticleStatus
+from app.schemas import Article, ArticleStatus, LLMUsage
 
 from . import llm
 
@@ -45,6 +45,11 @@ def _process_article(article: Article) -> tuple[int, int]:
     stocks = backend_api.get_stocks()
     sent_notifications, omitted_notifications = 0, 0
     for impact in llm.does_article_impact_stocks(article.content, stocks):
+        # Ignore LLM usage information
+        if isinstance(impact, LLMUsage):
+            logging.info(f"LLM usage detected: {impact}")
+            continue
+
         article.impacted_stocks.append(impact)
         if article.external_id is None:
             logging.info(f"Article {article.id} has no external ID. Skipping notification.")

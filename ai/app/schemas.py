@@ -105,3 +105,8 @@ class ParseCommandRequest(BaseModel):
 
 class CommandParseResult(BaseModel):
     intent: CommandIntent = Field(..., description="The recognized intent based on the user's text input.")
+
+
+class LLMUsage(BaseModel):
+    input_tokens: Optional[int] = Field(None, description="Number of input tokens used.")
+    output_tokens: Optional[int] = Field(None, description="Number of output tokens used.")

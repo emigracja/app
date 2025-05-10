@@ -5,6 +5,8 @@ from typing import Type
 from openai import OpenAI
 from pydantic import BaseModel
 
+from app.schemas import LLMUsage
+
 from .base import LLMProvider
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,7 @@ class OpenAIProvider(LLMProvider):
         response_format: Type[BaseModel],
         temperature: float = 0.5,
         max_tokens: int | None = None,
-    ) -> BaseModel:
+    ) -> tuple[BaseModel, LLMUsage]:
         self._log_prompt(messages)
         try:
             # Use the beta client's parse method for direct Pydantic model parsing
@@ -55,8 +57,13 @@ class OpenAIProvider(LLMProvider):
             )
             # The result should already be a parsed Pydantic object
             parsed_response = chat_completion.choices[0].message.parsed
+
+            input_tokens, output_tokens = None, None
+            if chat_completion.usage:
+                input_tokens = chat_completion.usage.prompt_tokens
+                output_tokens = chat_completion.usage.completion_tokens
             logger.debug(f"[{self.__class__.__name__}/{self.model_name}] Received structured response from OpenAI.")
-            return parsed_response
+            return parsed_response, LLMUsage(input_tokens=input_tokens, output_tokens=output_tokens)
 
         except Exception as e:
             logger.error(f"Error during OpenAI API call for model {self.model_name}: {e}")

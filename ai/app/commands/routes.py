@@ -24,7 +24,7 @@ def parse_command(
     """
     try:
         # Call the command parsing logic
-        command_result = llm.parse_command_intent(request.text)
+        command_result, llm_usage = llm.parse_command_intent(request.text)
         return schemas.ApiResponse(data=command_result)
     except Exception as e:
         logger.warning(f"Failed to parse command: {request.text}")

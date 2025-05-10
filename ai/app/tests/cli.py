@@ -18,6 +18,7 @@ from app.schemas import (
     ArticleContent,
     ArticleStockImpact,
     ArticleStockImpactSeverity,
+    LLMUsage,
     Stock,
 )
 
@@ -119,6 +120,18 @@ def run(
             impact_iterator = does_article_impact_stocks(article_content, stocks_to_analyze)
 
             for impact_result in impact_iterator:
+                if isinstance(impact_result, LLMUsage):
+                    logging.info(f"LLM usage detected: {impact_result}")
+                    if impact_result.input_tokens is not None:
+                        total_input_tokens += impact_result.input_tokens
+                    else:
+                        logger.warning(f"LLM usage without input tokens count!")
+                    if impact_result.output_tokens is not None:
+                        total_output_tokens += impact_result.output_tokens
+                    else:
+                        logger.warning(f"LLM usage without output tokens count!")
+                    continue
+
                 total_evaluated += 1
 
                 stock = stock_map_by_id.get(impact_result.stock_id)
@@ -165,8 +178,8 @@ def run(
         llm_identifier=llm_identifier,
         date=datetime.now(timezone.utc),
         time_ms=duration_ms,
-        input_tokens_used=None,
-        output_tokens_used=None,
+        input_tokens_used=total_input_tokens,
+        output_tokens_used=total_output_tokens,
         total_cases_evaluated=total_evaluated,
         correct_cases=total_correct,
         accuracy=accuracy,

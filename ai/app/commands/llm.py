@@ -2,7 +2,7 @@ import logging
 
 # Import the specific factory function for command parsing
 from app.llm_providers import get_command_parse_llm_provider
-from app.schemas import CommandIntent, CommandParseResult
+from app.schemas import CommandIntent, CommandParseResult, LLMUsage
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ If the intent is ambiguous or not recognizable, use the 'unknown' intent.
 """
 
 
-def parse_command_intent(text: str) -> CommandParseResult:
+def parse_command_intent(text: str) -> tuple[CommandParseResult, LLMUsage]:
     """
     Uses the configured LLM provider to parse user text input and classify it
     into a CommandIntent.
@@ -72,10 +72,10 @@ def parse_command_intent(text: str) -> CommandParseResult:
         {"role": "user", "content": text},
     ]
 
-    parsed_result = llm_provider.prompt_structured(
+    parsed_result, usage = llm_provider.prompt_structured(
         messages=messages,
         response_format=CommandParseResult,  # Pass the Pydantic model
         temperature=0,  # Low temperature for deterministic classification
     )
 
-    return parsed_result
+    return parsed_result, usage

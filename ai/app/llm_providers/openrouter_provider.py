@@ -5,6 +5,8 @@ from typing import Type
 from openai import OpenAI
 from pydantic import BaseModel
 
+from app.schemas import LLMUsage
+
 from .base import LLMProvider
 
 logger = logging.getLogger(__name__)
@@ -77,7 +79,11 @@ class OpenRouterProvider(LLMProvider):
             parsed_response = chat_completion.choices[0].message.parsed
             logger.debug(f"[{self.__class__.__name__}/{self.model_name}] Received structured response from OpenRouter.")
             logger.debug(chat_completion.choices[0].message.content)
-            return parsed_response
+            input_tokens, output_tokens = None, None
+            if chat_completion.usage:
+                input_tokens = chat_completion.usage.prompt_tokens
+                output_tokens = chat_completion.usage.completion_tokens
+            return parsed_response, LLMUsage(input_tokens=input_tokens, output_tokens=output_tokens)
 
         except Exception as e:
             logger.error(f"Error during OpenRouter API call for model {self.model_name}: {e}")
