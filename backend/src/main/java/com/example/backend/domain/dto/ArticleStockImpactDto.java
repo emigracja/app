@@ -1,5 +1,6 @@
 package com.example.backend.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -12,8 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ArticleStockImpactDto {
 
-    @NotBlank(message = "Article ID cannot be empty")
-    @JsonProperty("article_id")
+    @JsonIgnore
     private String articleId;
 
     @NotBlank(message = "Stock ID cannot be empty")
@@ -26,10 +26,3 @@ public class ArticleStockImpactDto {
 
     private String reason;
 }
-
-
-/*
-* Frontend (User, Date-range, Impact) -> Backend
-* Backend -> getUserStocks -> getImpactsByStocks -> filter by Impact -> getBoundedArticles -> filter by date-range
-* Backend (List<Articles>) -> Frontend
-* */

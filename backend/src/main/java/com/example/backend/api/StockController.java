@@ -10,6 +10,7 @@ import com.example.backend.infrastructure.exceptions.StockAlreadyAssociatedExcep
 import com.example.backend.infrastructure.exceptions.StockNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,12 +41,13 @@ public class StockController {
 
     @GetMapping(ALL_STOCKS)
     @Operation(summary = "Get a list of all stocks from the database",
-            description = "Returns a list of all stock entries. This endpoint does not support filters.",
+            description = "Returns a list of all stock entries. This endpoint supports various filter parameters.",
             responses = {
                     @ApiResponse(responseCode = "200",
                             description = "Successfully retrieved list of stocks",
                             content = @Content(
-                                    mediaType = "application/json", schema = @Schema(implementation = StockDto.class)
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = StockDto.class))
                             )),
                     @ApiResponse(responseCode = "403", description = "Access denied – insufficient permissions"),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -99,7 +101,8 @@ public class StockController {
                     @ApiResponse(responseCode = "200",
                             description = "Successfully retrieved list of user stocks",
                             content = @Content(
-                                    mediaType = "application/json", schema = @Schema(implementation = StockDto.class)
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = StockDto.class))
                             )),
                     @ApiResponse(responseCode = "403", description = "Access denied – user not authorized or token invalid"),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -125,18 +128,52 @@ public class StockController {
     @PostMapping(USER_STOCKS)
     @Operation(summary = "Add a stock to the current user's list",
             description = "Associates a stock, identified by its symbol, with the currently authenticated user.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = AddStockRequestDto.class))
+            ),
             responses = {
                     @ApiResponse(responseCode = "200",
                             description = "Stock successfully associated with the user",
                             content = @Content(
-                                    mediaType = "application/json", schema = @Schema(implementation = StockDto.class)
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = StockDto.class)
                             )),
-                    @ApiResponse(responseCode = "400", description = "Invalid request data (e.g., missing symbol)"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - User not authenticated"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - User cannot be identified from token"),
-                    @ApiResponse(responseCode = "404", description = "Stock with the given symbol not found"),
-                    @ApiResponse(responseCode = "409", description = "Stock is already associated with this user"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid request data (e.g., missing symbol)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - User not authenticated",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "403",
+                            description = "Forbidden - User cannot be identified from token",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "404",
+                            description = "Stock with the given symbol not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "409",
+                            description = "Stock is already associated with this user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            ))
             }
     )
     public ResponseEntity<?> addStockToUser(Principal principal, @Valid @RequestBody AddStockRequestDto requestDto) {

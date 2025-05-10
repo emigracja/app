@@ -1,8 +1,10 @@
 package com.example.backend.infrastructure.schedule;
 
+import com.example.backend.domain.dto.AiArticleRequest;
 import com.example.backend.domain.dto.ArticleDto;
 import com.example.backend.domain.service.article.ArticleApiService;
 import com.example.backend.domain.service.article.ArticleService;
+import com.example.backend.domain.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,9 +30,10 @@ public class ArticleFetcher {
     private final ArticleService articleService;
     private final ArticleApiService articleApiService;
 
-//    @Scheduled(fixedRate = 100000)
+//    @Scheduled(fixedRate = 10000000)
     @Scheduled(cron = "0 0 8 * * *")
     public void fetchArticles() {
+        log.info("Fetching articles");
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime prevDay = now.minusDays(1);
 
@@ -46,6 +49,7 @@ public class ArticleFetcher {
             return;
         }
 
+        log.info("Sending articles to AI");
         sendArticlesToAI(savedArticles);
     }
 
@@ -60,19 +64,29 @@ public class ArticleFetcher {
     }
 
     private void sendArticlesToAI(List<ArticleDto> savedArticles) {
-        Disposable subscribe = webClient.mutate()
-                .baseUrl(AI_URL)
-                .build()
-                .post()
-                .uri(ARTICLES_ENDPOINT)
-                .bodyValue(savedArticles)
-                .retrieve()
-                .toBodilessEntity()
-                .doOnSuccess(response -> log.info("Successfully sent articles: {}", savedArticles))
-                .doOnError(error -> log.error("Error sending articles: ", error))
-                .subscribe();
+        for (ArticleDto article : savedArticles) {
+            AiArticleRequest request = new AiArticleRequest(
+                    article.getTitle(), article.getDescription(), getAiArticleDate(article)
+            );
 
-        log.info("Subscription: {}", subscribe);
+            Disposable subscribe = webClient.mutate()
+                    .baseUrl(AI_URL)
+                    .build()
+                    .post()
+                    .uri(ARTICLES_ENDPOINT)
+                    .bodyValue(request)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .doOnSuccess(response -> log.info("Successfully sent article: {}", request))
+                    .doOnError(error -> log.error("Error sending article: ", error))
+                    .subscribe();
+
+            log.info("AI response for article {}: {}", request, subscribe);
+        }
+    }
+
+    private LocalDateTime getAiArticleDate(ArticleDto article) {
+        return DateUtils.toLocalDateTime(article.getPublishedAt());
     }
 
     private static boolean filterDates(ArticleDto article, LocalDateTime prevDay, LocalDateTime now) {
