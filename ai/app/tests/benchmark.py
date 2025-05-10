@@ -60,6 +60,9 @@ class BenchmarkRun(BaseModel):
     suite_name: str
     date: datetime
     llm_identifier: str = Field(description="LLM provider and model used (e.g., 'openai/gpt-4o')")
+    llm_variant_symbol: str = Field(
+        description="Symbol of the LLM variant used for news impact analysis (e.g., 'DEFAULT_COT')"
+    )
     time_ms: float
     input_tokens_used: Optional[int] = None
     output_tokens_used: Optional[int] = None

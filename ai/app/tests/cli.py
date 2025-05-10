@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 # Assuming imports are set up correctly after refactor
 from app.indexer.llm import does_article_impact_stocks
+from app.indexer.llm_variants import get_selected_variant_symbol
 from app.llm_providers import NEWS_IMPACT_LLM_CONFIG
 from app.schemas import (
     ArticleContent,
@@ -53,7 +54,10 @@ def run(
     Runs a specific benchmark test suite for stock impact prediction accuracy.
     """
     llm_identifier = NEWS_IMPACT_LLM_CONFIG
-    logger.info(f"--- Starting Benchmark Run for Suite: {suite_name} using LLM: {llm_identifier} ---")
+    active_news_impact_variant_symbol = get_selected_variant_symbol().value  # Added
+    logger.info(
+        f"--- Starting Benchmark Run for Suite: {suite_name} using LLM: {llm_identifier} and News Impact Variant: {active_news_impact_variant_symbol} ---"
+    )
 
     # --- Dynamically build paths based on suite_name ---
     suite_path = suites_dir / suite_name
@@ -176,6 +180,7 @@ def run(
     run_data = BenchmarkRun(
         suite_name=suite_name,
         llm_identifier=llm_identifier,
+        llm_variant_symbol=active_news_impact_variant_symbol,
         date=datetime.now(timezone.utc),
         time_ms=duration_ms,
         input_tokens_used=total_input_tokens,
@@ -201,6 +206,7 @@ def run(
     # --- 6. Print Summary ---
     logger.info(f"--- Benchmark Run Summary for Suite: {suite_name} ---")
     logger.info(f"LLM Used: {llm_identifier}")
+    logger.info(f"News Impact LLM Variant: {active_news_impact_variant_symbol}")
     logger.info(f"Execution Time: {duration_ms:.2f} ms")
     logger.info(f"Test Cases Processed: {len(test_cases)}")
     logger.info(f"Total Stock Impacts Evaluated: {total_evaluated}")
