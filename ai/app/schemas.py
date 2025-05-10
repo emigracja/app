@@ -31,6 +31,7 @@ class Stock(BaseModel):
 
 
 class ArticleContent(BaseModel):
+    external_id: Optional[uuid.UUID] = None
     title: str
     description: str
     published_at: Optional[datetime] = None
@@ -63,6 +64,7 @@ class Article(BaseModel):
     status: ArticleStatus
     impacted_stocks: list[ArticleStockImpact] = []
     error_message: Optional[str] = None
+    external_id: Optional[uuid.UUID] = None
 
 
 class ArticleList(BaseModel):
