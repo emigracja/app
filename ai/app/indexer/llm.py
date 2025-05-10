@@ -117,6 +117,9 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
         f"Using LLM impact analysis variant: {current_variant_config.symbol.value} (use_cot for schema={current_variant_config.use_cot})"
     )
 
+    # Chunk stocks for processing - adjust chunk size as needed
+    # Chunk size might depend on provider context limits and complexity
+    # Let's keep 10 for now, may need tuning per provider.
     chunk_size = 10
     stock_groups = [valid_stocks[i : i + chunk_size] for i in range(0, len(valid_stocks), chunk_size)]
 
@@ -181,4 +184,4 @@ def does_article_impact_stocks(article: ArticleContent, stocks: list[Stock]) -> 
                 exc_info=True,  # Include traceback for debugging
             )
             logger.warning(f"Skipping stock impact analysis for group {i+1} due to LLM error.")
-            continue
+            continue  # Move to the next chunk
