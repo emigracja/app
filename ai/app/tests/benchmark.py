@@ -59,6 +59,7 @@ class BenchmarkSingleResult(BaseModel):
 class BenchmarkRun(BaseModel):
     suite_name: str
     date: datetime
+    llm_identifier: str = Field(description="LLM provider and model used (e.g., 'openai/gpt-4o')")
     time_ms: float
     input_tokens_used: Optional[int] = None
     output_tokens_used: Optional[int] = None

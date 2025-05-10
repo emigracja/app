@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 # Assuming imports are set up correctly after refactor
 from app.indexer.llm import does_article_impact_stocks
+from app.llm_providers import NEWS_IMPACT_LLM_CONFIG
 from app.schemas import (
     ArticleContent,
     ArticleStockImpact,
@@ -50,7 +51,8 @@ def run(
     """
     Runs a specific benchmark test suite for stock impact prediction accuracy.
     """
-    logger.info(f"--- Starting Benchmark Run for Suite: {suite_name} ---")
+    llm_identifier = NEWS_IMPACT_LLM_CONFIG
+    logger.info(f"--- Starting Benchmark Run for Suite: {suite_name} using LLM: {llm_identifier} ---")
 
     # --- Dynamically build paths based on suite_name ---
     suite_path = suites_dir / suite_name
@@ -159,7 +161,8 @@ def run(
     # --- 5. Save Results ---
     # Include suite_name in the data to be saved
     run_data = BenchmarkRun(
-        suite_name=suite_name,  # Added suite name here
+        suite_name=suite_name,
+        llm_identifier=llm_identifier,
         date=datetime.now(timezone.utc),
         time_ms=duration_ms,
         input_tokens_used=None,
@@ -184,6 +187,7 @@ def run(
 
     # --- 6. Print Summary ---
     logger.info(f"--- Benchmark Run Summary for Suite: {suite_name} ---")
+    logger.info(f"LLM Used: {llm_identifier}")
     logger.info(f"Execution Time: {duration_ms:.2f} ms")
     logger.info(f"Test Cases Processed: {len(test_cases)}")
     logger.info(f"Total Stock Impacts Evaluated: {total_evaluated}")

@@ -5,7 +5,13 @@ services:
       dockerfile: Dockerfile
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - NEWS_IMPACT_LLM=${NEWS_IMPACT_LLM}
+      - COMMAND_PARSE_LLM=${COMMAND_PARSE_LLM}
       - BACKEND_API_URL=${BACKEND_API_URL}
+      - MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE=${MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE}
     ports:
       - "5000:5000"
     volumes:
@@ -62,6 +68,7 @@ services:
 
 networks:
   tarantula:
+
 
 volumes:
   postgres_data:
