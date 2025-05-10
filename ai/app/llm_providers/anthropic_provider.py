@@ -6,6 +6,8 @@ from typing import Type
 from anthropic import Anthropic
 from pydantic import BaseModel
 
+from app.schemas import LLMUsage
+
 from .base import LLMProvider
 
 logger = logging.getLogger(__name__)
@@ -122,7 +124,14 @@ class AnthropicProvider(LLMProvider):
                 f"[{self.__class__.__name__}/{self.model_name}] Received structured response from Anthropic Claude."
             )
 
-            return self._parse_json_output(structured_data, response_format)
+            input_tokens, output_tokens = None, None
+            if message.usage:
+                input_tokens = message.usage.input_tokens
+                output_tokens = message.usage.output_tokens
+
+            return self._parse_json_output(structured_data, response_format), LLMUsage(
+                input_tokens=input_tokens, output_tokens=output_tokens
+            )
 
         except Exception as e:
             logger.error(f"Error during Anthropic Claude API call for model {self.model_name}: {e}")
