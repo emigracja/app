@@ -68,36 +68,38 @@ VARIANTS_CONFIG: dict[ImpactAnalysisVariantSymbol, ImpactAnalysisVariantConfig] 
 
 _DEFAULT_VARIANT_SYMBOL = ImpactAnalysisVariantSymbol.DEFAULT_COT
 NEWS_IMPACT_VARIANT_ENV_VAR = "NEWS_IMPACT_VARIANT"
-SELECTED_VARIANT_SYMBOL_STR = os.getenv(NEWS_IMPACT_VARIANT_ENV_VAR, _DEFAULT_VARIANT_SYMBOL.value)
-
-_SELECTED_VARIANT_SYMBOL_ENUM: ImpactAnalysisVariantSymbol
-try:
-    _SELECTED_VARIANT_SYMBOL_ENUM = ImpactAnalysisVariantSymbol(SELECTED_VARIANT_SYMBOL_STR)
-    if _SELECTED_VARIANT_SYMBOL_ENUM not in VARIANTS_CONFIG:
-        logger.warning(
-            f"NEWS_IMPACT_VARIANT '{SELECTED_VARIANT_SYMBOL_STR}' is a valid symbol but not configured in VARIANTS_CONFIG. "
-            f"Defaulting to '{_DEFAULT_VARIANT_SYMBOL.value}'."
-        )
-        _SELECTED_VARIANT_SYMBOL_ENUM = _DEFAULT_VARIANT_SYMBOL
-except ValueError:
-    logger.warning(
-        f"Invalid NEWS_IMPACT_VARIANT value: '{SELECTED_VARIANT_SYMBOL_STR}'. "
-        f"Defaulting to '{_DEFAULT_VARIANT_SYMBOL.value}'. "
-        f"Valid options are: {[s.value for s in ImpactAnalysisVariantSymbol if s in VARIANTS_CONFIG]}"
-    )
-    _SELECTED_VARIANT_SYMBOL_ENUM = _DEFAULT_VARIANT_SYMBOL
-
-_SELECTED_VARIANT_CONFIG = VARIANTS_CONFIG[_SELECTED_VARIANT_SYMBOL_ENUM]
 
 
 def get_selected_variant_symbol() -> ImpactAnalysisVariantSymbol:
-    return _SELECTED_VARIANT_SYMBOL_ENUM
+    """
+    Determines the selected impact analysis variant symbol based on the
+    NEWS_IMPACT_VARIANT environment variable at runtime.
+    Defaults to _DEFAULT_VARIANT_SYMBOL if the env var is invalid or not set.
+    """
+    selected_variant_symbol_str = os.getenv(NEWS_IMPACT_VARIANT_ENV_VAR, _DEFAULT_VARIANT_SYMBOL.value)
+
+    try:
+        current_enum_value = ImpactAnalysisVariantSymbol(selected_variant_symbol_str)
+        if current_enum_value not in VARIANTS_CONFIG:
+            logger.warning(
+                f"NEWS_IMPACT_VARIANT '{selected_variant_symbol_str}' is a valid symbol but not configured in VARIANTS_CONFIG. "
+                f"Defaulting to '{_DEFAULT_VARIANT_SYMBOL.value}'."
+            )
+            current_enum_value = _DEFAULT_VARIANT_SYMBOL
+    except ValueError:
+        logger.warning(
+            f"Invalid NEWS_IMPACT_VARIANT value: '{selected_variant_symbol_str}'. "
+            f"Defaulting to '{_DEFAULT_VARIANT_SYMBOL.value}'. "
+            f"Valid options are: {[s.value for s in ImpactAnalysisVariantSymbol if s in VARIANTS_CONFIG]}"
+        )
+        current_enum_value = _DEFAULT_VARIANT_SYMBOL
+    return current_enum_value
 
 
 def get_selected_variant_config() -> ImpactAnalysisVariantConfig:
-    return _SELECTED_VARIANT_CONFIG
-
-
-logger.info(
-    f"News impact analysis variant set to: '{_SELECTED_VARIANT_SYMBOL_ENUM.value}' (system_prompt_template chosen, use_cot for schema: {_SELECTED_VARIANT_CONFIG.use_cot})"
-)
+    """
+    Gets the configuration for the currently selected impact analysis variant.
+    The selection is determined at runtime based on get_selected_variant_symbol().
+    """
+    current_symbol_enum = get_selected_variant_symbol()
+    return VARIANTS_CONFIG[current_symbol_enum]

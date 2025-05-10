@@ -7,8 +7,6 @@ from .base import LLMProvider
 logger = logging.getLogger(__name__)
 
 # --- Environment Variable Configuration ---
-# Using NEWS_IMPACT_LLM for the indexer task as requested
-NEWS_IMPACT_LLM_CONFIG = os.getenv("NEWS_IMPACT_LLM", "")
 COMMAND_PARSE_LLM_CONFIG = os.getenv("COMMAND_PARSE_LLM", "")
 
 
@@ -61,8 +59,12 @@ def get_llm_provider(config_string: str) -> LLMProvider:
 
 # Specific instance for the News Impact task
 def get_news_impact_llm_provider() -> LLMProvider:
-    """Gets the LLM provider configured for the News Impact task."""
-    return get_llm_provider(NEWS_IMPACT_LLM_CONFIG)
+    """
+    Gets the LLM provider configured for the News Impact task.
+    It reads the NEWS_IMPACT_LLM environment variable at runtime.
+    """
+    current_news_impact_llm_config = os.getenv("NEWS_IMPACT_LLM", "")
+    return get_llm_provider(current_news_impact_llm_config)
 
 
 # Specific instance for the Command Parsing task
