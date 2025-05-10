@@ -39,9 +39,14 @@ public class AuthController {
                             description = "Authentication successful – JWT token returned",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = CustomApiResponse.class)
                             )),
-                    @ApiResponse(responseCode = "401", description = "Authentication failed – invalid credentials"),
+                    @ApiResponse(responseCode = "401",
+                            description = "Authentication failed – invalid credentials",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
@@ -73,9 +78,14 @@ public class AuthController {
                             description = "User registered successfully",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = CustomApiResponse.class)
                             )),
-                    @ApiResponse(responseCode = "403", description = "Invalid request – missing or malformed data"),
+                    @ApiResponse(responseCode = "403",
+                            description = "Invalid request – missing or malformed data",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )

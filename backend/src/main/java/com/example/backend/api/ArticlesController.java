@@ -13,6 +13,7 @@ import com.example.backend.infrastructure.database.entity.ArticleStockImpactEnti
 import com.example.backend.infrastructure.database.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +49,9 @@ public class ArticlesController {
             summary = "Get all articles with optional filtering",
             description = "Retrieves articles with support for various filter parameters",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved articles", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved articles",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ArticleDto.class)))),
                     @ApiResponse(responseCode = "400", description = "Invalid parameters provided")
             }
     )
@@ -91,7 +94,9 @@ public class ArticlesController {
             summary = "Retrieve an article by its slug",
             description = "Fetches the article details for the given slug. Returns a 404 status if the article is not found.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Article found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Article found",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ArticleDto.class))),
                     @ApiResponse(responseCode = "404", description = "Article not found")
             }
     )
@@ -107,7 +112,9 @@ public class ArticlesController {
             summary = "Retrieve an article by its ID",
             description = "Fetches the article details for the given article ID. Returns a 404 status if the article is not found.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Article found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Article found",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ArticleDto.class))),
                     @ApiResponse(responseCode = "404", description = "Article not found")
             }
     )
@@ -125,24 +132,28 @@ public class ArticlesController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "Sentiment data for a specific article",
-                    content = @Content(schema = @Schema(implementation = String.class))
+                    content = @Content(schema = @Schema(implementation = ArticleStockImpactDto.class))
             ),
             responses = {
                     @ApiResponse(responseCode = "200",
                             description = "Sentiment data received and processed successfully",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
-                            )),
-                    @ApiResponse(responseCode = "400", description = "Invalid request – malformed or missing data"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error while processing sentiment data")
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request – malformed or missing data",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error while processing sentiment data",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)))
             }
     )
     public ResponseEntity<?> processArticleStockImpact(@PathVariable("article_id") String articleId,
                                                        @Valid @RequestBody ArticleStockImpactDto request,
                                                        BindingResult bindingResult) {
+        log.info("processArticleStockImpact");
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().toString();
+            log.error(errorMessage);
             return ResponseEntity.badRequest().body(new CustomApiResponse(
                     errorMessage, HttpStatus.BAD_REQUEST.value()
             ));
@@ -164,7 +175,9 @@ public class ArticlesController {
 
             webPushNotificationService.notifyAll(affectedUsers, payload);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(new CustomApiResponse(
+                    "Article processed successful", HttpStatus.OK.value()
+            ));
         } catch (Exception e) {
             String errorMessage = "Error processing stock impact for article %s".formatted(articleId);
             log.error(errorMessage, e);
@@ -178,10 +191,22 @@ public class ArticlesController {
             summary = "Get authenticated user's articles with optional filtering",
             description = "Retrieves articles associated with the authenticated user, with support for various filter parameters.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved user articles", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - User not authenticated"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - User cannot be identified or access denied")
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved user articles",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ArticleDto.class)))),
+                    @ApiResponse(responseCode = "400", description = "Invalid parameters provided",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - User not authenticated",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "403", description = "Forbidden - User cannot be identified or access denied",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)))
             }
     )
     @GetMapping(API_USER_ARTICLES_PATH)
@@ -242,5 +267,4 @@ public class ArticlesController {
             return ResponseEntity.internalServerError().body(message);
         }
     }
-
 }

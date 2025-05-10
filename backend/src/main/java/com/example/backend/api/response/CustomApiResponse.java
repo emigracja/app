@@ -11,6 +11,6 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class CustomApiResponse {
     private final String message;
-    private final int status;
+    private final Integer status;
     private Object data;
 }
