@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ArticleDto {
     private String slug;
-    private String externalId;
+    private String id;
     private String title;
     private String author;
     private String backgroundImage;
