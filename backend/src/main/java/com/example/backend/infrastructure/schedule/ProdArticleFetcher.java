@@ -23,13 +23,11 @@ public class ProdArticleFetcher extends ArticleFetcher {
 
     public ProdArticleFetcher(WebClient webClient, ArticleService articleService, ArticleApiService articleApiService) {
         super(webClient, articleService, articleApiService);
-        log.info("\n\n\nPROD constructor\n\n\n");
     }
 
     @Scheduled(cron = "${article.scheduler.cron:0 0 8 * * *}")
     public void scheduleFetchArticles() throws InterruptedException {
         log.info("PROD environment: Running article fetch with cron expression: {}", cronExpression);
-        Thread.sleep(10000000);
         fetchArticles();
     }
 }
