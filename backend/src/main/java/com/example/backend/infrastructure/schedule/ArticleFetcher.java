@@ -7,7 +7,6 @@ import com.example.backend.domain.service.article.ArticleService;
 import com.example.backend.domain.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.Disposable;
@@ -64,7 +63,7 @@ public abstract class ArticleFetcher {
     private void sendArticlesToAI(List<ArticleDto> savedArticles) {
         for (ArticleDto article : savedArticles) {
             AiArticleRequest request = new AiArticleRequest(
-                    article.getTitle(), article.getDescription(), getAiArticleDate(article)
+                    article.getExternalId(), article.getTitle(), article.getDescription(), getAiArticleDate(article)
             );
 
             Disposable subscribe = webClient.mutate()
