@@ -167,16 +167,21 @@ public class ArticlesController {
                 ));
             }
 
+            log.info("Processing impact for article {}: {}", articleId, request);
             request.setArticleId(articleId);
             ArticleStockImpactEntity impact = stockImpactService.processImpact(request);
+
+            log.info("Processed impact for article {}: {}", articleId, impact);
             List<UserEntity> affectedUsers = userService.findAllByStocksId(request.getStockId());
 
+            log.info("Found {} affected users for stock ID {}", affectedUsers.size(), request.getStockId());
             String payload = webPushNotificationService.prepareMessage(impact);
 
+            log.info("Sending notification to {} users", affectedUsers.size());
             webPushNotificationService.notifyAll(affectedUsers, payload);
 
             return ResponseEntity.ok().body(new CustomApiResponse(
-                    "Article processed successful", HttpStatus.OK.value()
+                    "Article processed successful", HttpStatus.OK.value(), impact
             ));
         } catch (Exception e) {
             String errorMessage = "Error processing stock impact for article %s".formatted(articleId);
