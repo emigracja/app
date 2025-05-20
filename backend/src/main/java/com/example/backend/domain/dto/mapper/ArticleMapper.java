@@ -14,7 +14,7 @@ public class ArticleMapper {
 
     public static ArticleEntity map(ArticleDto articleDto) {
         return ArticleEntity.builder()
-                .id(articleDto.getId())
+                .id(articleDto.getExternalId())
                 .title(articleDto.getTitle())
                 .slug(articleDto.getSlug())
                 .author(articleDto.getAuthor())
@@ -30,7 +30,7 @@ public class ArticleMapper {
         List<ArticleStockImpactEntity> impacts = articleEntity.getArticleImpacts();
 
         return ArticleDto.builder()
-                .id(articleEntity.getId())
+                .externalId(articleEntity.getId())
                 .title(articleEntity.getTitle())
                 .author(articleEntity.getAuthor())
                 .slug(articleEntity.getSlug())

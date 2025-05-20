@@ -63,7 +63,7 @@ public abstract class ArticleFetcher {
     private void sendArticlesToAI(List<ArticleDto> savedArticles) {
         for (ArticleDto article : savedArticles) {
             AiArticleRequest request = new AiArticleRequest(
-                    article.getId(), article.getTitle(), article.getDescription(), getAiArticleDate(article)
+                    article.getExternalId(), article.getTitle(), article.getDescription(), getAiArticleDate(article)
             );
 
             Disposable subscribe = webClient.mutate()
