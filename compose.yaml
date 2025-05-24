@@ -13,8 +13,14 @@ services:
       - BACKEND_API_URL=${BACKEND_API_URL}
       - MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE=${MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE}
       - NEWS_IMPACT_VARIANT=${NEWS_IMPACT_VARIANT}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - "5000:5000"
+    depends_on:
+      - rabbitmq
     volumes:
       - ./ai:/app
     networks:
@@ -67,6 +73,47 @@ services:
     networks:
       - tarantula
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./ai/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - tarantula
+
+  worker:
+    build:
+      context: ai
+      dockerfile: Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - NEWS_IMPACT_LLM=${NEWS_IMPACT_LLM}
+      - COMMAND_PARSE_LLM=${COMMAND_PARSE_LLM}
+      - BACKEND_API_URL=${BACKEND_API_URL}
+      - MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE=${MAXIMUM_STOCKS_TO_PROCESS_PER_ARTICLE}
+      - NEWS_IMPACT_VARIANT=${NEWS_IMPACT_VARIANT}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+    depends_on:
+      - rabbitmq
+    ports: []
+    command: poetry run dramatiq app.tasks --processes 1 --threads 1 --watch /app/app
+    volumes:
+      - ./ai:/app
+    networks:
+      - tarantula
+
 networks:
   tarantula:
 
@@ -74,3 +121,4 @@ networks:
 volumes:
   postgres_data:
   frontend_node_modules:
+  rabbitmq_data:
