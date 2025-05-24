@@ -3,9 +3,10 @@ from uuid import UUID
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Response
 
-from . import database, indexer, schemas
+from . import database, schemas
 from .commands.routes import router as commands_router
 from .schemas import Article, ArticleContent
+from .tasks import process_news
 
 # set DEBUG level of logs
 logging.basicConfig(level=logging.INFO)
@@ -22,14 +23,18 @@ def read_root() -> schemas.ApiResponse[dict]:
 
 
 @app.post("/articles")
-def process_article(article: ArticleContent, background_tasks: BackgroundTasks) -> schemas.ApiResponse[Article]:
+def process_article_endpoint(article_content: ArticleContent) -> schemas.ApiResponse[Article]:  # Renamed input variable
     try:
-        article = database.create_article(article)
-        background_tasks.add_task(indexer.index_article, article.id)
-        return schemas.ApiResponse(data=article)
+        article_db_obj = database.create_article(article_content)
+        logger.info(f"Article {article_db_obj.id} received...")
+        process_news.send(str(article_db_obj.id))
+        logger.info(f"Article {article_db_obj.id} received - task sent to queue for processing.")
+        return schemas.ApiResponse(data=article_db_obj)
     except Exception as e:
-        logger.exception(e)
-        return schemas.ApiResponse(error=str(e))
+        logger.exception(f"Failed to create article or queue for processing: {e}")
+        return schemas.ApiResponse(
+            error=f"Failed to process article request: {str(e)}", error_code="article_processing_failed"
+        )
 
 
 @app.get("/articles")
@@ -70,4 +75,6 @@ async def set_log_level(level: str):
         logger.info(f"Log level changed to {level.upper()}")
         return {"message": f"Log level changed to {level.upper()}"}
     else:
-        raise HTTPException(status_code=400, detail="Invalid log level")
+        raise HTTPException(
+            status_code=400, detail="Invalid log level. Valid levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL."
+        )
