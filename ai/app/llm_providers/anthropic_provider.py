@@ -124,13 +124,14 @@ class AnthropicProvider(LLMProvider):
                 f"[{self.__class__.__name__}/{self.model_name}] Received structured response from Anthropic Claude."
             )
 
-            input_tokens, output_tokens = None, None
+            input_tokens, output_tokens, cached_read_input_tokens = None, None, None
             if message.usage:
                 input_tokens = message.usage.input_tokens
                 output_tokens = message.usage.output_tokens
+                cached_read_input_tokens = message.usage.cache_read_input_tokens
 
             return self._parse_json_output(structured_data, response_format), LLMUsage(
-                input_tokens=input_tokens, output_tokens=output_tokens
+                input_tokens=input_tokens, output_tokens=output_tokens, cached_tokens=cached_read_input_tokens
             )
 
         except Exception as e:

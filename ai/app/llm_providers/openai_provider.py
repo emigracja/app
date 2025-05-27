@@ -58,12 +58,17 @@ class OpenAIProvider(LLMProvider):
             # The result should already be a parsed Pydantic object
             parsed_response = chat_completion.choices[0].message.parsed
 
-            input_tokens, output_tokens = None, None
+            input_tokens, output_tokens, cached_tokens = None, None, None
             if chat_completion.usage:
                 input_tokens = chat_completion.usage.prompt_tokens
                 output_tokens = chat_completion.usage.completion_tokens
+                prompt_details = getattr(chat_completion.usage, 'prompt_tokens_details', None)
+                if prompt_details is not None:
+                    cached_tokens = getattr(prompt_details, 'cached_tokens', None)
             logger.debug(f"[{self.__class__.__name__}/{self.model_name}] Received structured response from OpenAI.")
-            return parsed_response, LLMUsage(input_tokens=input_tokens, output_tokens=output_tokens)
+            return parsed_response, LLMUsage(
+                input_tokens=input_tokens, output_tokens=output_tokens, cached_tokens=cached_tokens
+            )
 
         except Exception as e:
             logger.error(f"Error during OpenAI API call for model {self.model_name}: {e}")

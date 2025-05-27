@@ -110,3 +110,4 @@ class CommandParseResult(BaseModel):
 class LLMUsage(BaseModel):
     input_tokens: Optional[int] = Field(None, description="Number of input tokens used.")
     output_tokens: Optional[int] = Field(None, description="Number of output tokens used.")
+    cached_tokens: Optional[int] = Field(None, description="Number of input prompt tokens that were cache hits.")
