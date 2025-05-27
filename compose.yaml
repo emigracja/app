@@ -17,6 +17,9 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - RABBITMQ_PORT=5672
       - RABBITMQ_HOST=rabbitmq
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "5000:5000"
     depends_on:
@@ -106,14 +109,33 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - rabbitmq
+      - redis
     ports: []
-    command: poetry run dramatiq app.tasks --processes 1 --threads 1 --watch /app/app
+    command: poetry run dramatiq app.tasks --processes 1 --threads 1
     volumes:
       - ./ai:/app
     networks:
       - tarantula
+
+  redis:
+    image: redis:7-alpine
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --save 20 1 --loglevel warning --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - tarantula
+    expose:
+      - "6379"
 
 networks:
   tarantula:
@@ -123,3 +145,4 @@ volumes:
   postgres_data:
   frontend_node_modules:
   rabbitmq_data:
+  redis_data:
