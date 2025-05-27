@@ -41,7 +41,7 @@ def _generate_response_model(stocks: list[Stock], variant_config: ImpactAnalysis
     )
 
     StockImpactReasoningDynamic = create_model(
-        f'StockImpactReasoningDynamic_{variant_config.symbol.value}_{"_".join(sorted(stock_analysis_fields.keys()))}',
+        f'StockImpactReasoningDynamic',
         **stock_analysis_fields,
     )
 
@@ -49,7 +49,7 @@ def _generate_response_model(stocks: list[Stock], variant_config: ImpactAnalysis
         stock.symbol: (StockImpactReasoningDynamic, Field(description=f"Analysis for {stock.name} ({stock.symbol})"))
         for stock in stocks
     }
-    model_name = f'StockResponseModel_{variant_config.symbol.value}_' + '_'.join(sorted(fields.keys()))
+    model_name = f'StockResponseModel'
     StockResponseModel = create_model(model_name, **fields)
     logger.debug(
         f"Generated dynamic response model: {model_name} for variant '{variant_config.symbol.value}' (use_cot={variant_config.use_cot}) with schema fields: {list(stock_analysis_fields.keys())}"
