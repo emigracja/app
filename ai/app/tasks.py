@@ -1,13 +1,15 @@
 import logging
 import os
+import time
 import uuid
 
 import dramatiq
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
 from dramatiq.middleware import Middleware
+from dramatiq.rate_limits import BucketRateLimiter
+from dramatiq.rate_limits.backends import RedisBackend
 from pika import PlainCredentials
 
-# Assuming these are the correct locations based on your project structure
 from app import backend_api
 from app.database import get_article, update_article
 from app.indexer import llm as indexer_llm
@@ -28,6 +30,36 @@ broker = RabbitmqBroker(
     port=int(os.getenv("RABBITMQ_PORT")),
     credentials=PlainCredentials(os.getenv("RABBITMQ_USER"), os.getenv("RABBITMQ_PASSWORD")),
 )
+
+REDIS_URL = f"redis://default:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}/"
+rate_limiter_backend = RedisBackend(url=REDIS_URL)
+# Up to 10 articles / minute
+# (1 every 6 seconds)
+article_rate_limiter = BucketRateLimiter(backend=rate_limiter_backend, key="article-processing", limit=1, bucket=6_000)
+
+how_often_bucket_refreshes_ms = {
+    "llm-usage": 6_000,
+}
+
+
+def acquire_rate_limiter(rate_limiter) -> bool:
+    logging.info(f"Trying to acquire rate_limiter {rate_limiter.key}")
+    bucket_refresh_ms = how_often_bucket_refreshes_ms.get(rate_limiter.key, 1000)
+    wait_for_ms = int(bucket_refresh_ms / 3)
+    # Attempt 6 times (arbitrary choice)
+    for n in range(6):
+        with rate_limiter.acquire(raise_on_failure=False) as acquired:
+            if acquired:
+                logging.info(f"Rate limiter acquired on try #{n}")
+                return True
+        logging.debug(f"Rate limiter not acquired on try #{n}. Attempting again in {wait_for_ms} ms")
+        time.sleep(wait_for_ms / 1000)
+    logging.info(f"Failed to acquire rate limiter after 6 tries.")
+    return False
+
+
+def acquire_article_rate_limiter() -> bool:
+    return acquire_rate_limiter(article_rate_limiter)
 
 
 class HandleArticleProcessingFailureMiddleware(Middleware):
@@ -88,6 +120,8 @@ dramatiq.set_broker(broker)
 def process_news(article_id_str: str):
     article_id = uuid.UUID(article_id_str)
     logger.info(f"Dramatiq: Received task to process article {article_id}.")
+    if not acquire_article_rate_limiter():
+        raise f"Dramatiq: Rate limit exceeded for article processing - {article_id}."
 
     article = get_article(article_id)
     if article is None:
@@ -102,8 +136,7 @@ def process_news(article_id_str: str):
 
     article.status = ArticleStatus.processing
     if not update_article(article):
-        logger.error(f"Dramatiq: Failed to update article {article_id} status to 'processing'. Abandoning task.")
-        return
+        raise f"Dramatiq: Failed to update article {article_id} status to 'processing'."
 
     logger.info(f"Dramatiq: Started processing article {article_id}.")
     try:

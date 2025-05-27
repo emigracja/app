@@ -23,7 +23,7 @@ def read_root() -> schemas.ApiResponse[dict]:
 
 
 @app.post("/articles")
-def process_article_endpoint(article_content: ArticleContent) -> schemas.ApiResponse[Article]:  # Renamed input variable
+def process_article_endpoint(article_content: ArticleContent) -> schemas.ApiResponse[Article]:
     try:
         article_db_obj = database.create_article(article_content)
         logger.info(f"Article {article_db_obj.id} received...")
