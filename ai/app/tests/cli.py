@@ -21,6 +21,7 @@ from app.schemas import (
     LLMUsage,
     Stock,
 )
+from app.tests.comparison import comparison_app
 
 # Import benchmark models (adjust path if needed after refactor)
 from .benchmark import (
@@ -39,6 +40,7 @@ RESULTS_DIR = f"{BASE_TESTS_DIR}/results"
 logger = logging.getLogger(__name__)
 
 app = typer.Typer(no_args_is_help=True)
+app.add_typer(comparison_app, name="comparison")
 
 
 @app.command()
@@ -56,7 +58,7 @@ def run(
         "--variant",
         help="LLM variant symbol to use (e.g., 'DEFAULT_COT'). Overrides NEWS_IMPACT_VARIANT env var.",
     ),
-):
+) -> Path:
     """
     Runs a specific benchmark test suite for stock impact prediction accuracy.
     """
@@ -239,3 +241,4 @@ def run(
     logger.info(f"Output Tokens Used: {total_output_tokens}")
     logger.info(f"Results file: {results_path}")
     logger.info(f"--- Benchmark Run Finished for Suite: {suite_name} ---")
+    return results_path
