@@ -111,6 +111,7 @@ def run(
     total_input_tokens = 0
     total_output_tokens = 0
     total_cached_tokens = 0
+    total_thinking_tokens = 0
 
     start_time = time.perf_counter()
 
@@ -157,6 +158,8 @@ def run(
                         logger.warning(f"LLM usage without output tokens count!")
                     if impact_result.cached_tokens is not None:
                         total_cached_tokens += impact_result.cached_tokens
+                    if impact_result.thinking_tokens is not None:
+                        total_thinking_tokens += impact_result.thinking_tokens
                     continue
 
                 total_evaluated += 1
@@ -209,6 +212,7 @@ def run(
         input_tokens_used=total_input_tokens,
         output_tokens_used=total_output_tokens,
         cached_tokens=total_cached_tokens,
+        total_thinking_tokens=total_thinking_tokens,
         total_cases_evaluated=total_evaluated,
         correct_cases=total_correct,
         accuracy=accuracy,
@@ -239,6 +243,7 @@ def run(
     logger.info(f"Input Tokens Used: {total_input_tokens}")
     logger.info(f"Cached Tokens Used: {total_cached_tokens}")
     logger.info(f"Output Tokens Used: {total_output_tokens}")
+    logger.info(f"Thinking Tokens Used: {total_thinking_tokens}")
     logger.info(f"Results file: {results_path}")
     logger.info(f"--- Benchmark Run Finished for Suite: {suite_name} ---")
     return results_path

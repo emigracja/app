@@ -76,14 +76,12 @@ def generate_comparison_csv(
             )
 
             try:
-                # Call the `run` function programmatically, passing llm and variant as direct arguments.
-                # The `run` command itself will handle setting/unsetting env vars temporarily for its execution.
                 json_result_path: Path = runner_cli.run(
                     suite_name=suite_name,
                     suites_dir=suites_dir,
                     results_dir=results_dir,
-                    llm=llm_id,  # Pass directly as parameter
-                    variant=variant_symbol,  # Pass directly as parameter
+                    llm=llm_id,
+                    variant=variant_symbol,
                 )
                 logger.info(f"Successfully completed run. Results at: {json_result_path}")
 
@@ -95,6 +93,7 @@ def generate_comparison_csv(
                     input_tokens=run_data_dict.get("input_tokens_used"),
                     output_tokens=run_data_dict.get("output_tokens_used"),
                     cached_tokens=run_data_dict.get("cached_tokens"),
+                    thinking_tokens=run_data_dict.get("thinking_tokens"),
                 )
 
                 row = {
@@ -105,6 +104,7 @@ def generate_comparison_csv(
                     "input_tokens_used": run_data_dict.get("input_tokens_used"),
                     "output_tokens_used": run_data_dict.get("output_tokens_used"),
                     "cached_tokens": run_data_dict.get("cached_tokens"),
+                    "thinking_tokens": run_data_dict.get("thinking_tokens"),
                     "cost": f"{cost:.8f}" if cost is not None else None,
                     "total_cases_evaluated": run_data_dict["total_cases_evaluated"],
                     "correct_cases": run_data_dict["correct_cases"],
