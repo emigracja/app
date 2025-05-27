@@ -38,9 +38,15 @@ CSV_HEADERS = [
 
 LLMS_TO_TEST = [
     "openai/gpt-4o",
+    "openai/gpt-4o-mini",
     "openai/gpt-4.1",
+    "openai/gpt-4.1-mini",
+    "openai/gpt-4.1-nano",
     "google/gemini-2.0-flash",
     "google/gemini-2.5-flash-preview-05-20",
+    "google/gemini-2.5-pro-preview-05-06",
+    "anthropic/claude-sonnet-4-20250514",
+    "anthropic/claude-3-5-haiku-20241022",
 ]
 VARIANTS_TO_TEST = [
     "DEFAULT_COT",
@@ -94,7 +100,7 @@ def generate_comparison_csv(
                     input_tokens=run_data_dict.get("input_tokens_used"),
                     output_tokens=run_data_dict.get("output_tokens_used"),
                     cached_tokens=run_data_dict.get("cached_tokens"),
-                    thinking_tokens=run_data_dict.get("thinking_tokens"),
+                    thinking_tokens=run_data_dict.get("thinking_tokens_used"),
                 )
 
                 row = {
@@ -105,7 +111,7 @@ def generate_comparison_csv(
                     "input_tokens_used": run_data_dict.get("input_tokens_used"),
                     "output_tokens_used": run_data_dict.get("output_tokens_used"),
                     "cached_tokens": run_data_dict.get("cached_tokens"),
-                    "thinking_tokens": run_data_dict.get("thinking_tokens"),
+                    "thinking_tokens": run_data_dict.get("thinking_tokens_used"),
                     "cost": f"{cost:.8f}" if cost is not None else None,
                     "total_cases_evaluated": run_data_dict["total_cases_evaluated"],
                     "correct_cases": run_data_dict["correct_cases"],
