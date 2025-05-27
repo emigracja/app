@@ -58,6 +58,74 @@ class BenchmarkRun(BaseModel):
     results: List[BenchmarkSingleResult]
 
 
+MODEL_PRICING = {
+    "openai/gpt-4.1": {
+        "input_per_million": 2.00,
+        "cached_input_per_million": 0.50,
+        "output_per_million": 8.00,
+    },
+    "google/gemini-2.5-flash-preview-05-20": {
+        "input_per_million": 0.15,
+        "cached_input_per_million": 0.0375,
+        "output_per_million": 0.60,  # Assuming "Non-thinking" output price
+    },
+    "google/gemini-2.0-flash": {
+        "input_per_million": 0.10,
+        "cached_input_per_million": 0.025,
+        "output_per_million": 0.40,
+    },
+    "openai/gpt-4o-mini": {
+        "input_per_million": 0.60,
+        "cached_input_per_million": 0.3,
+        "output_per_million": 2.40,
+    },
+    "openai/gpt-4o": {
+        "input_per_million": 5.00,
+        "cached_input_per_million": 2.50,
+        "output_per_million": 20.00,
+    },
+}
+
+
+def calculate_cost_for_run(
+    llm_identifier: str,
+    input_tokens: Optional[int],
+    output_tokens: Optional[int],
+    cached_tokens: Optional[int],
+) -> Optional[float]:
+    """
+    Calculates the estimated cost for a benchmark run based on token usage and LLM pricing.
+    Returns None if pricing is not available or if essential token counts are missing.
+    """
+    pricing_info = MODEL_PRICING.get(llm_identifier)
+    if not pricing_info:
+        logger.debug(f"No pricing information found for LLM: {llm_identifier}. Cost will be NULL.")
+        return None
+
+    _input_tokens = input_tokens if input_tokens is not None else 0
+    _output_tokens = output_tokens if output_tokens is not None else 0
+    _cached_tokens = cached_tokens if cached_tokens is not None else 0
+
+    if _cached_tokens > _input_tokens:
+        logger.error(
+            f"Cached tokens ({_cached_tokens}) exceed input tokens ({_input_tokens}) for {llm_identifier}. "
+            "This shouldn't happen! Assuming all input tokens are cached."
+        )
+        _cached_tokens = _input_tokens
+
+    non_cached_input_tokens = _input_tokens - _cached_tokens
+
+    cost = 0.0
+    cost += (non_cached_input_tokens / 1_000_000) * pricing_info["input_per_million"]
+
+    if "cached_input_per_million" in pricing_info:
+        cost += (_cached_tokens / 1_000_000) * pricing_info["cached_input_per_million"]
+
+    cost += (_output_tokens / 1_000_000) * pricing_info["output_per_million"]
+
+    return round(cost, 8)  # Using 8 decimal places for precision
+
+
 def load_json_data(path: Path, model: BaseModel) -> List[Any]:
     """Loads and validates a list of JSON objects from a file."""
     if not path.exists():
