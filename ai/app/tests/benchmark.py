@@ -71,7 +71,7 @@ MODEL_PRICING = {
         "output_per_million": 0.60,
         "thinking_output_per_million": 3.50,
     },
-    "google/gemini-2.5-pro-preview": {
+    "google/gemini-2.5-pro-preview-05-06": {
         "input_per_million": 1.25,
         "cached_input_per_million": 0.31,
         "output_per_million": 10.00,
@@ -91,6 +91,26 @@ MODEL_PRICING = {
         "input_per_million": 5.00,
         "cached_input_per_million": 2.50,
         "output_per_million": 20.00,
+    },
+    "openai/gpt-4.1-mini": {
+        "input_per_million": 0.40,
+        "cached_input_per_million": 0.10,
+        "output_per_million": 1.60,
+    },
+    "openai/gpt-4.1-nano": {
+        "input_per_million": 0.100,
+        "cached_input_per_million": 0.025,
+        "output_per_million": 0.400,
+    },
+    "anthropic/claude-sonnet-4-20250514": {  # Updated key
+        "input_per_million": 3.00,
+        "cached_input_per_million": 0.30,
+        "output_per_million": 15.00,
+    },
+    "anthropic/claude-3-5-haiku-20241022": {  # Updated key
+        "input_per_million": 0.80,
+        "cached_input_per_million": 0.08,
+        "output_per_million": 4.00,
     },
 }
 

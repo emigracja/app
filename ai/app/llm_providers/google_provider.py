@@ -152,6 +152,7 @@ class GoogleProvider(LLMProvider):
 
             input_tokens, output_tokens, cached_content_tokens, thinking_tokens = None, None, None, None
             if hasattr(response, 'usage_metadata') and response.usage_metadata:
+                logging.info(response.usage_metadata)
                 input_tokens = response.usage_metadata.prompt_token_count
                 output_tokens = response.usage_metadata.candidates_token_count
                 cached_content_tokens = response.usage_metadata.cached_content_token_count

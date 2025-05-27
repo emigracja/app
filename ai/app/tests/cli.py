@@ -212,7 +212,7 @@ def run(
         input_tokens_used=total_input_tokens,
         output_tokens_used=total_output_tokens,
         cached_tokens=total_cached_tokens,
-        total_thinking_tokens=total_thinking_tokens,
+        thinking_tokens_used=total_thinking_tokens,
         total_cases_evaluated=total_evaluated,
         correct_cases=total_correct,
         accuracy=accuracy,
