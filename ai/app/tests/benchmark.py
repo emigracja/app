@@ -52,6 +52,7 @@ class BenchmarkRun(BaseModel):
     input_tokens_used: Optional[int] = None
     cached_tokens: Optional[int] = None
     output_tokens_used: Optional[int] = None
+    thinking_tokens_used: Optional[int] = None
     total_cases_evaluated: int
     correct_cases: int
     accuracy: float
@@ -67,7 +68,14 @@ MODEL_PRICING = {
     "google/gemini-2.5-flash-preview-05-20": {
         "input_per_million": 0.15,
         "cached_input_per_million": 0.0375,
-        "output_per_million": 0.60,  # Assuming "Non-thinking" output price
+        "output_per_million": 0.60,
+        "thinking_output_per_million": 3.50,
+    },
+    "google/gemini-2.5-pro-preview": {
+        "input_per_million": 1.25,
+        "cached_input_per_million": 0.31,
+        "output_per_million": 10.00,
+        "thinking_output_per_million": 10.00,
     },
     "google/gemini-2.0-flash": {
         "input_per_million": 0.10,
@@ -92,10 +100,11 @@ def calculate_cost_for_run(
     input_tokens: Optional[int],
     output_tokens: Optional[int],
     cached_tokens: Optional[int],
+    thinking_tokens: Optional[int],  # Add thinking_tokens parameter
 ) -> Optional[float]:
     """
     Calculates the estimated cost for a benchmark run based on token usage and LLM pricing.
-    Returns None if pricing is not available or if essential token counts are missing.
+    Returns None if pricing is not available.
     """
     pricing_info = MODEL_PRICING.get(llm_identifier)
     if not pricing_info:
@@ -105,6 +114,7 @@ def calculate_cost_for_run(
     _input_tokens = input_tokens if input_tokens is not None else 0
     _output_tokens = output_tokens if output_tokens is not None else 0
     _cached_tokens = cached_tokens if cached_tokens is not None else 0
+    _thinking_tokens = thinking_tokens if thinking_tokens is not None else 0
 
     if _cached_tokens > _input_tokens:
         logger.error(
@@ -122,6 +132,12 @@ def calculate_cost_for_run(
         cost += (_cached_tokens / 1_000_000) * pricing_info["cached_input_per_million"]
 
     cost += (_output_tokens / 1_000_000) * pricing_info["output_per_million"]
+
+    if _thinking_tokens > 0:
+        if "thinking_output_per_million" not in pricing_info:
+            logger.error(f"No specific thinking output pricing defined for {llm_identifier}. ")
+
+        cost += (_thinking_tokens / 1_000_000) * pricing_info.get("thinking_output_per_million", 0.0)
 
     return round(cost, 8)  # Using 8 decimal places for precision
 
