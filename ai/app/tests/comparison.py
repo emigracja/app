@@ -28,6 +28,7 @@ CSV_HEADERS = [
     "input_tokens_used",
     "output_tokens_used",
     "cached_tokens",
+    "thinking_tokens",
     "cost",
     "total_cases_evaluated",
     "correct_cases",
