@@ -150,17 +150,20 @@ class GoogleProvider(LLMProvider):
                     logger.error("Gemini response has no candidates and no prompt_feedback provided.")
                 raise ValueError(f"Gemini response is empty or has no candidates. {block_reason_msg}")
 
-            input_tokens, output_tokens = None, None
+            input_tokens, output_tokens, cached_content_tokens = None, None, None
             if hasattr(response, 'usage_metadata') and response.usage_metadata:
                 input_tokens = response.usage_metadata.prompt_token_count
                 output_tokens = response.usage_metadata.candidates_token_count
+                cached_content_tokens = response.usage_metadata.cached_content_token_count
 
             raw_json_output = response.text
             logger.debug(
                 f"[{self.__class__.__name__}/{self.model_name}] Received raw JSON response from Google Gemini: {raw_json_output}"
             )
 
-            return response.parsed, LLMUsage(input_tokens=input_tokens, output_tokens=output_tokens)
+            return response.parsed, LLMUsage(
+                input_tokens=input_tokens, output_tokens=output_tokens, cached_tokens=cached_content_tokens
+            )
 
         except Exception as e:
             logger.error(

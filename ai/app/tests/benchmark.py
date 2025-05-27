@@ -11,13 +11,7 @@ from typing import Any, Dict, List, Optional, Set
 import typer
 from pydantic import BaseModel, Field, ValidationError
 
-from app.indexer.llm import does_article_impact_stocks
-from app.schemas import (
-    ArticleContent,
-    ArticleStockImpact,
-    ArticleStockImpactSeverity,
-    Stock,
-)
+from app.schemas import ArticleStockImpactSeverity
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,15 +22,6 @@ TESTS_DIR = "/app/tests"
 TEST_CASES_PATH = f"{TESTS_DIR}/test-cases.json"
 STOCKS_PATH = f"{TESTS_DIR}/stocks.json"
 RESULTS_DIR = f"{TESTS_DIR}/results"
-
-
-# --- Pydantic Models for JSON Validation and Results ---
-
-
-class BenchmarkStock(Stock):
-    # Inherits all fields from app.schemas.Stock
-    # Ensure stocks.json provides all required fields including 'id' (UUID)
-    pass
 
 
 class BenchmarkTestCase(BaseModel):
@@ -65,14 +50,12 @@ class BenchmarkRun(BaseModel):
     )
     time_ms: float
     input_tokens_used: Optional[int] = None
+    cached_tokens: Optional[int] = None
     output_tokens_used: Optional[int] = None
     total_cases_evaluated: int
     correct_cases: int
     accuracy: float
     results: List[BenchmarkSingleResult]
-
-
-# --- Helper Functions ---
 
 
 def load_json_data(path: Path, model: BaseModel) -> List[Any]:

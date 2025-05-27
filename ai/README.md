@@ -8,7 +8,14 @@ Refer to the main README.md for deployment instructions.
 
 ```
 poetry run python -m app.cli
+
+# For example, if you wish to run simple tests:
+poetry run python -m app.cli tests run
+
+# For advanced configuration:
+poetry run python -m app.cli tests run --help
 ```
+
 
 ## Development
 
