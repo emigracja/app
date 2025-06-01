@@ -12,7 +12,7 @@ const PriceChange = ({ todaysPriceChange }: Props): ReactElement<Props> => (
   >
     <p>
       {todaysPriceChange > 0 ? "+" : ""}
-      {todaysPriceChange}
+      {todaysPriceChange.toFixed(2)}
     </p>
   </div>
 );

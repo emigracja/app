@@ -17,13 +17,24 @@ import axios from "@/utils/axios";
 import { addCandlestickMockData } from "@/utils/mockData";
 import { News } from "@/types/news";
 
-const fetchStock = async (stockId: string): Promise<Stock> => {
+const fetchStock = async (symbol: string): Promise<Stock> => {
   try {
-    const response = await axios.get(`/stocks`);
-    const stock = addCandlestickMockData([response.data[0]])[0];
+    const stockRes = await axios.get(`/stocks?symbol=${symbol}`);
+    const candleRes = await fetch(
+      `/api/candles?symbol=${symbol}&interval=1h&limit=500`
+    );
+    if (!candleRes.ok) throw new Error("Błąd pobierania danych candle");
+    if (stockRes.status !== 200)
+      throw new Error("Błąd pobierania danych stock");
+    const stock = {
+      ...stockRes.data[0],
+      ...(await candleRes.json()),
+      currency: "PLN",
+      tags: [stockRes.data[0].ekd],
+    };
     return stock as Stock;
   } catch (err) {
-    console.error(`Error fetching stock ${stockId}:`, err);
+    console.error(`Error fetching stock ${symbol}:`, err);
     throw err;
   }
 };

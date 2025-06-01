@@ -34,7 +34,7 @@ const StockCard = ({
 }: Props): ReactElement => {
   return (
     <section className="relative block text-xl text-white rounded-xl p-3 box-content bg-card-bg">
-      <a href={`/stocks/${id}`}>
+      <a href={`/stocks/${symbol}`}>
         <div className="flex flex-row gap-3 items-start h-full">
           <div className="flex flex-col w-full gap-5 basis-2/3 grow">
             <StockName name={name} symbol={symbol} />
