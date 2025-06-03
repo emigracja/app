@@ -75,15 +75,15 @@ public abstract class ArticleFetcher {
                     .retrieve()
                     .toBodilessEntity()
                     .doOnSuccess(response -> log.info("Successfully sent article: {}", request))
-                    .doOnError(error -> log.error("Error sending article: ", error))
+                    .doOnError(error -> log.error("Error sending article: {}", error.getMessage()))
                     .subscribe();
 
             log.info("AI response for article {}: {}", request, subscribe);
         }
     }
 
-    private LocalDateTime getAiArticleDate(ArticleDto article) {
-        return DateUtils.toLocalDateTime(article.getPublishedAt());
+    private Date getAiArticleDate(ArticleDto article) {
+        return article.getPublishedAt();
     }
 
     private static boolean filterDates(ArticleDto article, LocalDateTime prevDay, LocalDateTime now) {
