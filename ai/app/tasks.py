@@ -155,7 +155,7 @@ def process_news(article_id_str: str):
                 )
                 continue
 
-            notify_backend.send(str(article.external_id), article_stock_impact.model_dump())
+        notify_backend.send(str(article.external_id), article_stock_impact.model_dump(mode='json'))
 
         article.status = ArticleStatus.completed
         article.error_message = None

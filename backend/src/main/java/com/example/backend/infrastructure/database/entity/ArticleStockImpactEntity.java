@@ -30,7 +30,7 @@ public class ArticleStockImpactEntity {
     @Column(name = "impact", nullable = false)
     private String impact;
 
-    @Column(name = "reason")
+    @Column(name = "reason", columnDefinition="TEXT")
     private String reason;
 }
 

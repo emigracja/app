@@ -5,8 +5,8 @@ spring:
     name: backend
   datasource:
     url: jdbc:postgresql://localhost:5432/radomDB
-    username: postgres
-    password: postgres
+    username: user
+    password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
