@@ -34,6 +34,19 @@ const fetchStocks = async ({ pageParam = 0 }): Promise<FetchResponse> => {
 
 export default function StockPage() {
   // --------------- INFINITE SCROLL STUFF ----------------------
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoadingCurrentPage, setIsLoadingCurrentPage] = useState(true);
+
+  const handleLoadingChange = (index: number, loading: boolean) => {
+    if (index == currentPage) {
+      if (!loading) {
+        setIsLoadingCurrentPage(false);
+        setCurrentPage(index + 1);
+      } else {
+        setIsLoadingCurrentPage(true);
+      }
+    }
+  };
 
   const { ref, inView } = useInView({
     // threshold: 0, // Trigger when the element enters the viewport
@@ -59,15 +72,26 @@ export default function StockPage() {
 
   // Effect to fetch next page when the ref element comes into view
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    if (inView && hasNextPage && !isFetchingNextPage && !isLoadingCurrentPage) {
+      const timeout = setTimeout(() => {
+        fetchNextPage();
+      }, 300); // małe opóźnienie
+      // fetchNextPage();
+      return () => clearTimeout(timeout);
     }
-  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [
+    inView,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoadingCurrentPage,
+  ]);
 
-  const allStocks = addCandlestickMockData(
-    data?.pages.flatMap((page) => page.data) ?? []
-  );
+  const allStocks = data?.pages.flatMap(
+    (page) => page.data
+  ) as Partial<Stock>[];
 
+  const lastPageStocks = data?.pages[data.pages.length - 1]?.data ?? [];
   // --------------- FILTERING STUFF --------------------
   // const [filteredStocks, setFilteredStocks] = useState(allStocks);
 
@@ -130,12 +154,19 @@ export default function StockPage() {
         />
       </div> */}
       <div>
-        <StockList stocks={allStocks} />
+        {/* <StockList partialStocks={allStocks} /> */}
+        {data?.pages.map((page, index) => (
+          <StockList
+            key={index}
+            partialStocks={page.data}
+            onLoadingChange={(loading) => handleLoadingChange(index, loading)}
+          />
+        ))}
 
         {/* --- Loading/Trigger Area --- */}
         <div
           ref={ref}
-          className="h-[50px] my-5 text-center text-white opacity-70"
+          className="h-[200px] my-5 text-center text-white opacity-70"
         >
           {isFetchingNextPage ? (
             <span>Loading more stocks...</span>
