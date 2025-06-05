@@ -13,7 +13,7 @@ const NewsFilters = ({ onSubmit }: Props): ReactElement => {
     e.preventDefault();
 
     onSubmit({
-      name: nameQuery,
+      n: nameQuery,
       from: fromQuery,
       to: toQuery,
     });
