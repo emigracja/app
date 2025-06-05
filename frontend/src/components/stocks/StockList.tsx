@@ -5,6 +5,7 @@ import { Stock } from "@/types/stocks";
 import StockCard from "./StockCard";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "@/components/loader/Loader";
+import useUserStockStore from "@/store/useUserStockStore";
 
 interface Props {
   partialStocks: Partial<Stock>[];
@@ -43,11 +44,21 @@ const StockList = ({ partialStocks, onLoadingChange }: Props): ReactElement => {
     queryFn: () => fetchCandles(partialStocks),
   });
 
+  const { updateUserStocks, userStocks } = useUserStockStore()
+
+    useEffect(() => {
+        updateUserStocks();
+        console.log(userStocks)
+    }, []);
+
   useEffect(() => {
     onLoadingChange?.(candleQuery.isLoading);
+
   }, [candleQuery.isLoading]);
 
   const stocks = candleQuery.data as Stock[];
+
+  const userSymbols = userStocks.map((s) => s.symbol);
 
   // todo: loader
   if (candleQuery.isLoading || !stocks) {
@@ -63,7 +74,7 @@ const StockList = ({ partialStocks, onLoadingChange }: Props): ReactElement => {
       }}
     >
       {stocks.map((stock) => (
-        <StockCard key={stock.id} {...stock} />
+        <StockCard key={stock.id} {...stock} favorite={userSymbols.includes(stock.symbol)} />
       ))}
     </div>
   );

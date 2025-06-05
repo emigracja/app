@@ -11,6 +11,8 @@ public interface StockService {
 
     List<StockDto> getAllStocks();
 
+    StockDto deleteStockForUser(String email, String symbol);
+
     List<StockDto> getStocksForUser(String email);
 
     StockDto addStockToUser(String username, String stockSymbol) throws StockAlreadyAssociatedException;

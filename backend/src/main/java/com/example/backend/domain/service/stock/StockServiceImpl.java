@@ -72,6 +72,21 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    @Transactional
+    public StockDto deleteStockForUser(String email, String symbol) {
+
+        UserEntity user = userJpaRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        StockEntity stockToRemove = stockJpaRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new StockNotFoundException("Stock not found with symbol: " + symbol));
+
+        user.getStocks().remove(stockToRemove);
+
+        return StockMapper.map(stockToRemove);
+    }
+
+    @Override
     public List<StockDto> findAllBySearchParams(StocksSearchParams params) {
         Pageable pageable = PageRequest.of(params.page(), params.size());
         return stockJpaRepository.findAll(createStockSpecification(params), pageable)
