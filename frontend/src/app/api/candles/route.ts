@@ -12,6 +12,27 @@ async function ensureCacheDirectoryExists() {
   }
 }
 
+async function deleteOldFiles(symbol: string) {
+  try {
+    const files = await fs.readdir(CACHE_DIR);
+    const symbolPrefix = `${symbol}_`;
+    const today = new Date().toISOString().split("T")[0];
+
+    for (const file of files) {
+      if (file.startsWith(symbolPrefix) && file.endsWith(".json")) {
+        const datePart = file.slice(symbolPrefix.length, -5); // Remove prefix and .json
+        if (datePart < today) {
+          const oldFilePath = path.join(CACHE_DIR, file);
+          await fs.unlink(oldFilePath);
+          console.log(`Deleted old file: ${oldFilePath}`);
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Error deleting old files:", err);
+  }
+}
+
 interface StooqDataItem {
   time: string;
   open: number;
@@ -34,10 +55,11 @@ export async function GET(request: Request) {
   }
 
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  const filename = `${symbol
-    .toLowerCase()
-    .replace(/[^a-z0-9.-]/gi, "_")}_${today}.json`; // Sanitize symbol for filename
+  const safeSymbol = symbol.toLowerCase().replace(/[^a-z0-9.-]/gi, "_");
+  const filename = `${safeSymbol}_${today}.json`; // Sanitize symbol for filename
   const filePath = path.join(CACHE_DIR, filename);
+
+  await deleteOldFiles(safeSymbol);
 
   // 1. Try to read from cache
   try {
