@@ -1,26 +1,12 @@
 // auth.ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthConfig } from "next-auth";
-import { User } from "@/types/users";
-import { users } from "@/store/data";
-import bcrypt from "bcryptjs";
-
-export async function getUserFromDb(email: string): Promise<User | null> {
-  // TODO:
-  // Replace this with actual database query
-  const user = users.filter((u) => u.email === email);
-  if (user.length > 0) {
-    return user[0];
-  }
-
-  return null;
-}
+import type { NextAuthConfig, User as NextAuthUser } from "next-auth";
 
 export const config: NextAuthConfig = {
   trustHost: true,
   pages: {
-    signIn: "/login", // Redirect users to /login if they are not signed in
+    signIn: "/login",
   },
   providers: [
     CredentialsProvider({
@@ -33,10 +19,7 @@ export const config: NextAuthConfig = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<any> {
-        // Using 'any' here as User type might conflict before extensions are fully processed by TS
-        // TODO
-        // Add validation logic here
+      async authorize(credentials): Promise<NextAuthUser | null> {
         if (!credentials?.email || !credentials?.password) {
           console.error("Missing credentials");
           return null;
@@ -45,98 +28,98 @@ export const config: NextAuthConfig = {
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        const user = await getUserFromDb(email);
-
-        if (!user || !user.passwordHash) {
-          console.log("User not found or password missing for:", email);
-          return null;
-        }
-
-        // Verify password
-        const passwordsMatch = await bcrypt.compare(
-          password,
-          user.passwordHash
-        );
-
-        // TODO
-        // Verify password on backend
-        let isLoggedIn = false;
-        let backendToken;
         try {
+          console.log("Attempting backend login for:", email);
+          console.log(`${process.env.BACKEND_URL}/users/auth/login`)
           const response = await fetch(
-            `${process.env.BACKEND_API_URL}/users/auth/login`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password,
-              }),
-            }
+              `${process.env.BACKEND_URL}/users/auth/login`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+              }
           );
-          console.log(response);
+
           if (response.ok) {
-            isLoggedIn = true;
-            backendToken = await response.text();
-            console.log(backendToken);
+            const backendAuthResponse = await response.json(); // Expects { token: "string" }
+            console.log("Backend login successful:", backendAuthResponse.data);
+
+            if (!backendAuthResponse.data.token) {
+              console.error("Backend response is missing token");
+              return null;
+            }
+
+            const backendToken = backendAuthResponse.data.token as string;
+
+            console.log(backendToken)
+
+            return {
+              id: backendToken,
+              email: null,
+              name: null,
+            };
+
+          } else {
+            const errorData = await response.json().catch(() => ({ message: "Unknown error from backend" }));
+            console.error(
+                "Backend login failed:",
+                response.status,
+                response.statusText,
+                errorData
+            );
+            return null;
           }
         } catch (err) {
-          console.log("Login attemp failed. error:", err);
-          isLoggedIn = false;
-        }
-
-        // change passwordsMatch to isLoggedIn when backend auth will work
-        if (passwordsMatch) {
-          // This object is then encoded in the JWT
-          return {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-          };
-        } else {
-          console.log("Password mismatch for:", email);
+          console.error("Error during backend login request:", err);
           return null;
         }
       },
     }),
   ],
   callbacks: {
-    // The `jwt` callback is invoked when a JWT is created or updated.
-    // We add the user's ID and role to the token here.
-    async jwt({ token, user }) {
-      if (user) {
-        // User object is available on initial sign-in
+    async jwt({ token, user, account }) {
+      if (account && user) {
+
         token.id = user.id;
-        token.role = user.role;
-        token.backendToken = user.backendToken;
+        token.email = user.email;
+        token.name = user.name;
+
+        if (user .backendToken) {
+          token.backendToken = (user ).backendToken as string;
+        }
       }
       return token;
     },
-    // The `session` callback is invoked when a session is checked.
     async session({ session, token }) {
-      if (token && session.user) {
+      if (session.user) {
+
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.backendToken = token.backendToken as string;
+        session.user.email = token.email as string | null;
+        session.user.name = token.name as string | null;
+        // Make the backendToken available in the session
+        if (token.backendToken) {
+          session.user.backendToken = token.backendToken as string;
+        }
       }
       return session;
     },
-    // Use authorized callback to implement authorization logic
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
+      const isOnLoginPage = nextUrl.pathname.startsWith("/login");
       const isOnSignupPage = nextUrl.pathname.startsWith("/signup");
-      if (isOnSignupPage) {
+
+      if (isOnLoginPage || isOnSignupPage) {
         return true;
       }
+
       if (!isLoggedIn) {
-        return true;
+        return Response.redirect(new URL("/login", nextUrl));
       }
       return true;
     },
   },
-  // the session object is derived from the JWT token
   session: { strategy: "jwt" },
 };
 

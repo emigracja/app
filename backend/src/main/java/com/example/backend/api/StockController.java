@@ -125,13 +125,12 @@ public class StockController {
         }
     }
 
-    @PostMapping(USER_STOCKS)
+
+
+    @GetMapping(USER_STOCKS+"/add/{symbol}")
     @Operation(summary = "Add a stock to the current user's list",
             description = "Associates a stock, identified by its symbol, with the currently authenticated user.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AddStockRequestDto.class))
-            ),
+
             responses = {
                     @ApiResponse(responseCode = "200",
                             description = "Stock successfully associated with the user",
@@ -176,15 +175,14 @@ public class StockController {
                             ))
             }
     )
-    public ResponseEntity<?> addStockToUser(Principal principal, @Valid @RequestBody AddStockRequestDto requestDto) {
+    public ResponseEntity<?> addStockToUser(Principal principal, @PathVariable String symbol) {
         String email = principal.getName();
-        String stockSymbol = requestDto.getSymbol();
 
-        log.info("Attempting to add stock with symbol '{}' for user '{}'", stockSymbol, email);
+        log.info("Attempting to add stock with symbol '{}' for user '{}'", symbol, email);
 
         try {
-            StockDto addedStock = stockService.addStockToUser(email, stockSymbol);
-            log.info("Successfully added stock '{}' for user '{}'", stockSymbol, email);
+            StockDto addedStock = stockService.addStockToUser(email, symbol);
+            log.info("Successfully added stock '{}' for user '{}'", symbol, email);
             return ResponseEntity.ok(addedStock);
         } catch (UsernameNotFoundException e) {
             log.error("User not found for username obtained from token: {}", email, e);
@@ -192,17 +190,88 @@ public class StockController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new CustomApiResponse(message, HttpStatus.FORBIDDEN.value()));
         } catch (StockNotFoundException e) {
-            String message = "Stock not found with symbol '%s' for user '%s'".formatted(stockSymbol, email);
+            String message = "Stock not found with symbol '%s' for user '%s'".formatted(symbol, email);
             log.warn(message, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new CustomApiResponse(message, HttpStatus.NOT_FOUND.value()));
         } catch (StockAlreadyAssociatedException e) {
-            String message = "Stock '%s' already associated with user '%s'".formatted(stockSymbol, email);
+            String message = "Stock '%s' already associated with user '%s'".formatted(symbol, email);
             log.warn(message, e);
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new CustomApiResponse(message, HttpStatus.CONFLICT.value()));
         } catch (Exception e) {
-            log.error("Error adding stock '{}' for user '{}'", stockSymbol, email, e);
+            log.error("Error adding stock '{}' for user '{}'", symbol, email, e);
+            return ResponseEntity.internalServerError().body(new CustomApiResponse(
+                    "An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()
+            ));
+        }
+    }
+
+    @GetMapping(USER_STOCKS + "/remove/{symbol}")
+    @Operation(summary = "Remove a stock from the current user's list",
+            description = "Disassociates a stock, identified by its symbol, from the currently authenticated user.",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Stock successfully disassociated from the user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = StockDto.class)
+                            )),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid request data (e.g., missing symbol)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - User not authenticated",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "403",
+                            description = "Forbidden - User cannot be identified from token",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "404",
+                            description = "Stock with the given symbol not found for this user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            )),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CustomApiResponse.class)
+                            ))
+            }
+    )
+    public  ResponseEntity<?> removeStock(
+            Principal principal,
+            @PathVariable String symbol
+    ){
+        String email = principal.getName();
+
+        log.info("Attempting to remove stock with symbol '{}' for user '{}'", symbol, email);
+
+        try {
+            StockDto deleteStockForUser = stockService.deleteStockForUser(email, symbol);
+            log.info("Successfully removed stock '{}' for user '{}'", symbol, email);
+            return ResponseEntity.ok(deleteStockForUser);
+        } catch (UsernameNotFoundException e) {
+            log.error("User not found for username obtained from token: {}", email, e);
+            String message = "User specified in token not found.";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new CustomApiResponse(message, HttpStatus.FORBIDDEN.value()));
+        } catch (StockNotFoundException e) {
+            String message = "Stock not found with symbol '%s' for user '%s'".formatted(symbol, email);
+            log.warn(message, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CustomApiResponse(message, HttpStatus.NOT_FOUND.value()));
+        } catch (Exception e) {
+            log.error("Error adding stock '{}' for user '{}'", symbol, email, e);
             return ResponseEntity.internalServerError().body(new CustomApiResponse(
                     "An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()
             ));

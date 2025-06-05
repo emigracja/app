@@ -6,7 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { News } from "@/types/news";
 import axios from "@/utils/axios";
-import { BeatLoader, MoonLoader } from "react-spinners";
+import { BeatLoader } from "react-spinners";
 import NewsFilters from "@/components/news/NewsFilters";
 import Loader from "@/components/loader/Loader";
 import useStore from "@/store/useStore";
