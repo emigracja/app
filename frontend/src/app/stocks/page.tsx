@@ -1,7 +1,7 @@
 "use client";
 
 import StockList from "@/components/stocks/StockList";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "next/navigation";
@@ -9,33 +9,50 @@ import { debounce } from "lodash";
 import axios from "@/utils/axios";
 import { Stock } from "@/types/stocks";
 import { addCandlestickMockData } from "@/utils/mockData";
+import useStore from "@/store/useStore";
 
 interface FetchResponse {
   data: Partial<Stock>[];
   nextPage: number | null | undefined;
 }
 
-const fetchStocks = async ({ pageParam = 0 }): Promise<FetchResponse> => {
-  try {
-    const response = await axios.get(`/stocks?page=${pageParam}`);
-
-    const stocks = response.data || [];
-    const hasMore = stocks.length > 0;
-
-    return {
-      data: stocks,
-      nextPage: hasMore ? pageParam + 1 : undefined,
-    };
-  } catch (err) {
-    console.error("Error fetching stocks:", err);
-    throw err;
-  }
-};
-
 export default function StockPage() {
   // --------------- INFINITE SCROLL STUFF ----------------------
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoadingCurrentPage, setIsLoadingCurrentPage] = useState(true);
+  const [searchParams, setSearchParams] = useState<{ [key: string]: string }>(
+    {}
+  );
+  const [symbolQuery, setSymbolQuery] = useState("");
+
+  const filtersOpen = useStore((state) => state.filtersOpen);
+  const setFiltersOpen = useStore((state) => state.setFiltersOpen);
+
+  const filtersContainer = useRef<HTMLDivElement | null>(null);
+
+  const fetchStocks = async ({ pageParam = 0 }): Promise<FetchResponse> => {
+    const filteredSearchParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([_, value]) => value !== "")
+    );
+    const params = new URLSearchParams({
+      page: String(pageParam),
+      ...filteredSearchParams,
+    });
+    try {
+      const response = await axios.get(`/stocks?${params.toString()}`);
+
+      const stocks = response.data || [];
+      const hasMore = stocks.length > 0;
+
+      return {
+        data: stocks,
+        nextPage: hasMore ? pageParam + 1 : undefined,
+      };
+    } catch (err) {
+      console.error("Error fetching stocks:", err);
+      throw err;
+    }
+  };
 
   const handleLoadingChange = (index: number, loading: boolean) => {
     if (index == currentPage) {
@@ -61,10 +78,11 @@ export default function StockPage() {
     isLoading,
     isFetchingNextPage,
     status, // 'loading', 'error', 'success'
+    refetch,
   } = useInfiniteQuery<FetchResponse, Error>({
-    queryKey: ["stocks"],
+    queryKey: ["stocks", searchParams],
     queryFn: fetchStocks,
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage: any) => {
       // lastPage is the result returned by fetchNews for the last page fetched
       return lastPage.nextPage;
     },
@@ -92,7 +110,32 @@ export default function StockPage() {
   ) as Partial<Stock>[];
 
   const lastPageStocks = data?.pages[data.pages.length - 1]?.data ?? [];
+
   // --------------- FILTERING STUFF --------------------
+  // Effect to open or close filters
+  useEffect(() => {
+    if (filtersContainer.current) {
+      if (filtersOpen) {
+        filtersContainer.current.style.display = "block";
+      } else {
+        filtersContainer.current.style.display = "none";
+      }
+    }
+  }, [filtersOpen]);
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    handleSubmit({
+      symbol: symbolQuery,
+    });
+  };
+
+  const handleSubmit = useCallback((params: { [key: string]: string }) => {
+    setSearchParams(params);
+    setFiltersOpen(false);
+  }, []);
+
   // const [filteredStocks, setFilteredStocks] = useState(allStocks);
 
   // const searchParams = useSearchParams();
@@ -145,14 +188,25 @@ export default function StockPage() {
 
   return (
     <>
-      {/* <div className="w-full p-2">
-        <input
-          onChange={handleChange}
-          className="p-2 w-full text-white border-white border-1 rounded-xl outline-none"
-          type="text"
-          placeholder="Search..."
-        />
-      </div> */}
+      <div className="hidden" ref={filtersContainer}>
+        <form onSubmit={onSubmit} className="p-2 w-full text-white">
+          <input
+            onChange={(e) => setSymbolQuery(e.target.value.toUpperCase())}
+            className="p-2 w-full text-white border-white border-1 rounded-xl outline-none"
+            type="text"
+            placeholder="Search by symbol..."
+          />
+          <button
+            type="submit"
+            className={`
+                my-2 p-2 w-full rounded-xl font-semibold transition duration-150 ease-in-out
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                focus:ring-offset-gray-800/70 bg-blue-600 hover:bg-blue-700`}
+          >
+            Search
+          </button>
+        </form>
+      </div>
       <div>
         {/* <StockList partialStocks={allStocks} /> */}
         {data?.pages.map((page, index) => (
