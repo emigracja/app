@@ -1,36 +1,34 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
 
-
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:8080';
+const backendURL = process.env.BACKEND_URL || "http://localhost:8080";
 
 const axiosInstance = axios.create({
-    baseURL: backendURL,
+  baseURL: backendURL,
 });
 
 axiosInstance.interceptors.request.use(
-    async (config) => {
+  async (config) => {
+    if (typeof window !== "undefined") {
+      const session = await getSession();
 
-        if (typeof window !== "undefined") {
-            const session = await getSession();
+      let token: string | null = null;
 
-            let token: string | null = null;
-
-            if (session?.user) {
-                    if (session.user.id) {
-                    token = session.user.id;
-                }
-            }
-
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
+      if (session?.user) {
+        if (session.user.id) {
+          token = session.user.id;
         }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+      }
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 export default axiosInstance;

@@ -1,6 +1,7 @@
 // src/app/api/auth/register/route.ts
 import { NextResponse } from "next/server";
-import { getUserFromDb } from "../auth";
+// import { getUserFromDb } from "../auth";
+import axios from "@/utils/axios";
 
 async function createUser(userData: {
   password: string;
@@ -10,25 +11,32 @@ async function createUser(userData: {
   phone: string;
 }) {
   try {
-    const response = await fetch(
-      `${process.env.BACKEND_API_URL}/users/auth/register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+    const response = await fetch(`http://backend:8080/users/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: userData.password,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+      }),
+    });
+
+    if (!response.ok) {
+      console.log(await response.json());
+      console.log(
+        JSON.stringify({
           password: userData.password,
           email: userData.email,
           firstName: userData.firstName,
           lastName: userData.lastName,
           phone: userData.phone,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Rejestracja nie powiodła się: ${response.status}`);
+        })
+      );
+      throw new Error(`Rejestracja nie powiodła się`);
     }
 
     const result = await response.json();
@@ -44,6 +52,8 @@ async function createUser(userData: {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("--------------------------------------------");
+    console.log(body);
     const { email, password, firstName, lastName, phone } = body;
 
     // --- Input Validation ---
@@ -70,15 +80,6 @@ export async function POST(request: Request) {
       );
     }
     // --- End Validation ---
-
-    // --- Check if user already exists ---
-    const existingUser = await getUserFromDb(email);
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "User with this email already exists." },
-        { status: 409 }
-      );
-    }
 
     // --- Create User ---
     const newUser = await createUser({
