@@ -42,6 +42,7 @@ public class ArticleMapper {
                 .stocks(impacts == null ? Collections.emptyList() :
                         impacts
                                 .stream()
+                                .filter(entity -> !entity.getImpact().equals("none"))
                                 .map(entity ->
                                         SymbolWithImpact.builder()
                                                 .symbol(entity.getStock().getSymbol())
