@@ -1,10 +1,9 @@
 package com.example.backend.infrastructure.schedule;
 
 import com.example.backend.domain.dto.AiArticleRequest;
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 import com.example.backend.domain.service.article.ArticleApiService;
 import com.example.backend.domain.service.article.ArticleService;
-import com.example.backend.domain.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
