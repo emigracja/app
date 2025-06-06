@@ -2,7 +2,7 @@ package com.example.backend.api;
 
 import com.example.backend.api.params.ArticleSearchParams;
 import com.example.backend.api.response.CustomApiResponse;
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 import com.example.backend.domain.dto.ArticleStockImpactDto;
 import com.example.backend.domain.service.article.ArticleService;
 import com.example.backend.domain.service.impact.ArticleStockImpactService;

@@ -1,6 +1,6 @@
 package com.example.backend.domain.service.external.rss_fetcher.fetcher.bankier;
 
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 import com.example.backend.domain.service.external.rss_fetcher.fetcher.Fetcher;
 import com.example.backend.domain.service.external.rss_fetcher.fetcher.RssFetcher;
 import com.example.backend.domain.service.external.rss_fetcher.mapper.BankierRssNewsMapper;

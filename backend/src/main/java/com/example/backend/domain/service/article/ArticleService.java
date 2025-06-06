@@ -1,7 +1,7 @@
 package com.example.backend.domain.service.article;
 
 import com.example.backend.api.params.ArticleSearchParams;
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,6 +1,7 @@
 package com.example.backend.domain.dto.mapper;
 
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
+import com.example.backend.domain.dto.article.SymbolWithImpact;
 import com.example.backend.infrastructure.database.entity.ArticleEntity;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
 import lombok.AccessLevel;
@@ -41,7 +42,13 @@ public class ArticleMapper {
                 .stocks(impacts == null ? Collections.emptyList() :
                         impacts
                                 .stream()
-                                .map(entity -> entity.getStock().getSymbol()).toList()
+                                .map(entity ->
+                                        SymbolWithImpact.builder()
+                                                .symbol(entity.getStock().getSymbol())
+                                                .impact(entity.getImpact())
+                                                .build()
+
+                                ).toList()
                 )
                 .build();
     }

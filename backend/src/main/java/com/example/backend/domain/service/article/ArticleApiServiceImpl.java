@@ -1,6 +1,6 @@
 package com.example.backend.domain.service.article;
 
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 import com.example.backend.domain.service.external.rss_fetcher.service.RssNewsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.example.backend.domain.service.external.rss_fetcher.mapper;
 
-import com.example.backend.domain.dto.ArticleDto;
+import com.example.backend.domain.dto.article.ArticleDto;
 import com.example.backend.domain.service.article.slug.SlugGenerator;
 import com.example.backend.domain.service.external.rss_fetcher.fetcher.bankier.BankierRssObject;
 import org.springframework.stereotype.Component;

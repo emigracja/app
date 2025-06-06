@@ -1,4 +1,4 @@
-package com.example.backend.domain.dto;
+package com.example.backend.domain.dto.article;
 
 import lombok.*;
 
@@ -19,5 +19,5 @@ public class ArticleDto {
     private String url;
     private String description;
     private Date publishedAt;
-    private List<String> stocks;
+    private List<SymbolWithImpact> stocks;
 }
