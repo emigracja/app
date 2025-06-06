@@ -14,9 +14,9 @@ const fetchNewsWithStocks = async (slug: string) => {
   const newsData = response.data;
 
   const updatedStocks = await Promise.all(
-    newsData.stocks.map(async (symbol: string) => {
-      const stockResponse = await axios.get(`/stocks?symbol=${symbol}`);
-      return stockResponse.data[0];
+    newsData.stocks.map(async (stock: { symbol: string; impact: string }) => {
+      const stockResponse = await axios.get(`/stocks?symbol=${stock.symbol}`);
+      return { ...stockResponse.data[0], impact: stock.impact };
     })
   );
 
@@ -25,6 +25,7 @@ const fetchNewsWithStocks = async (slug: string) => {
 };
 
 const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
+  const severityLevels = ["severe", "high", "medium", "low"];
   const { id } = React.use(params);
   const [selectedDrawer, setSelectedDrawer] = useState<string | null>(null);
   const [userStocksFiltered, setUserStocksFiltered] = useState([]);
@@ -95,7 +96,26 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           open={selectedDrawer === "t"}
           onChange={handleDrawerChange}
         >
-          <StockList partialStocks={userStocksFiltered}></StockList>
+          <div>
+            {severityLevels.map((label) => {
+              const stocksForSeverity = userStocksFiltered.filter(
+                (stock: any) => stock.impact === label
+              );
+
+              if (stocksForSeverity.length === 0) return null;
+
+              return (
+                <div key={label}>
+                  <StockList
+                    partialStocks={stocksForSeverity}
+                    label={`${label.charAt(0).toUpperCase()}${label.slice(
+                      1
+                    )} Impact`}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </Drawer>
         <Drawer
           id={"y"}
@@ -103,7 +123,26 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           open={selectedDrawer === "y"}
           onChange={handleDrawerChange}
         >
-          <StockList partialStocks={data.stocks}></StockList>
+          <div>
+            {severityLevels.map((label) => {
+              const stocksForSeverity = data.stocks.filter(
+                (stock: any) => stock.impact === label
+              );
+
+              if (stocksForSeverity.length === 0) return null;
+
+              return (
+                <div key={label}>
+                  <StockList
+                    partialStocks={stocksForSeverity}
+                    label={`${label.charAt(0).toUpperCase()}${label.slice(
+                      1
+                    )} Impact`}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </Drawer>
       </div>
     </div>

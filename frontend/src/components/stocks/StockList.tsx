@@ -10,6 +10,7 @@ import useUserStockStore from "@/store/useUserStockStore";
 interface Props {
   partialStocks: Partial<Stock>[];
   onLoadingChange?: (loading: boolean) => void;
+  label?: string;
 }
 
 const fetchCandles = async (stocks: Partial<Stock>[]): Promise<Stock[]> => {
@@ -37,23 +38,26 @@ const fetchCandles = async (stocks: Partial<Stock>[]): Promise<Stock[]> => {
   }
 };
 
-const StockList = ({ partialStocks, onLoadingChange }: Props): ReactElement => {
+const StockList = ({
+  partialStocks,
+  onLoadingChange,
+  label,
+}: Props): ReactElement => {
   const candleQuery = useQuery({
     // queryKey: partialStocks.map((s) => `stock-${s.id}`),
     queryKey: [`candles`, partialStocks.map((s) => s.id).join(",")],
     queryFn: () => fetchCandles(partialStocks),
   });
 
-  const { updateUserStocks, userStocks } = useUserStockStore()
+  const { updateUserStocks, userStocks } = useUserStockStore();
 
-    useEffect(() => {
-        updateUserStocks();
-        console.log(userStocks)
-    }, []);
+  useEffect(() => {
+    updateUserStocks();
+    console.log(userStocks);
+  }, []);
 
   useEffect(() => {
     onLoadingChange?.(candleQuery.isLoading);
-
   }, [candleQuery.isLoading]);
 
   const stocks = candleQuery.data as Stock[];
@@ -66,17 +70,26 @@ const StockList = ({ partialStocks, onLoadingChange }: Props): ReactElement => {
   }
   // todo: error
 
+  const showLabel = !!(label && stocks.length);
+
   return (
-    <div
-      className="flex flex-col gap-6 p-2 h-full"
-      style={{
-        backgroundColor: "transparent",
-      }}
-    >
-      {stocks.map((stock) => (
-        <StockCard key={stock.id} {...stock} favorite={userSymbols.includes(stock.symbol)} />
-      ))}
-    </div>
+    <>
+      {showLabel && <p className="text-white px-2 pt-2 font-bold">{label}</p>}
+      <div
+        className="flex flex-col gap-6 p-2 h-full"
+        style={{
+          backgroundColor: "transparent",
+        }}
+      >
+        {stocks.map((stock) => (
+          <StockCard
+            key={stock.id}
+            {...stock}
+            favorite={userSymbols.includes(stock.symbol)}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
