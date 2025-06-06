@@ -97,8 +97,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         String userId = optionalUser.get().getId();
-        Sort sortAsc = Sort.by("publishedAt");
-        Pageable pageable = PageRequest.of(params.pageNumber(), params.size(), sortAsc);
+        Sort sortAsc = Sort.by("id");
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
         return articleJpaRepository.findArticlesByUserId(userId, pageable)
                 .stream()
                 .map(ArticleMapper::map)

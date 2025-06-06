@@ -16,6 +16,7 @@ import { periods } from "@/storage/default/chats";
 import axios from "@/utils/axios";
 import { addCandlestickMockData } from "@/utils/mockData";
 import { News } from "@/types/news";
+import Loader from "@/components/loader/Loader";
 
 const fetchStock = async (symbol: string): Promise<Stock> => {
   try {
@@ -67,38 +68,8 @@ export default function StockDetail() {
   const news = newsQuery.data;
   const isLoading = stockQuery.isLoading || newsQuery.isLoading;
 
-  const [isNews, setIsNews] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const chartSection = useRef<HTMLDivElement | null>(null);
-  const newsSection = useRef<HTMLDivElement | null>(null);
-  const chartButton = useRef<HTMLButtonElement | null>(null);
-  const newsButton = useRef<HTMLButtonElement | null>(null);
   const scrollContainer = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (
-      !chartSection.current ||
-      !newsSection.current ||
-      !chartButton.current ||
-      !newsButton.current
-    )
-      return;
-    const chartClasses = chartSection.current.classList;
-    const newsClasses = newsSection.current.classList;
-    const chartButtonClasses = chartButton.current.classList;
-    const newsButtonClasses = newsButton.current.classList;
-    if (isNews) {
-      newsClasses.remove("hidden");
-      newsButtonClasses.add("font-bold");
-      chartClasses.add("hidden");
-      chartButtonClasses.remove("font-bold");
-    } else {
-      chartClasses.remove("hidden");
-      chartButtonClasses.add("font-bold");
-      newsClasses.add("hidden");
-      newsButtonClasses.remove("font-bold");
-    }
-  }, [isNews]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -125,11 +96,7 @@ export default function StockDetail() {
   }, []);
 
   if (isLoading || !news || !stock) {
-    return (
-      <div className="h-full w-full text-white flex justify-center items-center">
-        <p>Loading...</p> {/* TODO: Add spinner and lazy loading */}
-      </div>
-    );
+    return <Loader />;
   }
 
   const handleDotClick = (position: number) => {
@@ -171,16 +138,6 @@ export default function StockDetail() {
         <p className="text-3xl pr-2">{stock.currency}</p>
         <div className="flex items-center h-full justify-center">
           <PriceChange todaysPriceChange={stock.todaysPriceChange} />
-        </div>
-      </section>
-      <section
-        ref={scrollContainer}
-        className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory"
-      >
-        <div className="flex w-[200vw] box-border justify-between px-1">
-          <div className="w-[100vw] box-border snap-center">
-            <MainChart CandlestickData={stock.periodPrices} />
-          </div>
         </div>
       </section>
       <section
