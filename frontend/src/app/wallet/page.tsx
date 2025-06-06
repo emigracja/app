@@ -29,12 +29,7 @@ const fetchStocks = async () => {
 };
 
 const Wallet = () => {
-  const [isNews, setIsNews] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const chartSection = useRef<HTMLDivElement | null>(null);
-  const newsSection = useRef<HTMLDivElement | null>(null);
-  const chartButton = useRef<HTMLButtonElement | null>(null);
-  const newsButton = useRef<HTMLButtonElement | null>(null);
   const scrollContainer = useRef<HTMLDivElement | null>(null);
 
   const newsQuery = useQuery({
@@ -48,31 +43,6 @@ const Wallet = () => {
     queryFn: fetchStocks,
   });
   const stocks = stocksQuery.data;
-
-  useEffect(() => {
-    if (
-      !chartSection.current ||
-      !newsSection.current ||
-      !chartButton.current ||
-      !newsButton.current
-    )
-      return;
-    const chartClasses = chartSection.current.classList;
-    const newsClasses = newsSection.current.classList;
-    const chartButtonClasses = chartButton.current.classList;
-    const newsButtonClasses = newsButton.current.classList;
-    if (isNews) {
-      newsClasses.remove("hidden");
-      newsButtonClasses.add("font-bold");
-      chartClasses.add("hidden");
-      chartButtonClasses.remove("font-bold");
-    } else {
-      chartClasses.remove("hidden");
-      chartButtonClasses.add("font-bold");
-      newsClasses.add("hidden");
-      newsButtonClasses.remove("font-bold");
-    }
-  }, [isNews]);
 
   useEffect(() => {
     const handleScroll = () => {
