@@ -1,19 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Drawer from "@/components/drawer/Drawer";
 import Card from "@/components/news/Card";
 import axios from "@/utils/axios";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "@/components/loader/Loader";
+import StockList from "@/components/stocks/StockList";
+import useUserStockStore from "@/store/useUserStockStore";
+import { Stock } from "@/types/stocks";
 
-const fetchNews = async (slug: string) => {
+const fetchNewsWithStocks = async (slug: string) => {
   const response = await axios.get(`/articles/slug/${slug}`);
-  return response.data;
+  const newsData = response.data;
+
+  const updatedStocks = await Promise.all(
+    newsData.stocks.map(async (symbol: string) => {
+      const stockResponse = await axios.get(`/stocks?symbol=${symbol}`);
+      return stockResponse.data[0];
+    })
+  );
+
+  newsData.stocks = updatedStocks;
+  return newsData;
 };
 
 const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
   const [selectedDrawer, setSelectedDrawer] = useState<string | null>(null);
+  const [userStocksFiltered, setUserStocksFiltered] = useState([]);
+  const userStocks = useUserStockStore((state) => state.userStocks);
+  const updateUserStocks = useUserStockStore((state) => state.updateUserStocks);
 
   const { data, isLoading } = useQuery({
     queryKey: ["news", id],
@@ -23,9 +39,22 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
       if (!currentSlug) {
         throw new Error("Slug is required to fetch news.");
       }
-      return fetchNews(currentSlug);
+      return fetchNewsWithStocks(currentSlug);
     },
   });
+
+  useEffect(() => {
+    if (!data || userStocks.length === 0) return;
+
+    const userSymbols = userStocks.map((s) => s.symbol);
+    setUserStocksFiltered(
+      data.stocks.filter((s: Stock) => userSymbols.includes(s.symbol))
+    );
+  }, [data, userStocks]);
+
+  useEffect(() => {
+    updateUserStocks();
+  }, []);
 
   if (isLoading) {
     return <Loader />;
@@ -34,7 +63,8 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleDrawerChange = (id: string) => {
     setSelectedDrawer(selectedDrawer === id ? null : id);
   };
-  console.log(data);
+
+  console.log(userStocksFiltered);
 
   return (
     <div
@@ -61,31 +91,19 @@ const NewsDetails = ({ params }: { params: Promise<{ id: string }> }) => {
       <div className={"flex flex-col gap-2 overflow-hidden"}>
         <Drawer
           id={"t"}
-          text="YOUR AFFECTED STOKS (2)"
+          text={`YOUR AFFECTED STOCKS (${userStocksFiltered.length})`}
           open={selectedDrawer === "t"}
           onChange={handleDrawerChange}
         >
-          <div className={"flex flex-col gap-2  h-full"}>
-            <p className={"text-white font-bold"}>AAPL</p>
-            <p className={"text-white font-bold"}>GOOGL</p>
-          </div>
+          <StockList partialStocks={userStocksFiltered}></StockList>
         </Drawer>
         <Drawer
           id={"y"}
-          text="AFFECTED STOKS (8)"
+          text={`AFFECTED STOCKS (${data.stocks.length})`}
           open={selectedDrawer === "y"}
           onChange={handleDrawerChange}
         >
-          <div className={"flex flex-col gap-2 overflow-scroll h-[90%]"}>
-            <p className={"text-white font-bold"}>AAPL</p>
-            <p className={"text-white font-bold"}>GOOGL</p>
-            <p className={"text-white font-bold"}>AAPL</p>
-            <p className={"text-white font-bold"}>GOOGL</p>
-            <p className={"text-white font-bold"}>AAPL</p>
-            <p className={"text-white font-bold"}>GOOGL</p>
-            <p className={"text-white font-bold"}>AAPL</p>
-            <p className={"text-white font-bold"}>GOOGL</p>
-          </div>
+          <StockList partialStocks={data.stocks}></StockList>
         </Drawer>
       </div>
     </div>
