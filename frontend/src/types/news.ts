@@ -7,4 +7,5 @@ export interface News {
   author: string;
   imageUri: string;
   slug: string;
+  backgroundImage: string;
 }
