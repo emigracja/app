@@ -16,6 +16,7 @@ import { periods } from "@/storage/default/chats";
 import axios from "@/utils/axios";
 import { addCandlestickMockData } from "@/utils/mockData";
 import { News } from "@/types/news";
+import Loader from "@/components/loader/Loader";
 
 const fetchStock = async (symbol: string): Promise<Stock> => {
   try {
@@ -125,11 +126,7 @@ export default function StockDetail() {
   }, []);
 
   if (isLoading || !news || !stock) {
-    return (
-      <div className="h-full w-full text-white flex justify-center items-center">
-        <p>Loading...</p> {/* TODO: Add spinner and lazy loading */}
-      </div>
-    );
+    return <Loader />;
   }
 
   const handleDotClick = (position: number) => {
@@ -171,16 +168,6 @@ export default function StockDetail() {
         <p className="text-3xl pr-2">{stock.currency}</p>
         <div className="flex items-center h-full justify-center">
           <PriceChange todaysPriceChange={stock.todaysPriceChange} />
-        </div>
-      </section>
-      <section
-        ref={scrollContainer}
-        className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory"
-      >
-        <div className="flex w-[200vw] box-border justify-between px-1">
-          <div className="w-[100vw] box-border snap-center">
-            <MainChart CandlestickData={stock.periodPrices} />
-          </div>
         </div>
       </section>
       <section
