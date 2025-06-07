@@ -40,9 +40,9 @@ const fetchStock = async (symbol: string): Promise<Stock> => {
   }
 };
 
-const fetchNews = async (): Promise<News[]> => {
+const fetchNews = async (symbol: string): Promise<News[]> => {
   try {
-    const response = await axios.get(`/articles?page=2`);
+    const response = await axios.get(`/articles/stock/${symbol}`);
     return response.data as News[];
   } catch (err) {
     console.error(`Error fetching news:`, err);
@@ -56,7 +56,7 @@ export default function StockDetail() {
 
   const newsQuery = useQuery({
     queryKey: ["news"],
-    queryFn: fetchNews,
+    queryFn: () => fetchNews(id),
   });
 
   const stockQuery = useQuery({
@@ -142,7 +142,7 @@ export default function StockDetail() {
       </section>
       <section
         ref={scrollContainer}
-        className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory"
+        className="relative flex overflow-x-scroll scrollbar-hide pb-10 snap-x snap-mandatory h-full"
       >
         <div className="flex w-[200vw] box-border justify-between px-1">
           <div className="flex flex-col align-middle gap-2 w-[100vw] box-border snap-center">
