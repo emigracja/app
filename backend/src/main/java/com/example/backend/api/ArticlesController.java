@@ -271,4 +271,20 @@ public class ArticlesController {
             return ResponseEntity.internalServerError().body(message);
         }
     }
+
+    @GetMapping("/articles/stock/{symbol}")
+    public ResponseEntity<List<ArticleDto>> getStockArticles(
+            @PathVariable String symbol,
+            @RequestParam(name = "page", defaultValue = "0") Integer pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") Integer size
+    ) {
+        try {
+            log.info("Fetching articles for stock with symbol: {}", symbol);
+            List<ArticleDto> articles = articleService.findByStockSymbol(symbol, pageNumber, size);
+            return ResponseEntity.ok(articles);
+        } catch (Exception e) {
+            log.error("Error fetching articles for stock with symbol: {}", symbol, e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
