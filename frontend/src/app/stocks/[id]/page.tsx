@@ -4,19 +4,23 @@ import StockName from "@/components/stocks/StockName";
 import Image from "next/image";
 import favEmpty from "../../../../public/icons/favEmpty.svg";
 import notification from "../../../../public/icons/notification.svg";
-import { Stock, CandlestickData } from "@/types/stocks";
-import { useQuery } from "@tanstack/react-query";
+import { Stock } from "@/types/stocks";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 import MainChart from "@/components/stocks/MainChart";
 import PriceChange from "@/components/stocks/PriceChange";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import useDataStore from "@/store/useDataStore";
 import NewsList from "@/components/news/NewsList";
-import { periods } from "@/storage/default/chats";
 import axios from "@/utils/axios";
-import { addCandlestickMockData } from "@/utils/mockData";
 import { News } from "@/types/news";
+import { BeatLoader } from "react-spinners";
 import Loader from "@/components/loader/Loader";
+
+interface FetchResponse {
+  data: News[];
+  nextPage: number | null | undefined; // The page number for the *next* fetch, or null/undefined if no more pages
+}
 
 const fetchStock = async (symbol: string): Promise<Stock> => {
   try {
@@ -40,24 +44,53 @@ const fetchStock = async (symbol: string): Promise<Stock> => {
   }
 };
 
-const fetchNews = async (symbol: string): Promise<News[]> => {
-  try {
-    const response = await axios.get(`/articles/stock/${symbol}`);
-    return response.data as News[];
-  } catch (err) {
-    console.error(`Error fetching news:`, err);
-    throw err;
-  }
-};
-
 export default function StockDetail() {
   const params = useParams();
   const id = params.id as string;
 
-  const newsQuery = useQuery({
-    queryKey: ["news"],
-    queryFn: () => fetchNews(id),
+  const { ref, inView } = useInView({
+    // threshold: 0, // Trigger when the element enters the viewport
+    // triggerOnce: false // Keep observing even after it becomes visible once
   });
+
+  const fetchNews = async ({ pageParam = 0 }): Promise<FetchResponse> => {
+    const params = new URLSearchParams({
+      page: String(pageParam),
+    });
+    try {
+      const response = await axios.get(
+        `/articles/stock/${id}?${params.toString()}`
+      );
+
+      const articles = response.data || [];
+      const hasMore = articles.length > 0;
+      return {
+        data: articles,
+        nextPage: hasMore ? pageParam + 1 : undefined,
+      };
+    } catch (err) {
+      console.error("Error fetching news:", err);
+      throw err;
+    }
+  };
+
+  const newsQuery = useInfiniteQuery<FetchResponse, Error>({
+    queryKey: ["news", id],
+    queryFn: fetchNews,
+    getNextPageParam: (lastPage: any) => {
+      // lastPage is the result returned by fetchNews for the last page fetched
+      return lastPage.nextPage;
+    },
+  });
+
+  const {
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status, // 'loading', 'error', 'success'
+    refetch,
+  } = newsQuery;
 
   const stockQuery = useQuery({
     queryKey: [`stock-${id}`],
@@ -70,6 +103,13 @@ export default function StockDetail() {
 
   const [scrollPosition, setScrollPosition] = useState(0);
   const scrollContainer = useRef<HTMLDivElement | null>(null);
+
+  // Effect to fetch next page when the ref element comes into view
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,10 +135,6 @@ export default function StockDetail() {
     };
   }, []);
 
-  if (isLoading || !news || !stock) {
-    return <Loader />;
-  }
-
   const handleDotClick = (position: number) => {
     if (scrollContainer.current) {
       const scrollLeft =
@@ -111,6 +147,20 @@ export default function StockDetail() {
       });
     }
   };
+
+  if (isLoading || !news || !stock) {
+    return <Loader />;
+  }
+
+  if (status === "error") {
+    return (
+      <div className="my-5 text-center text-white opacity-70">
+        Error loading news: {error?.message}
+      </div>
+    );
+  }
+
+  const allNews = news?.pages.flatMap((page: any) => page.data) ?? [];
 
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
@@ -149,7 +199,20 @@ export default function StockDetail() {
             <MainChart CandlestickData={stock.periodPrices} />
           </div>
           <div className="w-[100vw] overflow-y-scroll box-border snap-center px-1">
-            <NewsList news={news} />
+            <NewsList news={allNews} />
+            <div
+              ref={ref}
+              className="h-[50px] text-center text-white opacity-70"
+            >
+              {isFetchingNextPage ? (
+                <span className="flex align-middle justify-center w-full mt-15">
+                  <BeatLoader
+                    className="flex align-middle justify-center"
+                    color="white"
+                  />
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
