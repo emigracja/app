@@ -19,4 +19,6 @@ public interface ArticleService {
     List<ArticleDto> getArticlesForUser(ArticleSearchParams params, String email);
 
     Optional<ArticleDto> findBySlug(String slug);
+
+    List<ArticleDto> findByStockSymbol(String stockSymbol, int pageNumber, int size);
 }

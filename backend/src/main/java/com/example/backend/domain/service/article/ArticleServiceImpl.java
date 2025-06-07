@@ -7,6 +7,7 @@ import com.example.backend.infrastructure.database.entity.ArticleEntity;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
 import com.example.backend.infrastructure.database.entity.UserEntity;
 import com.example.backend.infrastructure.database.repository.ArticleJpaRepository;
+import com.example.backend.infrastructure.database.repository.ArticleStockImpactJpaRepository;
 import com.example.backend.infrastructure.database.repository.UserJpaRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -34,6 +35,7 @@ import java.util.Optional;
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleJpaRepository articleJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final ArticleStockImpactJpaRepository articleStockImpactJpaRepository;
 
     @Override
     public List<ArticleDto> findAllBySearchParams(ArticleSearchParams params) {
@@ -97,14 +99,21 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         String userId = optionalUser.get().getId();
-        Sort sortAsc = Sort.by("id");
-        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
+        Sort sortAsc = Sort.by("publishedAt");
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size(), sortAsc);
         return articleJpaRepository.findArticlesByUserId(userId, pageable)
                 .stream()
                 .map(ArticleMapper::map)
                 .toList();
     }
 
+    @Override
+    public List<ArticleDto> findByStockSymbol(String stockSymbol, int pageNumber, int size) {
+            return articleStockImpactJpaRepository.findAllByStockSymbol(stockSymbol, PageRequest.of(pageNumber, size)).stream()
+                    .filter(impact -> !impact.getImpact().equals("none"))
+                    .map(impact -> ArticleMapper.map(impact.getArticle()))
+                    .toList();
+    }
 
     private Specification<ArticleEntity> createArticleSpecification(ArticleSearchParams params) {
         return (root, query, criteriaBuilder) -> {
