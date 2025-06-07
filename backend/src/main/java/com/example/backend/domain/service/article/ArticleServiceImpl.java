@@ -110,7 +110,6 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleDto> findByStockSymbol(String stockSymbol, int pageNumber, int size) {
             return articleStockImpactJpaRepository.findAllByStockSymbol(stockSymbol, PageRequest.of(pageNumber, size)).stream()
-                    .filter(impact -> !impact.getImpact().equals("none"))
                     .map(impact -> ArticleMapper.map(impact.getArticle()))
                     .toList();
     }
