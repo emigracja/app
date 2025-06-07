@@ -1,35 +1,35 @@
-'use client';
-import React, {useEffect} from 'react';
+"use client";
+import React, { useEffect } from "react";
 
 import { getUserSettings } from "@/storage/settings.storage";
-import {SettingDetail} from "@/storage/storage.types";
+import { SettingDetail } from "@/storage/storage.types";
+import { SignOutButton } from "@/components/auth/authButtons";
 import SettingsGroup from "@/components/settings/SettingsGroup";
 
 const SettingsPage = () => {
-    const settings = getUserSettings();
+  const settings = getUserSettings();
 
-    const settingsArray = Object.entries(settings);
+  const settingsArray = Object.entries(settings);
 
-    return (
-        <div className="text-white h-full overflow-auto flex flex-col justify-between p-10">
-            <div>
-                {settingsArray.map(([groupKey, groupValue]) => {
+  return (
+    <div className="text-white h-full overflow-auto flex flex-col justify-between p-4">
+      <div>
+        {settingsArray.map(([groupKey, groupValue]) => {
+          const settingsForGroupComponent = groupValue as {
+            [settingName: string]: SettingDetail<any>;
+          };
 
-                    const settingsForGroupComponent = groupValue as { [settingName: string]: SettingDetail<any> };
+          const groupComponentProps = {
+            name: groupKey,
+            settings: settingsForGroupComponent,
+          };
 
-                    const groupComponentProps = {
-                        name: groupKey,
-                        settings: settingsForGroupComponent,
-                    };
-
-                    return (
-                        <SettingsGroup {...groupComponentProps} key={groupKey} />
-                    );
-                })}
-            </div>
-            {/*<SignOutButton />*/}
-        </div>
-    );
+          return <SettingsGroup {...groupComponentProps} key={groupKey} />;
+        })}
+      </div>
+      <SignOutButton />
+    </div>
+  );
 };
 
 export default SettingsPage;

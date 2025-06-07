@@ -92,7 +92,7 @@ export async function POST(request: Request) {
 
     // --- Success Response ---
     return NextResponse.json(
-      { message: "User created successfully.", userId: newUser.id }, // Or return relevant newUser fields except passwordHash
+      { message: "User created successfully.", userId: newUser.id },
       { status: 201 }
     );
   } catch (error) {

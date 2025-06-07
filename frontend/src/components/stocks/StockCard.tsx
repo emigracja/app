@@ -11,7 +11,6 @@ import PreviewPrice from "./PreviewPrice";
 import StockName from "./StockName";
 import useUserStockStore from "@/store/useUserStockStore";
 
-
 interface Props {
   id: string;
   name: string;
@@ -24,7 +23,7 @@ interface Props {
   currentPeriod: Period;
   tags: string[];
   periodPrices: CandlestickData[];
-  favorite: boolean
+  favorite: boolean;
 }
 
 const StockCard = ({
@@ -37,53 +36,44 @@ const StockCard = ({
   todaysPriceChange,
   // tags,
   periodPrices,
-    favorite
+  favorite,
 }: Props): ReactElement => {
-  const { addUserStock, removeUserStock } = useUserStockStore()
+  const { addUserStock, removeUserStock } = useUserStockStore();
   return (
-      <section className="relative block text-xl text-white rounded-xl p-3 box-content bg-card-bg">
-        <a href={`/stocks/${symbol}`}>
-          <div className="flex flex-row gap-3 items-start h-full">
-            <div className="flex flex-col w-full gap-5 basis-2/3 grow">
-              <StockName name={name} symbol={symbol}/>
-              <PreviewChart CandlestickData={periodPrices} id={id}/>
-            </div>
-            <div className="basis-1/3 grow flex flex-col items-end justify-between h-full">
-              <PreviewPrice
-                  price={price}
-                  todaysPriceChange={todaysPriceChange}
-                  currency={currency}
-              />
-            </div>
+    <section className="relative block text-xl text-white rounded-xl p-3 box-content bg-card-bg">
+      <a href={`/stocks/${symbol}`}>
+        <div className="flex flex-row gap-3 items-start h-full">
+          <div className="flex flex-col w-full gap-5 basis-2/3 grow">
+            <StockName name={name} symbol={symbol} />
+            <PreviewChart CandlestickData={periodPrices} id={id} />
           </div>
-        </a>
-        <div className="absolute right-2 bottom-3 flex flex-end">
-          <Image
-              className="box-border mr-2 rounded-xl active:bg-white/5 z-10"
-              src={notification}
-              alt="favEmpty"
-              height={40}
-              width={40}
-          />
-          <Image
-              className="box-border rounded-xl active:bg-white/5 z-10"
-              onClick={(e) => {
-                e.stopPropagation();
-                if(favorite) {
-                  removeUserStock(symbol);
-                }else {
-                    addUserStock(symbol);
-                }
-
-
-              }}
-              src={favorite ? favFilled : favEmpty}
-              alt="favEmpty"
-              height={40}
-              width={40}
-          />
+          <div className="basis-1/3 grow flex flex-col items-end justify-between h-full">
+            <PreviewPrice
+              price={price}
+              todaysPriceChange={todaysPriceChange}
+              currency={currency}
+            />
+          </div>
         </div>
-      </section>
+      </a>
+      <div className="absolute right-2 bottom-3 flex flex-end">
+        <Image
+          className="box-border rounded-xl active:bg-white/5 z-10"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (favorite) {
+              removeUserStock(symbol);
+            } else {
+              addUserStock(symbol);
+            }
+          }}
+          src={favorite ? favFilled : favEmpty}
+          alt="favEmpty"
+          height={40}
+          width={40}
+        />
+      </div>
+    </section>
   );
 };
 

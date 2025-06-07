@@ -1,18 +1,18 @@
-import {InterfaceSettings} from "@/storage/default/interface";
-import {ChartSettings} from "@/storage/default/chats";
-import {NotificationSettings} from "@/storage/default/notifications";
+import { InterfaceSettings } from "@/storage/default/interface";
+import { ChartSettings } from "@/storage/default/chats";
+import { NotificationSettings } from "@/storage/default/notifications";
 
 export interface SettingDetail<T> {
-    value: T;
-    possibleValues: T[];
+  value: T;
+  possibleValues: T[];
 }
 
 export interface Setting<T> {
-    [key: string]: SettingDetail<T>;
+  [key: string]: SettingDetail<T>;
 }
 
 export interface Settings {
-    interface: InterfaceSettings;
-    chart: ChartSettings,
-    notifications: NotificationSettings,
+  // interface: InterfaceSettings;
+  // chart: ChartSettings,
+  notifications: NotificationSettings;
 }

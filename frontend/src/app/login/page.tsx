@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Get callback URL from query parameters, default to dashboard
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/wallet";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,7 +37,6 @@ export default function LoginPage() {
           setError("An unexpected error occurred. Please try again.");
         }
       } else if (result?.ok) {
-        // Sign-in successful, redirect to the originally intended page or dashboard
         router.push(callbackUrl);
         router.refresh();
       } else {
