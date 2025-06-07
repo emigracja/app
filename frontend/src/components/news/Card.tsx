@@ -1,5 +1,5 @@
 "use client";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Image from "next/image";
 import { getTimeDifference } from "@/utils/util";
 
@@ -31,6 +31,12 @@ const Card = ({
 
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    if (!backgroundImage) {
+      setIsLoading(false);
+    }
+  }, [backgroundImage]);
+
   return (
     <section className="min-h-32 relative block text-xl text-white rounded-xl p-3 box-content">
       <a href={`/news/${slug}`} className="flex flex-col gap-5 justify-end">
@@ -50,16 +56,20 @@ const Card = ({
       </a>
       <div className="flex absolute inset-0 rounded-xl pointer-events-none">
         {isLoading ? <MoonLoader className="m-auto" color="white" /> : null}
-        <Image
-          onLoad={() => {
-            setIsLoading(false);
-          }}
-          className=" opacity-40 pointer-events-none"
-          quality={50}
-          src={backgroundImage}
-          alt="background"
-          layout="fill"
-        />
+        {backgroundImage ? (
+          <Image
+            onLoad={() => {
+              setIsLoading(false);
+            }}
+            className=" opacity-40 pointer-events-none"
+            quality={50}
+            src={backgroundImage}
+            alt="background"
+            layout="fill"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-600 opacity-30"></div>
+        )}
       </div>
       <div
         className={"absolute text-white -bottom-6 right-0 opacity-70 text-sm"}
