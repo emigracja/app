@@ -102,6 +102,9 @@ const Wallet = () => {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
+    let intervalId: number;
+    let added = false;
+
     const handleScroll = () => {
       if (scrollContainer.current) {
         const scrollLeft = scrollContainer.current.scrollLeft;
@@ -114,9 +117,16 @@ const Wallet = () => {
 
     const scrollContCurrent = scrollContainer.current;
 
-    if (scrollContainer.current) {
-      scrollContainer.current.addEventListener("scroll", handleScroll);
-    }
+    const tryAddListener = () => {
+      const el = scrollContainer.current;
+      if (el && !added) {
+        el.addEventListener("scroll", handleScroll);
+        added = true;
+        clearInterval(intervalId);
+      }
+    };
+
+    intervalId = window.setInterval(tryAddListener, 100); // check every 100ms
 
     return () => {
       if (scrollContCurrent) {

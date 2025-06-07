@@ -112,6 +112,9 @@ export default function StockDetail() {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
+    let intervalId: number;
+    let added = false;
+
     const handleScroll = () => {
       if (scrollContainer.current) {
         const scrollLeft = scrollContainer.current.scrollLeft;
@@ -123,13 +126,20 @@ export default function StockDetail() {
     };
 
     const scrollContCurrent = scrollContainer.current;
+    const tryAddListener = () => {
+      const el = scrollContainer.current;
+      if (el && !added) {
+        el.addEventListener("scroll", handleScroll);
+        added = true;
+        clearInterval(intervalId);
+      }
+    };
 
-    if (scrollContainer.current) {
-      scrollContainer.current.addEventListener("scroll", handleScroll);
-    }
+    intervalId = window.setInterval(tryAddListener, 100); // check every 100ms
 
     return () => {
       if (scrollContCurrent) {
+        console.log(`removing ev`);
         scrollContCurrent.removeEventListener("scroll", handleScroll);
       }
     };
