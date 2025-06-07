@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Comparator;
 
 @Slf4j
 @Service
@@ -99,11 +100,11 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         String userId = optionalUser.get().getId();
-        Sort sortAsc = Sort.by("publishedAt");
-        Pageable pageable = PageRequest.of(params.pageNumber(), params.size(), sortAsc);
+        Pageable pageable = PageRequest.of(params.pageNumber(), params.size());
         return articleJpaRepository.findArticlesByUserId(userId, pageable)
                 .stream()
                 .map(ArticleMapper::map)
+                .sorted(Comparator.comparing(ArticleDto::getPublishedAt).reversed())
                 .toList();
     }
 
