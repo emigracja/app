@@ -51,7 +51,7 @@ public class WebPushSubscriptionService {
 
     public List<Subscription> findUsersSubscriptions(List<UserEntity> users, NotificationSeverity severity) {
         log.info("Searching for web push subscriptions for {} user(s).", users.size());
-        List<WebPushSubscriptionEntity> subscriptions = webPushSubscriptionRepository.findAllByUserEntityInAndActiveIsTrue(users, severity.getLevel());
+        List<WebPushSubscriptionEntity> subscriptions = webPushSubscriptionRepository.findAllByUserEntityInAndActiveIsTrue(users, severity);
         log.info("Found {} total web push subscription(s) for the provided users.", subscriptions.size());
         return subscriptions
                 .stream()
