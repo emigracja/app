@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "ARTICLES")
+@ToString
 public class ArticleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

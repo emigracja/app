@@ -13,6 +13,7 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "ARTICLE_STOCK_IMPACTS")
+@ToString
 public class ArticleStockImpactEntity {
 
     @Id

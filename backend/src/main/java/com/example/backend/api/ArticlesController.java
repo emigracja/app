@@ -170,9 +170,8 @@ public class ArticlesController {
 
             log.info("Processing impact for article {}: {}", articleId, request);
             request.setArticleId(articleId);
-            ArticleStockImpactEntity impact = stockImpactService.processImpact(request);
+           ArticleStockImpactEntity impact = stockImpactService.processImpact(request);
 
-            log.info("Processed impact for article {}: {}", articleId, impact);
             List<UserEntity> affectedUsers = userService.findAllByStocksId(request.getStockId());
 
             log.info("Found {} affected users for stock ID {}", affectedUsers.size(), request.getStockId());
