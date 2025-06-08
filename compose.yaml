@@ -67,6 +67,9 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
+    environment:
+      - BACKEND_URL=${FRONTEND_API_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
     ports:
       - "3000:3000"
     depends_on:
@@ -136,25 +139,6 @@ services:
       - tarantula
     expose:
       - "6379"
-      
-  # --- MODIFIED: Renamed for clarity and removed the second ngrok service ---
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok # Simplified name
-    depends_on:
-      - frontend
-    ports:
-      - "4040:4040"
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
-    command:
-      # This single tunnel points to the frontend service
-      - "http"
-      - "frontend:3000"
-      - "--log=stdout"
-      - "--host-header=rewrite"
-    networks:
-      - tarantula
 
 networks:
   tarantula:
