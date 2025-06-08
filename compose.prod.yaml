@@ -149,7 +149,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx_proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - tarantula
     depends_on:
