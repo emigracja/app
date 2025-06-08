@@ -30,9 +30,12 @@ export default function NewsPage() {
   const setFiltersOpen = useStore((state) => state.setFiltersOpen);
 
   const fetchNews = async ({ pageParam = 0 }): Promise<FetchResponse> => {
+    const filteredSearchParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([_, value]) => value !== "")
+    );
     const params = new URLSearchParams({
       page: String(pageParam),
-      ...searchParams,
+      ...filteredSearchParams,
     });
     try {
       const response = await axios.get(`/articles?${params.toString()}`);

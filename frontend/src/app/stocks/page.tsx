@@ -4,11 +4,9 @@ import StockList from "@/components/stocks/StockList";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useSearchParams } from "next/navigation";
-import { debounce } from "lodash";
+import { BeatLoader } from "react-spinners";
 import axios from "@/utils/axios";
 import { Stock } from "@/types/stocks";
-import { addCandlestickMockData } from "@/utils/mockData";
 import useStore from "@/store/useStore";
 
 interface FetchResponse {
@@ -106,7 +104,7 @@ export default function StockPage() {
   ]);
 
   const allStocks = data?.pages.flatMap(
-    (page) => page.data
+    (page: any) => page.data
   ) as Partial<Stock>[];
 
   const lastPageStocks = data?.pages[data.pages.length - 1]?.data ?? [];
@@ -135,42 +133,6 @@ export default function StockPage() {
     setSearchParams(params);
     setFiltersOpen(false);
   }, []);
-
-  // const [filteredStocks, setFilteredStocks] = useState(allStocks);
-
-  // const searchParams = useSearchParams();
-
-  // useEffect(() => {
-  //   const searchQuery = searchParams.get("search");
-
-  //   if (!searchQuery) {
-  //     setFilteredStocks(allStocks);
-  //   }
-
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  //   searchQuery
-  //     ? setFilteredStocks(
-  //         allStocks.filter((stock) =>
-  //           stock.name.toLowerCase().includes(searchQuery.toLowerCase())
-  //         )
-  //       )
-  //     : setFilteredStocks(allStocks);
-  // }, [searchParams, allStocks]);
-
-  // const search = useCallback((query: string) => {
-  //   const url = new URL(window.location.href);
-  //   url.searchParams.set("search", query);
-  //   window.history.pushState({}, "", url);
-  // }, []);
-
-  // const debouncedSearch = debounce((query: string) => {
-  //   search(query);
-  // }, 500);
-
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   debouncedSearch.cancel();
-  //   debouncedSearch(e.target.value);
-  // };
 
   if (isLoading) {
     return (
@@ -208,7 +170,6 @@ export default function StockPage() {
         </form>
       </div>
       <div>
-        {/* <StockList partialStocks={allStocks} /> */}
         {data?.pages.map((page, index) => (
           <StockList
             key={index}
@@ -218,17 +179,15 @@ export default function StockPage() {
         ))}
 
         {/* --- Loading/Trigger Area --- */}
-        <div
-          ref={ref}
-          className="h-[200px] my-5 text-center text-white opacity-70"
-        >
+        <div ref={ref} className="h-[50px] text-center text-white opacity-70">
           {isFetchingNextPage ? (
-            <span>Loading more stocks...</span>
-          ) : hasNextPage ? (
-            <span>Scroll down to load more...</span>
-          ) : (
-            <span>No more stocks to load.</span>
-          )}
+            <span className="flex align-middle justify-center w-full mt-15">
+              <BeatLoader
+                className="flex align-middle justify-center"
+                color="white"
+              />
+            </span>
+          ) : null}
         </div>
       </div>
     </>
