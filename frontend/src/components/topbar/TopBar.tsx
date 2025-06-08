@@ -75,13 +75,15 @@ const TopBar = () => {
         href={buttonData.route}
         onClick={shouldShowFilter ? toggleFiltersOpen : () => {}}
       >
-        <Image
-          className="p-1 justify-self-center opacity-75"
-          src={buttonData.icon}
-          alt="settings"
-          height={40}
-          width={40}
-        />
+        {buttonData.icon ? (
+          <Image
+            className="p-1 justify-self-center opacity-75"
+            src={buttonData.icon}
+            alt="settings"
+            height={40}
+            width={40}
+          />
+        ) : null}
       </Link>
     </nav>
   );
