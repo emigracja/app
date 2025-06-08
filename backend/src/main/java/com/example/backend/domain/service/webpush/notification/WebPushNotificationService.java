@@ -6,6 +6,7 @@ import com.example.backend.infrastructure.database.entity.ArticleEntity;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
 import com.example.backend.infrastructure.database.entity.StockEntity;
 import com.example.backend.infrastructure.database.entity.UserEntity;
+import com.example.backend.infrastructure.database.entity.enums.NotificationSeverity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.martijndwars.webpush.Notification;
@@ -27,8 +28,8 @@ public class WebPushNotificationService {
     private final PushService pushService;
     private final WebPushSubscriptionService webPushSubscriptionService;
 
-    public void notifyAll(List<UserEntity> users, String payloadJson) {
-        webPushSubscriptionService.findUsersSubscriptions(users)
+    public void notifyAll(List<UserEntity> users, String payloadJson, NotificationSeverity severity) {
+        webPushSubscriptionService.findUsersSubscriptions(users, severity)
                 .forEach(subscription -> notify(subscription, payloadJson));
     }
 
@@ -41,7 +42,6 @@ public class WebPushNotificationService {
             throw new RuntimeException(e);
         }
     }
-
 
     public String prepareMessage(ArticleStockImpactEntity articleStockImpactEntity) {
 

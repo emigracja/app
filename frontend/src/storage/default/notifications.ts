@@ -1,10 +1,10 @@
 import { SettingDetail } from "@/storage/storage.types";
 
-const NOTIFICATIONS = "notifications";
+export const NOTIFICATIONS = "notifications";
 
 const EVENTS_SEVERITY = "severity";
 
-enum NOTIFICATION_STATUS_VALUES {
+export enum NOTIFICATION_STATUS_VALUES {
   ON = "on",
   OFF = "off",
 }

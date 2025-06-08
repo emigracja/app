@@ -1,15 +1,14 @@
-FROM node:22-alpine
+# ---- Stage 1: Build the application ----
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
+# Install all dependencies and build the app
 RUN npm install
-
-RUN npm install -g nodemon
-
 COPY . .
 
 EXPOSE 3000
 
-CMD ["nodemon", "-L", "node_modules/.bin/next", "dev"]
+CMD ["npm", "run", "dev"]
