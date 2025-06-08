@@ -14,6 +14,7 @@ import nl.martijndwars.webpush.Subscription;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.print.attribute.standard.Severity;
 import java.util.List;
 
 @Service
@@ -48,9 +49,9 @@ public class WebPushSubscriptionService {
         log.info("Successfully saved web push subscription for user: {}. Endpoint: {}", email, subscription.getEndpoint());
     }
 
-    public List<Subscription> findUsersSubscriptions(List<UserEntity> users) {
+    public List<Subscription> findUsersSubscriptions(List<UserEntity> users, NotificationSeverity severity) {
         log.info("Searching for web push subscriptions for {} user(s).", users.size());
-        List<WebPushSubscriptionEntity> subscriptions = webPushSubscriptionRepository.findAllByUserEntityInAndActiveIsTrue(users);
+        List<WebPushSubscriptionEntity> subscriptions = webPushSubscriptionRepository.findAllByUserEntityInAndActiveIsTrue(users, severity.getLevel());
         log.info("Found {} total web push subscription(s) for the provided users.", subscriptions.size());
         return subscriptions
                 .stream()

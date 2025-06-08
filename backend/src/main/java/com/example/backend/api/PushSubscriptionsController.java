@@ -6,6 +6,7 @@ import com.example.backend.domain.service.user.UserService;
 import com.example.backend.domain.service.webpush.notification.WebPushNotificationService;
 import com.example.backend.domain.service.webpush.subscription.WebPushSubscriptionService;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
+import com.example.backend.infrastructure.database.entity.enums.NotificationSeverity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.Severity;
 import java.security.Principal;
 
 @RestController
@@ -167,8 +169,8 @@ public class PushSubscriptionsController {
 
               webpushNotificationService.prepareMessage(
                       articleStockImpactService.getAnyImpact()
-              )
-
+              ),
+              NotificationSeverity.LOW
       );
 
         log.info("Test push notification sent successfully.");

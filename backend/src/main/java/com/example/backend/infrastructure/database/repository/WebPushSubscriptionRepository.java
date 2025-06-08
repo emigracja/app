@@ -15,8 +15,8 @@ import java.util.Optional;
 @Repository
 public interface WebPushSubscriptionRepository extends JpaRepository<WebPushSubscriptionEntity, String> {
 
-    @Query("SELECT w FROM WebPushSubscriptionEntity w WHERE w.userEntity IN :users AND w.isActive = true")
-    List<WebPushSubscriptionEntity> findAllByUserEntityInAndActiveIsTrue(List<UserEntity> users);
+    @Query("SELECT w FROM WebPushSubscriptionEntity w WHERE w.userEntity IN :users AND w.isActive = true AND w.severityLevel > :severityLevel")
+    List<WebPushSubscriptionEntity> findAllByUserEntityInAndActiveIsTrue(List<UserEntity> users, int severityLevel);
 
     @Query("SELECT w FROM WebPushSubscriptionEntity w WHERE w.userEntity.id = ?1")
     List<WebPushSubscriptionEntity> findByUserId(@Param("id") String id);

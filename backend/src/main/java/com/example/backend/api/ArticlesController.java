@@ -11,6 +11,7 @@ import com.example.backend.domain.service.webpush.notification.WebPushNotificati
 import com.example.backend.infrastructure.annotations.RequireNotEmptyEmail;
 import com.example.backend.infrastructure.database.entity.ArticleStockImpactEntity;
 import com.example.backend.infrastructure.database.entity.UserEntity;
+import com.example.backend.infrastructure.database.entity.enums.NotificationSeverity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -180,7 +181,7 @@ public class ArticlesController {
             log.info("Prepared notification payload: {}", payload);
 
             log.info("Sending notification to {} users", affectedUsers.size());
-            webPushNotificationService.notifyAll(affectedUsers, payload);
+            webPushNotificationService.notifyAll(affectedUsers, payload, NotificationSeverity.fromValue(impact.getImpact()));
 
             return ResponseEntity.ok().body(new CustomApiResponse(
                     "Article processed successful", HttpStatus.OK.value(), impact
