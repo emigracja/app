@@ -69,7 +69,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - BACKEND_URL=${FRONTEND_API_URL}
-      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_SECRET=${JWT_SECRET}
     ports:
       - "3000:3000"
     depends_on:
