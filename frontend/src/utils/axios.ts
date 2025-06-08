@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 const backendURL = process.env.BACKEND_URL || "http://localhost:8080";
 
 const axiosInstance = axios.create({
-  baseURL: backendURL,
+  baseURL: '/api',
 });
 
 axiosInstance.interceptors.request.use(

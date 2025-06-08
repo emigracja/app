@@ -1,5 +1,3 @@
-import { InterfaceSettings } from "@/storage/default/interface";
-import { ChartSettings } from "@/storage/default/chats";
 import { NotificationSettings } from "@/storage/default/notifications";
 
 export interface SettingDetail<T> {

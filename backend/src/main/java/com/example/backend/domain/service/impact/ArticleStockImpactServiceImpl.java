@@ -15,7 +15,15 @@ public class ArticleStockImpactServiceImpl implements ArticleStockImpactService 
     @Override
     public ArticleStockImpactEntity processImpact(ArticleStockImpactDto dto) {
         ArticleStockImpactEntity mapped = ArticleStockImpactMapper.map(dto);
-        return articleStockImpactJpaRepository.save(mapped);
+        articleStockImpactJpaRepository.save(mapped);
+        return mapped;
     }
 
+    @Override
+    public ArticleStockImpactEntity getAnyImpact() {
+        return articleStockImpactJpaRepository.findAll()
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
 }

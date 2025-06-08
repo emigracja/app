@@ -1,117 +1,82 @@
 "use client";
-import React, { ReactElement, useState, useEffect } from "react";
-import { SettingDetail } from "@/storage/storage.types";
-import { setUserSettings } from "@/storage/settings.storage";
 
-export interface SettingGroupProps {
-  name: string;
-  settings: {
-    [sectionName: string]: {
-      [settingName: string]: SettingDetail<any>;
-    };
-  };
-}
+import React, { ReactElement, useCallback, useEffect } from "react";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { NotificationSeverity, useSettingsStore } from "@/store/useSettingsStore";
+import SettingRow from "@/components/settings/SettingsRow";
 
-const capitalizeFirstLetter = (inputString: string) => {
-  if (!inputString) {
-    return "";
-  }
+const SettingGroup = (): ReactElement => {
+    const { status, subscribe, unsubscribe, isSupported, updateSeverity } = usePushNotifications();
+    const { notificationsEnabled, severity, setNotificationsEnabled, setSeverity } = useSettingsStore();
 
-  return inputString.charAt(0).toUpperCase() + inputString.slice(1);
-};
+    useEffect(() => {
+        setNotificationsEnabled(status === 'subscribed');
+    }, [status, setNotificationsEnabled]);
 
-const SettingGroup = ({
-  name,
-  settings,
-}: SettingGroupProps): ReactElement | null => {
-  const sectionName = Object.keys(settings)[0];
-  const initialValues = settings[sectionName];
+    const handleNotificationToggle = useCallback(async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const shouldEnable = e.target.value === 'On';
 
-  const [currentSectionSettings, setCurrentSectionSettings] =
-    useState(initialValues);
+        try {
+            if (shouldEnable) {
+                await subscribe();
+            } else {
+                await unsubscribe();
+            }
+        } catch (error) {
+            console.error("Failed to update push notification status:", error);
+        }
+    }, [subscribe, unsubscribe]);
 
-  useEffect(() => {
-    const updatedValues = settings[sectionName];
-    if (updatedValues) {
-      setCurrentSectionSettings(updatedValues);
-    }
-  }, [JSON.stringify(settings[sectionName]), sectionName]);
+    const handleSeverityChange = useCallback(async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSeverity = e.target.value as NotificationSeverity;
 
-  const handleSettingChange = (
-    settingName: string,
-    newValue: string | number | boolean
-  ) => {
-    const updatedSettings = {
-      ...currentSectionSettings,
-      [settingName]: {
-        ...currentSectionSettings[settingName],
-        value: newValue,
-      },
-    };
+        setSeverity(newSeverity);
 
-    setCurrentSectionSettings(updatedSettings);
+        await updateSeverity(newSeverity);
+    }, [setSeverity, updateSeverity]);
 
-    setUserSettings({ [name]: { [sectionName]: updatedSettings } });
-  };
+    const isToggleDisabled = !isSupported || status === 'loading' || status === 'denied';
 
-  return (
-    <div>
-      <h2 className="text-xl font-bold text-white border-b-2 border-gray-600">
-        {name.toUpperCase()}
-      </h2>
+    return (
+        <div>
+            <h2 className="text-xl font-bold text-white border-b-2 border-gray-600 pb-2">
+                NOTIFICATIONS
+            </h2>
 
-      <div className="flex gap-3 text-md flex-col align-center capitalize p-4 mt-2 mb-2">
-        {Object.entries(currentSectionSettings).map(
-          ([settingName, settingData]) => {
-            if (!settingData) return null;
+            <div className="flex flex-col gap-2 p-4 mt-2 mb-2 text-md">
+                <SettingRow
+                    label="Notifications"
+                    value={notificationsEnabled ? 'On' : 'Off'}
+                    onChange={handleNotificationToggle}
+                    disabled={isToggleDisabled}
+                    options={[
+                        { value: 'On', label: 'On' },
+                        { value: 'Off', label: 'Off' },
+                    ]}
+                />
 
-            const possibleValues = Array.isArray(settingData.possibleValues)
-              ? settingData.possibleValues.map(String)
-              : [];
+                {status === 'denied' && (
+                    <p className="text-sm text-red-400 -mt-3 ml-4">
+                        Notifications are blocked in your browser settings.
+                    </p>
+                )}
 
-            const currentValue = String(settingData.value);
-
-            return (
-              <div
-                className="flex font-bold capitalize items-center justify-between border-b border-gray-600"
-                key={settingName}
-              >
-                <label htmlFor={`setting-${sectionName}-${settingName}`}>
-                  {capitalizeFirstLetter(settingName)}
-                </label>
-
-                <div>
-                  <select
-                    id={`setting-${sectionName}-${settingName}`}
-                    onChange={(e) => {
-                      handleSettingChange(settingName, e.target.value);
-                    }}
-                    value={currentValue}
-                    className="block bg-transparent capitalize border border-gray-600 rounded-md px-3 py-1 min-w-40 text-center appearance-none focus:outline-none focus:border-gray-400 pr-6"
-                    style={{
-                      WebkitAppearance: "none",
-                      MozAppearance: "none",
-                      textAlignLast: "center",
-                    }}
-                  >
-                    {possibleValues.map((possibleValue, index) => (
-                      <option
-                        key={index}
-                        value={possibleValue}
-                        className="bg-gray-900 text-center"
-                      >
-                        {capitalizeFirstLetter(possibleValue)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            );
-          }
-        )}
-      </div>
-    </div>
-  );
+                {notificationsEnabled && !isToggleDisabled && (
+                    <SettingRow
+                        label="Severity"
+                        value={severity}
+                        onChange={handleSeverityChange}
+                        options={[
+                            { value: 'severe', label: 'Severe' },
+                            { value: 'high', label: 'High' },
+                            { value: 'medium', label: 'Medium' },
+                            { value: 'low', label: 'Low' },
+                        ]}
+                    />
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default SettingGroup;

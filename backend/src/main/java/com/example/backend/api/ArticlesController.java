@@ -177,6 +177,8 @@ public class ArticlesController {
             log.info("Found {} affected users for stock ID {}", affectedUsers.size(), request.getStockId());
             String payload = webPushNotificationService.prepareMessage(impact);
 
+            log.info("Prepared notification payload: {}", payload);
+
             log.info("Sending notification to {} users", affectedUsers.size());
             webPushNotificationService.notifyAll(affectedUsers, payload);
 

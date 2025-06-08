@@ -20,6 +20,7 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+
   doc:
     api-docs:
       enabled: true
@@ -33,10 +34,12 @@ spring:
   show-actuator: true
 
 jwt:
-  secret: wartosc_domyslna_tylko_dla_dev_nie_produkcja_klucza_sekretnego_ściśle_strzeżonego
+  secret: wartosc_domyslna_Dtylko_dla_dev_nie_produkcja_klucza_sekretnego_ściśle_strzeżonego
 vapid:
-  public.key: BKpBiJpEMiFP_DHHjoQuulIVbVPCFS0RrOkIdh3EgEO_awvW7_LQA4iU2x5qhCeHemWQHdu4GWpakdLoqiBp1WA
-  private.key: Kgosx01sBrGh0FazCqS6hRVG-inT4vhnTtk2-Bi9lHk
+  public:
+    key: BMyy-ae7l2txEwSzbhyEINemj6ZMGbXsb_8RPU6VPeyfbOnEF9KwkCrA09EUxntTKkub4Y4BW2W2wYictG2KJY4
+  private:
+    key: y7y9_rdrsZCsj1TyK_RSbkeT_okTBioCxbFEYOgUhPU
   subject: mailto:dummy@yourdomain.com
 
 article:

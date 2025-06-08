@@ -2,11 +2,13 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthConfig, User as NextAuthUser } from "next-auth";
+import axios from "@/utils/axios";
 
 export const config: NextAuthConfig = {
   trustHost: true,
   pages: {
     signIn: "/login",
+    error: "/login?error=CredentialsSignin",
   },
   providers: [
     CredentialsProvider({
@@ -30,49 +32,37 @@ export const config: NextAuthConfig = {
 
         try {
           console.log("Attempting backend login for:", email);
-          console.log(`${process.env.BACKEND_URL}/users/auth/login`)
-          const response = await fetch(
-              `${process.env.BACKEND_URL}/users/auth/login`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-              }
+          console.log(`${process.env.BACKEND_URL}/users/auth/login`);
+
+          // --- REPLACED FETCH WITH AXIOS ---
+          const response = await axios.post(
+              `http://backend:8080/users/auth/login`,
+              { email, password } // axios automatically handles JSON stringification
           );
 
-          if (response.ok) {
-            const backendAuthResponse = await response.json(); // Expects { token: "string" }
-            console.log("Backend login successful:", backendAuthResponse.data);
+          // With axios, a successful request (2xx status) will land here.
+          // The response data is already parsed as JSON and available in `response.data`.
+          const backendAuthResponse = response.data;
+          console.log("Backend login successful:", backendAuthResponse.data);
 
-            if (!backendAuthResponse.data.token) {
-              console.error("Backend response is missing token");
-              return null;
-            }
-
-            const backendToken = backendAuthResponse.data.token as string;
-
-            console.log(backendToken)
-
-            return {
-              id: backendToken,
-              email: null,
-              name: null,
-            };
-
-          } else {
-            const errorData = await response.json().catch(() => ({ message: "Unknown error from backend" }));
-            console.error(
-                "Backend login failed:",
-                response.status,
-                response.statusText,
-                errorData
-            );
+          if (!backendAuthResponse.data.token) {
+            console.error("Backend response is missing token");
             return null;
           }
+
+          const backendToken = backendAuthResponse.data.token as string;
+
+          console.log(backendToken);
+
+          return {
+            id: backendToken,
+            email: null,
+            name: null,
+          };
+
         } catch (err) {
-          console.error("Error during backend login request:", err);
+          // axios throws an error for any non-2xx status code.
+          // We can inspect the error object to get details about the failed response.
           return null;
         }
       },
@@ -81,20 +71,18 @@ export const config: NextAuthConfig = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
 
-        if (user .backendToken) {
-          token.backendToken = (user ).backendToken as string;
+        if (user.backendToken) {
+          token.backendToken = (user).backendToken as string;
         }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-
         session.user.id = token.id as string;
         session.user.email = token.email as string | null;
         session.user.name = token.name as string | null;

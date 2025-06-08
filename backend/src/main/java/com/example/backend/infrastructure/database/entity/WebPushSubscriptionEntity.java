@@ -1,9 +1,8 @@
 package com.example.backend.infrastructure.database.entity;
 
+import com.example.backend.infrastructure.database.entity.enums.NotificationSeverity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import nl.martijndwars.webpush.Subscription;
 
 @Entity
@@ -11,6 +10,8 @@ import nl.martijndwars.webpush.Subscription;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 public class WebPushSubscriptionEntity {
 
     @Id
@@ -20,13 +21,17 @@ public class WebPushSubscriptionEntity {
     private String p256dh;
     @Column(name = "auth", nullable = false)
     private String auth;
-
     @Column(name= "endpoint", nullable = false)
     private String endpoint;
-
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity userEntity;
+    @Column(name = "device_id", unique = true, nullable = false)
+    private String deviceId;
+    @Column(name = "severity_level", nullable = false)
+    private NotificationSeverity severityLevel;
 
     public Subscription toWebPushSubscription() {
         return new Subscription(
