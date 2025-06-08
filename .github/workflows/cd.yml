@@ -9,27 +9,30 @@ on:
 
 jobs:
   test:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - name: Init .env
-          run: cp .env.example .env
-        - name: Init compose
-          run: cp compose.local.yaml compose.yaml
-        - name: Start Docker Compose services
-          run: docker compose up -d
+    name: Testy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Init .env
+        run: cp .env.example .env
+      - name: Init compose
+        run: cp compose.local.yaml compose.yaml
+      - name: Start Docker Compose services
+        run: docker compose up -d
 
-        - name: Check service health
-          uses: jaracogmbh/docker-compose-health-check-action@v1.0.0
-          with:
-            max-retries: 6
-            retry-interval: 5
-            compose-file: "compose.yaml"
-            skip-exited: "false"
-            skip-no-healthcheck: "false"
+      - name: Check service health
+        uses: jaracogmbh/docker-compose-health-check-action@v1.0.0
+        with:
+          max-retries: 6
+          retry-interval: 5
+          compose-file: "compose.yaml"
+          skip-exited: "false"
+          skip-no-healthcheck: "false"
 
   deploy:
+    name: Deploy na proda
     runs-on: ubuntu-latest
+    needs: test 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -42,7 +45,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            sudo su 
             cd /var/www/app
-            git pull
-            docker-compose up -d --build
+            sudo git pull
+            sudo docker compose up -d --build
