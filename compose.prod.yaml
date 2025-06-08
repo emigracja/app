@@ -141,6 +141,20 @@ services:
       - tarantula
     expose:
       - "6379"
+  
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx_proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - tarantula
+    depends_on:
+      - backend
+      - frontend
 
 networks:
   tarantula:
