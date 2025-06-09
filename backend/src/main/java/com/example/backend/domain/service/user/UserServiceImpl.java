@@ -48,6 +48,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity findUserByEmail(String email) {
+        return userJpaRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    @Override
     public Optional<UserEntity> findUserById(String id) {
         return userJpaRepository.findById(id);
     }

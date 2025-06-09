@@ -34,7 +34,7 @@ public class JwtUtils {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 days
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .signWith(getSignKey())
                 .compact();
     }
 

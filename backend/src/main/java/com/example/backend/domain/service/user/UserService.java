@@ -15,4 +15,7 @@ public interface UserService {
     Optional<UserEntity> findUserById(String id);
 
     List<UserEntity> findAllByStocksId(String stockId);
+
+    UserEntity findUserByEmail(String email);
 }
+

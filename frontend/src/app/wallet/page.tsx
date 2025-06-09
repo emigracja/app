@@ -1,23 +1,24 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import StockList from "@/components/stocks/StockList";
 import NewsList from "@/components/news/NewsList";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 import Link from "next/link";
 import Image from "next/image";
+import { BeatLoader } from "react-spinners";
+import NewsFilters from "@/components/news/NewsFilters";
 import filter from "../../../public/icons/filter.svg";
 import Loader from "@/components/loader/Loader";
 import axiosInstance from "@/utils/axios";
+import { News } from "@/types/news";
+import useStore from "@/store/useStore";
 
-const fetchNews = async () => {
-  try {
-    const response = await axiosInstance.get(`/user/articles`);
-    return response.data;
-  } catch (err) {
-    throw new Error(`Error fetching articles: ${err}`);
-  }
-};
+interface FetchResponse {
+  data: News[];
+  nextPage: number | null | undefined; // The page number for the *next* fetch, or null/undefined if no more pages
+}
 
 const fetchStocks = async () => {
   try {
@@ -31,12 +32,61 @@ const fetchStocks = async () => {
 const Wallet = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const scrollContainer = useRef<HTMLDivElement | null>(null);
+  const [searchParams, setSearchParams] = useState<{ [key: string]: string }>(
+    {}
+  );
 
-  const newsQuery = useQuery({
-    queryKey: ["usernews"],
+  const { ref, inView } = useInView({});
+  const filtersContainer = useRef<HTMLDivElement | null>(null);
+  const filtersOpen = useStore((state) => state.filtersOpen);
+  const setFiltersOpen = useStore((state) => state.setFiltersOpen);
+
+  const fetchNews = async ({ pageParam = 0 }): Promise<FetchResponse> => {
+    const filteredSearchParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([_, value]) => value !== "")
+    );
+    const params = new URLSearchParams({
+      page: String(pageParam),
+      ...filteredSearchParams,
+    });
+    console.log(params.toString());
+    try {
+      const response = await axiosInstance.get(
+        `/user/articles?${params.toString()}`
+      );
+
+      const articles = response.data || [];
+      const hasMore = articles.length > 0;
+      console.log(articles);
+      return {
+        data: articles,
+        nextPage: hasMore ? pageParam + 1 : undefined,
+      };
+    } catch (err) {
+      console.error("Error fetching news:", err);
+      throw err;
+    }
+  };
+
+  const newsQuery = useInfiniteQuery<FetchResponse, Error>({
+    queryKey: ["usernews", searchParams],
     queryFn: fetchNews,
+    getNextPageParam: (lastPage: any) => {
+      // lastPage is the result returned by fetchNews for the last page fetched
+      return lastPage.nextPage;
+    },
   });
-  const news = newsQuery.data;
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status, // 'loading', 'error', 'success'
+    refetch,
+  } = newsQuery;
+
+  const news = data;
 
   const stocksQuery = useQuery({
     queryKey: ["userstocks"],
@@ -44,7 +94,17 @@ const Wallet = () => {
   });
   const stocks = stocksQuery.data;
 
+  // Effect to fetch next page when the ref element comes into view
   useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    let intervalId: number;
+    let added = false;
+
     const handleScroll = () => {
       if (scrollContainer.current) {
         const scrollLeft = scrollContainer.current.scrollLeft;
@@ -57,15 +117,38 @@ const Wallet = () => {
 
     const scrollContCurrent = scrollContainer.current;
 
-    if (scrollContainer.current) {
-      scrollContainer.current.addEventListener("scroll", handleScroll);
-    }
+    const tryAddListener = () => {
+      const el = scrollContainer.current;
+      if (el && !added) {
+        el.addEventListener("scroll", handleScroll);
+        added = true;
+        clearInterval(intervalId);
+      }
+    };
+
+    intervalId = window.setInterval(tryAddListener, 100); // check every 100ms
 
     return () => {
       if (scrollContCurrent) {
         scrollContCurrent.removeEventListener("scroll", handleScroll);
       }
     };
+  }, []);
+
+  // Effect to open or close filters
+  useEffect(() => {
+    if (filtersContainer.current) {
+      if (filtersOpen) {
+        filtersContainer.current.style.display = "block";
+      } else {
+        filtersContainer.current.style.display = "none";
+      }
+    }
+  }, [filtersOpen]);
+
+  const onSubmit = useCallback((params: { [key: string]: string }) => {
+    setSearchParams(params);
+    setFiltersOpen(false);
   }, []);
 
   const isLoading = newsQuery.isLoading || stocksQuery.isLoading;
@@ -86,6 +169,17 @@ const Wallet = () => {
   if (isLoading) {
     return <Loader />;
   }
+
+  if (status === "error") {
+    return (
+      <div className="my-5 text-center text-white opacity-70">
+        Error loading news: {error?.message}
+      </div>
+    );
+  }
+
+  const allNews = news?.pages.flatMap((page: any) => page.data) ?? [];
+
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
       <section
@@ -111,10 +205,27 @@ const Wallet = () => {
                   alt="filter"
                   height={40}
                   width={40}
+                  onClick={() => setFiltersOpen(!filtersOpen)}
                 />
               </Link>
             </div>
-            <NewsList news={news} />
+            <div className="hidden" ref={filtersContainer}>
+              <NewsFilters onSubmit={onSubmit} />
+            </div>
+            <NewsList news={allNews} />
+            <div
+              ref={ref}
+              className="h-[50px] text-center text-white opacity-70"
+            >
+              {isFetchingNextPage ? (
+                <span className="flex align-middle justify-center w-full mt-15">
+                  <BeatLoader
+                    className="flex align-middle justify-center"
+                    color="white"
+                  />
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>

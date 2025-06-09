@@ -2,5 +2,4 @@
 .idea
 .next
 compose.override.yaml
-.env.example
-.gitignore
+compose.yaml 

@@ -18,14 +18,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class DevArticleFetcher extends ArticleFetcher {
 
-    @Value("${article.scheduler.fixed-rate:10000000}")
-    private long fixedRate;
+    private long fixedRate = 100000;
 
     public DevArticleFetcher(WebClient webClient, ArticleService articleService, ArticleApiService articleApiService) {
         super(webClient, articleService, articleApiService);
     }
 
-    @Scheduled(fixedRateString = "${article.scheduler.fixed-rate:10000000}")
+    @Scheduled(fixedRateString = "100000")
     public void scheduleFetchArticles() {
         log.info("DEV environment: Running article fetch with fixed rate of {} ms", fixedRate);
         fetchArticles();

@@ -102,12 +102,12 @@ MODEL_PRICING = {
         "cached_input_per_million": 0.025,
         "output_per_million": 0.400,
     },
-    "anthropic/claude-sonnet-4-20250514": {  # Updated key
+    "anthropic/claude-sonnet-4-20250514": {
         "input_per_million": 3.00,
         "cached_input_per_million": 0.30,
         "output_per_million": 15.00,
     },
-    "anthropic/claude-3-5-haiku-20241022": {  # Updated key
+    "anthropic/claude-3-5-haiku-20241022": {
         "input_per_million": 0.80,
         "cached_input_per_million": 0.08,
         "output_per_million": 4.00,

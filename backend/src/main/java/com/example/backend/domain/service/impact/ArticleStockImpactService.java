@@ -5,4 +5,6 @@ import com.example.backend.infrastructure.database.entity.ArticleStockImpactEnti
 
 public interface ArticleStockImpactService {
     ArticleStockImpactEntity processImpact(ArticleStockImpactDto request);
+
+    ArticleStockImpactEntity getAnyImpact();
 }

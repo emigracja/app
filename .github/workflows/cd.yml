@@ -1,0 +1,51 @@
+# .github/workflows/cd.yml
+name: CD - Deploy to Production
+
+# Trigger: uruchamiaj workflow tylko po pushu do gałęzi 'main'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Testy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Init .env
+        run: cp .env.example .env
+      - name: Init compose
+        run: cp compose.local.yaml compose.yaml
+      - name: Start Docker Compose services
+        run: docker compose up -d
+
+      - name: Check service health
+        uses: jaracogmbh/docker-compose-health-check-action@v1.0.0
+        with:
+          max-retries: 6
+          retry-interval: 5
+          compose-file: "compose.yaml"
+          skip-exited: "false"
+          skip-no-healthcheck: "false"
+
+  deploy:
+    name: Deploy na proda
+    runs-on: ubuntu-latest
+    needs: test 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /var/www/app
+            sudo git pull
+            sudo cp compose.prod.yaml compose.yaml
+            sudo docker compose up -d --build

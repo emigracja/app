@@ -5,7 +5,6 @@ import { Currency, Period, CandlestickData } from "@/types/stocks";
 import Image from "next/image";
 import favEmpty from "../../../public/icons/favEmpty.svg";
 import favFilled from "../../../public/icons/favFilled.svg";
-import notification from "../../../public/icons/notification.svg";
 import PreviewChart from "./PreviewChart";
 import PreviewPrice from "./PreviewPrice";
 import StockName from "./StockName";

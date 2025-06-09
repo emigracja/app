@@ -20,8 +20,8 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     depends_on:
       - rabbitmq
     volumes:
@@ -36,8 +36,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: radomDB
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     networks:
       - tarantula
     volumes:
@@ -55,27 +55,32 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - ARTICLE_SCHEDULER_FIXED_RATE=${ARTICLE_SCHEDULER_FIXED_RATE}
       - ARTICLE_SCHEDULER_CRON=${ARTICLE_SCHEDULER_CRON}
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       - postgres-db
       - ai
     networks:
-      - tarantula
+      tarantula:
+        ipv4_address: 10.213.7.11
 
   frontend:
     build:
       context: frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    environment:
+      - BACKEND_URL=${FRONTEND_API_URL}
+      - AUTH_SECRET=${JWT_SECRET}
+    expose:
+      - "3000"
     depends_on:
       - backend
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     networks:
-      - tarantula
+      tarantula:
+        ipv4_address: 10.213.7.69
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -85,9 +90,9 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./ai/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+    expose:
+      - "15672"
+      - "5672"
     networks:
       - tarantula
 
@@ -136,10 +141,29 @@ services:
       - tarantula
     expose:
       - "6379"
+  
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - tarantula
+    depends_on:
+      - backend
+      - frontend
 
 networks:
   tarantula:
-
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.213.7.0/24"
+          gateway: "10.213.7.1"
 
 volumes:
   postgres_data:
