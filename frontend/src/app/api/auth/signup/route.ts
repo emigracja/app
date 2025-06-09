@@ -26,16 +26,6 @@ async function createUser(userData: {
     });
 
     if (!response.ok) {
-      console.log(await response.json());
-      console.log(
-        JSON.stringify({
-          password: userData.password,
-          email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          phone: userData.phone,
-        })
-      );
       throw new Error(`Rejestracja nie powiodła się`);
     }
 
