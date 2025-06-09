@@ -35,7 +35,7 @@ export const config: NextAuthConfig = {
 
           // --- REPLACED FETCH WITH AXIOS ---
           const response = await axios.post(
-            `http://backend:8080/users/auth/login`,
+            `${process.env.BACKEND_URL}/users/auth/login`,
             { email, password } // axios automatically handles JSON stringification
           );
 
