@@ -32,12 +32,11 @@ export const config: NextAuthConfig = {
 
         try {
           console.log("Attempting backend login for:", email);
-          console.log(`${process.env.BACKEND_URL}/users/auth/login`);
 
           // --- REPLACED FETCH WITH AXIOS ---
           const response = await axios.post(
-              `http://backend:8080/users/auth/login`,
-              { email, password } // axios automatically handles JSON stringification
+            `http://backend:8080/users/auth/login`,
+            { email, password } // axios automatically handles JSON stringification
           );
 
           // With axios, a successful request (2xx status) will land here.
@@ -52,14 +51,11 @@ export const config: NextAuthConfig = {
 
           const backendToken = backendAuthResponse.data.token as string;
 
-          console.log(backendToken);
-
           return {
             id: backendToken,
             email: null,
             name: null,
           };
-
         } catch (err) {
           // axios throws an error for any non-2xx status code.
           // We can inspect the error object to get details about the failed response.
@@ -76,7 +72,7 @@ export const config: NextAuthConfig = {
         token.name = user.name;
 
         if (user.backendToken) {
-          token.backendToken = (user).backendToken as string;
+          token.backendToken = user.backendToken as string;
         }
       }
       return token;

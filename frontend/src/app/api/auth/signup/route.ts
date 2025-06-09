@@ -42,8 +42,6 @@ async function createUser(userData: {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("--------------------------------------------");
-    console.log(body);
     const { email, password, firstName, lastName, phone } = body;
 
     // --- Input Validation ---
