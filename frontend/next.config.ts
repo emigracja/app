@@ -13,23 +13,24 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'galeria.bankier.pl',
-        pathname: '/**',
+        protocol: "http",
+        hostname: "galeria.bankier.pl",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'ipla.pluscdn.pl',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "ipla.pluscdn.pl",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'www.polsatnews.pl',
-        pathname: '/**',
-      }
+        protocol: "https",
+        hostname: "www.polsatnews.pl",
+        pathname: "/**",
+      },
     ],
   },
   reactStrictMode: true,
+  output: "standalone",
 
   // --- START: PROXY CONFIGURATION CORRECTED ---
   async rewrites() {
@@ -38,12 +39,12 @@ const nextConfig = {
         // MODIFIED: This source uses a compatible custom regex for the `:path` parameter.
         // It tells Next.js to match any path under `/api/` where the path
         // itself does not start with `auth`.
-        source: '/api/:path((?!auth).*)',
+        source: "/api/:path((?!auth).*)",
 
         // The destination remains the same, proxying to your backend.
-        destination: 'http://backend:8080/:path*',
+        destination: "http://backend:8080/:path*",
       },
-    ]
+    ];
   },
   // --- END: PROXY CONFIGURATION CORRECTED ---
 

@@ -76,7 +76,6 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     networks:
       tarantula:
@@ -141,7 +140,7 @@ services:
       - tarantula
     expose:
       - "6379"
-  
+
   nginx-proxy:
     image: nginx:latest
     container_name: nginx-proxy

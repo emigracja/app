@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation"; // Use next/navigation for App Router
+import { useRouter } from "next/navigation"; // Use next/navigation for App Router
+import Loader from "@/components/loader/Loader";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Get callback URL from query parameters, default to dashboard
-  const callbackUrl = searchParams.get("callbackUrl") || "/wallet";
+  const callbackUrl = "/wallet";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
