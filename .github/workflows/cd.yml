@@ -46,6 +46,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /var/www/app
-            sudo git pull
-            sudo cp compose.prod.yaml compose.yaml
-            sudo docker compose up -d --build
+            sudo git pull && sudo cp compose.prod.yaml compose.yaml && sudo docker compose up -d --build
