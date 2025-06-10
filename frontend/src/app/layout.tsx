@@ -12,14 +12,14 @@ const mavenPro = Maven_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Your app name",
-  description: "Your app description",
+  title: "NICE News",
+  description: "NICE News",
   generator: "Next.js",
   manifest: "/manifest.json",
   keywords: ["nextjs", "next14", "pwa", "next-pwa"],
   icons: [
-    { rel: "apple-touch-icon", url: "icon-192x192.png" },
-    { rel: "icon", url: "icon-192x192.png" },
+    { rel: "apple-touch-icon", url: "/icons/logo.svg" },
+    { rel: "icon", url: "/icons/logo.svg" },
   ],
 };
 
