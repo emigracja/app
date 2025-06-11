@@ -10,8 +10,8 @@ const NavBar = (): ReactElement => {
     const icons = [
         {src: home, alt: "news"},
         {src: stocks, alt: "stocks"},
-        {src: wallet, alt: "wallet"},
-        {src: ai, alt: "ai"}
+        {src: ai, alt: "ai"},
+        {src: wallet, alt: "wallet"}
     ];
     return (
         <nav className="flex w-full justify-center align-center box-border bg-white/5 h-[80px]">

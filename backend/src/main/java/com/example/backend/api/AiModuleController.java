@@ -9,6 +9,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/ai")
 @AllArgsConstructor
@@ -49,5 +51,27 @@ public class AiModuleController {
                 .bodyToMono(String.class)
                 .doOnSuccess(responseText -> log.info("Successfully received transcription: {}", responseText))
                 .doOnError(error -> log.error("Error forwarding file to AI module: {}", error.getMessage()));
+    }
+
+    @PostMapping("/parse")
+    public Mono<String> parseText(@RequestParam("text") String text) {
+        if (text == null || text.isEmpty()) {
+            return Mono.error(new IllegalArgumentException("Received empty text for parsing."));
+        }
+
+        log.info("Received text for parsing: {}", text);
+
+        Map<String, String> requestBody = Map.of("text", text);
+
+        return webClient.mutate()
+                .baseUrl(AI_URL)
+                .build()
+                .post()
+                .uri("/commands/parse")
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(responseText -> log.info("Successfully parsed text: {}", responseText))
+                .doOnError(error -> log.error("Error parsing text: {}", error.getMessage()));
     }
 }
