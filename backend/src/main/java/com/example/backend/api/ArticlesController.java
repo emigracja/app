@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.Severity;
 import java.security.Principal;
 import java.util.List;
 
@@ -171,6 +172,13 @@ public class ArticlesController {
             log.info("Processing impact for article {}: {}", articleId, request);
             request.setArticleId(articleId);
            ArticleStockImpactEntity impact = stockImpactService.processImpact(request);
+
+           if(impact.getImpact().equals(NotificationSeverity.NONE.getValue())) {
+                log.info("No significant impact detected for article {}", articleId);
+                return ResponseEntity.ok().body(new CustomApiResponse(
+                        "No significant impact detected", HttpStatus.OK.value(), impact
+                ));
+            }
 
             List<UserEntity> affectedUsers = userService.findAllByStocksId(request.getStockId());
 

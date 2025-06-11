@@ -15,7 +15,7 @@ public class PolsatNewsRssFetcher extends RssFetcher<PolastNewsRssObject> implem
 
     private final PolsatNewsRssNewsMapper polsatNewsRssNewsMapper;
 
-    private static final String RSS_URL = "https://www.polsatnews.pl/rss/wszystkie.xml";
+    private static final String RSS_URL = "https://www.polsatnews.pl/rss/biznes.xml";
 
     @Override
     public List<ArticleDto> fetch() {

@@ -8,7 +8,8 @@
  * public class Message {
  * private String title;       // -> Notification Title
  * private String description; // -> Notification Body
- * private String slug;       // -> Used to build the click URL (e.g., /articles/slug)
+ * private String stock;       // -> Stock Symbol (e.g., AAPL, TSLA)
+ * private String slug;       // -> Used to build the click URL (e.g., /news/slug)
  * }
  * =================================================================
  */
@@ -24,14 +25,16 @@ self.addEventListener('push', function (event) {
             pushData = {
                 title: 'New Update',
                 description: 'Something new has happened!',
-                stock: null
+                stock: null,
+                slug: null
             };
         }
     } else {
         pushData = {
             title: 'New Update',
             description: 'Something new has happened!',
-            stock: null
+            stock: null,
+            slug: null
         };
     }
 
@@ -40,7 +43,7 @@ self.addEventListener('push', function (event) {
         icon: '/icons/logo.svg',
         badge: '/icons/logo.svg',
         data: {
-            url: pushData.stock ? `/stocks/${pushData.stock}` : '/'
+            url: pushData.slug ? `/news/${pushData.slug}` : '/'
         }
     };
 
