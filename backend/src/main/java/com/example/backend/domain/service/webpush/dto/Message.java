@@ -11,6 +11,7 @@ public class Message {
     private String title;
     private String description;
     private String stock;
+    private String slug;
 
     @SneakyThrows
     public String toJson() {

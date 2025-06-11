@@ -49,6 +49,7 @@ public class WebPushNotificationService {
         ArticleEntity article = articleStockImpactEntity.getArticle();
 
         return Message.builder()
+                .slug(article.getSlug())
                 .stock(stock.getSymbol())
                 .description(article.getDescription())
                 .title(article.getTitle())

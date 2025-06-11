@@ -13,7 +13,9 @@ import reactor.core.Disposable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -56,7 +58,10 @@ public abstract class ArticleFetcher {
     }
 
     private List<ArticleDto> saveArticles(List<ArticleDto> articles) {
-        return articleService.saveAll(articles);
+        Set<String> uniqueSlugs = new HashSet<>();
+        return articleService.saveAll(articles.stream()
+                .filter(article -> uniqueSlugs.add(article.getSlug()))
+                .toList());
     }
 
     private void sendArticlesToAI(List<ArticleDto> savedArticles) {
