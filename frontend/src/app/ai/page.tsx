@@ -5,6 +5,8 @@ import mic from "../../../public/icons/mic.svg";
 import React from "react";
 import {RiseLoader} from "react-spinners";
 import MicrophonePopup from "@/components/microphone/MicrophonePopup";
+import axiosInstance from "@/utils/axios";
+import axios from "axios";
 
 
 const AiPage = () => {
@@ -15,14 +17,45 @@ const AiPage = () => {
 
     const sendRequest = () => {
         setSending(true);
-        // Here you would typically make an API call with the 'text' state
-        console.log("Sending text to AI:", text);
-        setTimeout(() => {
+        if (text.trim() === "") {
+            console.error("Text input is empty");
             setSending(false);
-        }, 1500);
+            return;
+        }
+        parse(text);
     }
 
-    // CORRECTED: This function's only job is to close the popup.
+    const parse = async (text: string) => {
+        const formData = new FormData();
+        formData.append("file", text);
+
+        try {
+            const body = new URLSearchParams();
+            body.append('text', text);
+
+            const response = await axiosInstance.post(
+                "/ai/parse",
+                body,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }
+            );
+
+            const parsed = response.data.data.intent;
+            console.log("Parsed intent:", parsed);
+            location.pathname = `/${parsed}`;
+
+        } catch (uploadError) {
+            if (axios.isAxiosError(uploadError) && uploadError.response) {
+                console.error("Error response from server:", uploadError.response.data);
+            } else {
+                console.error("Error parsing:", uploadError);
+            }
+        }
+    }
+
     const closeRecordingPopUp = () => {
         setRecordingOpen(false);
     }
@@ -57,7 +90,7 @@ const AiPage = () => {
                     <RiseLoader className="opacity-80" color={"white"} loading={isSending}/>
                 </section>
             </section>
-            {isRecordingOpen ?  <MicrophonePopup onTranscriptionComplete={setText} onClose={closeRecordingPopUp}/> : null}
+            {isRecordingOpen ?  <MicrophonePopup onTranscriptionComplete={parse} onClose={closeRecordingPopUp}/> : null}
         </>
     );
 };

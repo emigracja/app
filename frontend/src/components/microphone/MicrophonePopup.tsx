@@ -4,6 +4,8 @@ import Image from "next/image";
 import { PuffLoader } from "react-spinners";
 import { useState, useEffect, useRef } from "react";
 import MicRecorder from "mic-recorder-to-mp3";
+import axiosInstance from "@/utils/axios";
+import axios from "axios";
 
 interface Props {
     onClose: () => void;
@@ -36,7 +38,6 @@ const MicrophonePopup = ({ onClose, onTranscriptionComplete }: Props) => {
         if (recorderRef.current) {
             setIsRecording(false);
 
-            // The .then() block can be async to allow for 'await'
             recorderRef.current.stop().getMp3()
                 .then(async ([buffer, blob]) => {
                     const fileName = `recording-${new Date().toISOString()}.mp3`;
@@ -45,10 +46,9 @@ const MicrophonePopup = ({ onClose, onTranscriptionComplete }: Props) => {
                         lastModified: Date.now()
                     });
 
-                    // Send the MP3 file to the backend and wait for it to finish
+                    // Send the MP3 file to the backend
                     await sendToTranscribeEndpoint(mp3File);
 
-                    // Close the popup *after* the upload process has been initiated
                     onClose();
                 })
                 .catch((e) => {
@@ -63,20 +63,19 @@ const MicrophonePopup = ({ onClose, onTranscriptionComplete }: Props) => {
         formData.append("file", file);
 
         try {
-            const response = await fetch("http://localhost:8080/ai/transcribe", {
-                method: 'POST',
-                body: formData,
-            });
 
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`HTTP error! Status: ${response.status} - ${errorBody}`);
-            }
+            const response = await axiosInstance.post("/ai/transcribe", formData);
 
-            const result = await response.json();
-            onTranscriptionComplete(result.transcription || "Could not parse transcription.");
+            const transcription = response.data.transcription;
+            onTranscriptionComplete(transcription || "Could not parse transcription.");
+
         } catch (uploadError) {
-            console.error("Error uploading file:", uploadError);
+            if (axios.isAxiosError(uploadError) && uploadError.response) {
+                console.error("Error response from server:", uploadError.response.data);
+            } else {
+                console.error("Error uploading file:", uploadError);
+            }
+            onTranscriptionComplete("Error: Transcription failed.");
         }
     };
 
