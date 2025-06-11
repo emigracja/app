@@ -70,7 +70,6 @@ const SettingGroup = (): ReactElement => {
                             { value: 'severe', label: 'Severe' },
                             { value: 'high', label: 'High' },
                             { value: 'medium', label: 'Medium' },
-                            { value: 'low', label: 'Low' },
                         ]}
                     />
                 )}

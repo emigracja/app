@@ -45,7 +45,14 @@ const AiPage = () => {
 
             const parsed = response.data.data.intent;
             console.log("Parsed intent:", parsed);
-            location.pathname = `/${parsed}`;
+
+            if(parsed !== 'unknown') {
+                location.pathname = `/${parsed}`;
+            }
+
+            setSending(false);
+            setText(text);
+
 
         } catch (uploadError) {
             if (axios.isAxiosError(uploadError) && uploadError.response) {

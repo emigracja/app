@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-export type NotificationSeverity = 'none' | 'low' | 'medium' | 'high' | 'severe';
+export type NotificationSeverity =  'medium' | 'high' | 'severe';
 
 interface SettingsState {
     notificationsEnabled: boolean;
@@ -14,7 +14,7 @@ export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
             notificationsEnabled: false,
-            severity: 'low',
+            severity: 'medium', // Default severity level
 
             setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
             setSeverity: (severity) => set({ severity }),
