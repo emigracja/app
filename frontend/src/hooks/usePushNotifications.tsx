@@ -44,29 +44,23 @@ export function usePushNotifications() {
     const activate = useCallback(async () => {
         console.log("Attempting to activate notifications...");
         if (!isSupported) {
-            console.log("Push notifications not supported, skipping activation.");
             return;
         }
         try {
             await apiClient.get('/notifications/activate');
-            console.log("Successfully activated notifications with the backend.");
         } catch (err) {
             console.error("Failed to activate notifications:", err);
         }
     }, [isSupported]);
 
     useEffect(() => {
-        console.log("usePushNotifications effect started. Determining initial status...");
-
         const determineInitialStatus = async () => {
             if (!isSupported) {
-                console.log("Status check: Browser does not support push notifications.");
                 setStatus('unsupported');
                 return;
             }
 
             if (isIOS && !isInStandaloneMode()) {
-                console.log("Status check: iOS device not in standalone mode.");
                 setStatus('needs_home_screen');
                 return;
             }
@@ -112,8 +106,6 @@ export function usePushNotifications() {
         try {
             const registration = await navigator.serviceWorker.ready;
 
-            // --- ✅ KEY CHANGE: Check for existing subscription ---
-            // If a subscription already exists, just activate it and exit.
             const existingSubscription = await registration.pushManager.getSubscription();
             if (existingSubscription) {
                 console.log("Subscription already exists. Activating it instead of re-subscribing.");
@@ -121,7 +113,6 @@ export function usePushNotifications() {
                 await activate();
                 return;
             }
-            // --- End of change ---
 
             if (Notification.permission !== 'granted') {
                 console.log("Requesting notification permission...");
@@ -133,18 +124,14 @@ export function usePushNotifications() {
                 }
             }
 
-            console.log("Fetching VAPID public key from backend...");
             const response = await apiClient.get('/notifications/publicKey');
             const vapidPublicKey = response.data;
             if (!vapidPublicKey || typeof vapidPublicKey !== 'string' || vapidPublicKey.length < 50) {
-                console.error("VAPID key from backend is invalid.", vapidPublicKey);
                 setStatus('prompt');
                 return;
             }
             const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-            console.log("VAPID key received and processed.");
 
-            console.log("Creating new push subscription...");
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey,
@@ -153,7 +140,6 @@ export function usePushNotifications() {
             const subscriptionJSON = subscription.toJSON();
             const deviceId = getOrCreateDeviceId();
 
-            console.log("Sending subscription to backend...");
             await apiClient.post('/notifications/subscribe', {
                 device_id: deviceId,
                 endpoint: subscriptionJSON.endpoint,
@@ -161,20 +147,17 @@ export function usePushNotifications() {
                 auth: subscriptionJSON.keys.auth,
             });
 
-            console.log("Successfully subscribed.");
             setStatus('subscribed');
         } catch (err) {
-            console.error("Failed to subscribe:", err);
             if (Notification.permission === 'denied') {
                 setStatus('denied');
             } else {
                 setStatus('prompt');
             }
         }
-    }, [isSupported, activate]); // Added activate to the dependency array
+    }, [isSupported, activate]);
 
     const unsubscribe = useCallback(async () => {
-        console.log("Attempting to unsubscribe...");
         if (!isSupported) {
             console.log("Cannot unsubscribe: Push not supported.");
             return;
@@ -183,21 +166,16 @@ export function usePushNotifications() {
         setStatus('loading');
 
         try {
-            console.log("Sending unsubscribe request to backend...");
             await apiClient.delete(`/notifications/unsubscribe`);
-            console.log("Successfully unsubscribed.");
             setStatus('prompt');
         } catch(err) {
-            console.error("Failed to unsubscribe:", err);
             setStatus('subscribed');
         }
     }, [isSupported]);
 
     const requestPermission = useCallback(async () => {
         if ('Notification' in window) {
-            console.log("Requesting notification permission via dedicated function...");
             const permission = await Notification.requestPermission();
-            console.log("Permission result:", permission);
             if (permission === 'granted' && status === 'prompt') {
                 await subscribe();
             } else if (permission === 'denied') {
@@ -207,16 +185,10 @@ export function usePushNotifications() {
     }, [status, subscribe]);
 
     const updateSeverity = useCallback(async (level: NotificationSeverity) => {
-        console.log(`Attempting to update severity level to: ${level}`);
-        // We don't strictly need to check for support/subscription here,
-        // as the backend should handle updates for known subscriptions.
+
         try {
-            // Using the PUT endpoint you provided
             await apiClient.put(`/notifications/severityLevel/${level}`);
-            console.log("Successfully updated severity level on the backend.");
         } catch (err) {
-            console.error("Failed to update severity level:", err);
-            // Here you could add logic to revert the severity in the UI on failure
         }
     }, []);
 
@@ -228,5 +200,6 @@ export function usePushNotifications() {
         activate,
         requestPermission,
         isSupported,
+        isIOS,
     };
 }
