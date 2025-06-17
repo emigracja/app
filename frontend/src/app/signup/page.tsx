@@ -52,20 +52,16 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle errors returned from the API
         setError(data.message || "Registration failed. Please try again.");
       } else {
-        // --- Registration Successful ---
 
-        // Automatically log the user in
         const signInResult = await signIn("credentials", {
-          redirect: false, // Don't redirect automatically from signIn
+          redirect: true,
           email,
           password,
         });
 
         if (signInResult?.error) {
-          // Handle sign-in error after successful registration
           console.error(
             "Sign-in after registration failed:",
             signInResult.error
@@ -87,7 +83,13 @@ export default function SignupPage() {
   };
 
   return (
-    <section className="relative block w-full h-full max-w-md mx-auto text-white rounded-xl p-6 sm:p-8 shadow-lg">
+    <section className=" block w-full h-full max-w-md mx-auto text-white rounded-xl p-6 sm:p-8 shadow-lg">
+      { isLoading && (
+      <div className="fixed left-0 top-0 bg-black/50 flex items-center justify-center z-20 w-full h-full">
+        <Loader />
+      </div>
+      )
+      }
       <form
         onSubmit={handleSubmit}
         className="relative z-10 flex flex-col gap-5"
