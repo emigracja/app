@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface WebPushSubscriptionRepository extends JpaRepository<WebPushSubscriptionEntity, String> {
 
-    @Query("SELECT w FROM WebPushSubscriptionEntity w WHERE w.userEntity IN :users AND w.isActive = true AND w.severityLevel > :severityLevel")
+    @Query("SELECT w FROM WebPushSubscriptionEntity w WHERE w.userEntity IN :users AND w.isActive = true AND w.severityLevel <= :severityLevel")
     List<WebPushSubscriptionEntity> findAllByUserEntityInAndActiveIsTrue(
             List<UserEntity> users,
             NotificationSeverity severityLevel
