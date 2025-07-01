@@ -41,7 +41,7 @@ const Card = ({
     <section className="min-h-32 relative block text-xl text-white rounded-xl p-3 box-content">
       <a href={`/news/${slug}`} className="flex flex-col gap-5 justify-end">
         <p className={"text-white font-bold"}>{title}</p>
-        <div className={"flex justify-between content-center"}>
+        <div className={"flex justify-between content-center overflow-hidden"}>
           <div className={"flex gap-2"}>
             {stocks.map((tag) => (
               <Tag key={tag.symbol}>{tag.symbol}</Tag>

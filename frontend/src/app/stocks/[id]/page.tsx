@@ -3,7 +3,7 @@
 import StockName from "@/components/stocks/StockName";
 import Image from "next/image";
 import favEmpty from "../../../../public/icons/favEmpty.svg";
-import notification from "../../../../public/icons/notification.svg";
+import favFilled from "../../../public/icons/favFilled.svg";
 import { Stock } from "@/types/stocks";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
@@ -16,6 +16,7 @@ import axios from "@/utils/axios";
 import { News } from "@/types/news";
 import { BeatLoader } from "react-spinners";
 import Loader from "@/components/loader/Loader";
+import useUserStockStore from "@/store/useUserStockStore";
 
 interface FetchResponse {
   data: News[];
@@ -47,6 +48,7 @@ const fetchStock = async (symbol: string): Promise<Stock> => {
 export default function StockDetail() {
   const params = useParams();
   const id = params.id as string;
+  const { addUserStock, removeUserStock } = useUserStockStore();
 
   const { ref, inView } = useInView({
     // threshold: 0, // Trigger when the element enters the viewport
@@ -178,18 +180,19 @@ export default function StockDetail() {
         <StockName name={stock.name} symbol={stock.symbol} />
         <div className="flex flex-end">
           <Image
-            className="box-border mr-2 rounded-xl active:bg-white/5"
-            src={notification}
-            alt="notification"
-            height={40}
-            width={40}
-          />
-          <Image
             className="box-border rounded-xl active:bg-white/5"
-            src={favEmpty}
+            src={stock.favorite ? favFilled : favEmpty}
             alt="favEmpty"
             height={40}
             width={40}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (stock.favorite) {
+                removeUserStock(stock.symbol);
+              } else {
+                addUserStock(stock.symbol);
+              }
+            }}
           />
         </div>
       </section>
