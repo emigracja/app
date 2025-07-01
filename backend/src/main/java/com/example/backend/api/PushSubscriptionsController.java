@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Severity;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -164,13 +165,12 @@ public class PushSubscriptionsController {
 
 
       webpushNotificationService.notifyAll(
-                      userService.findAllByStocksId(
-                              "069f08ad-1c49-4367-a1be-2c0b41d7a0f7"),
+              List.of(userService.findUserByEmail("test@test.test")),
 
               webpushNotificationService.prepareMessage(
                       articleStockImpactService.getAnyImpact()
               ),
-              NotificationSeverity.LOW
+              NotificationSeverity.MEDIUM
       );
 
         log.info("Test push notification sent successfully.");
