@@ -3,7 +3,7 @@
 import StockName from "@/components/stocks/StockName";
 import Image from "next/image";
 import favEmpty from "../../../../public/icons/favEmpty.svg";
-import favFilled from "../../../public/icons/favFilled.svg";
+import favFilled from "../../../../public/icons/favFilled.svg";
 import { Stock } from "@/types/stocks";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
